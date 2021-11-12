@@ -1,4 +1,4 @@
-# timezoner-discord-bot
+# timezoner
 [![talk to me - join discord server](https://img.shields.io/badge/talk_to_me-join_discord_server-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/RQhskPjrGv)
 
 goodbye to timezone conversions! this bot tries to make sharing times/dates with your friends all over the world easier
