@@ -3,9 +3,8 @@
 
 goodbye to timezone conversions! this bot tries to make sharing times/dates with your friends all over the world easier
 
-## commands
-
-### /set_timezone
+## commands
+### /set_timezone
 yes you need this because time sucks, it's just a one-time copy-paste from [a timezone picker](https://kevinnovak.github.io/Time-Zone-Picker) though
 ### /time
 give it an hour and give it a minute, and it will send a magical little message that shows that time in everyone's own timezone!
