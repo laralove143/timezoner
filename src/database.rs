@@ -16,21 +16,8 @@ impl AsI64 for NonZeroU64 {
 }
 
 pub async fn new() -> Result<SqlitePool> {
-    let db = SqlitePool::connect_with(
-        SqliteConnectOptions::new()
-            .filename("timezoner.sqlite")
-            .create_if_missing(true),
-    )
-    .await?;
-
-    query!(
-        "CREATE TABLE IF NOT EXISTS timezones (
-        user_id INTEGER PRIMARY KEY NOT NULL,
-        timezone TEXT NOT NULL
-    )"
-    )
-    .execute(&db)
-    .await?;
+    let db =
+        SqlitePool::connect_with(SqliteConnectOptions::new().filename("timezoner.sqlite")).await?;
 
     Ok(db)
 }
