@@ -1,5 +1,7 @@
+use std::str::FromStr;
+
 use anyhow::{bail, Result};
-use chrono_tz::{Tz, TZ_VARIANTS};
+use chrono_tz::Tz;
 use sqlx::SqlitePool;
 use twilight_model::{
     application::{
@@ -17,22 +19,18 @@ pub async fn run(
     user_id: UserId,
     options: Vec<CommandDataOption>,
 ) -> Result<String> {
-    let tz = if let CommandOptionValue::String(name) = &options[0].value {
-        match get_timezone(name) {
-            Some(tz) => tz,
-            None => return Ok("i couldn't find that timezone >.< if you're sure it's right see my profile to report please".to_string()),
+    let tz = if let CommandOptionValue::String(tz_name) = &options[0].value {
+        match Tz::from_str(tz_name) {
+            Ok(tz) => tz,
+            Err(_) => return Ok("i couldn't find that timezone >.< if you're sure it's right see my profile to report please".to_string()),
         }
     } else {
         bail!("first option for set_timezone is not string: {:?}", options);
     };
 
-    database::set_timezone(db, user_id, tz).await?;
+    database::set_timezone(db, user_id, &tz).await?;
 
     Ok("tada! now you can use the `/time` command ^^".to_string())
-}
-
-fn get_timezone(name: &str) -> Option<&Tz> {
-    TZ_VARIANTS.iter().find(|tz| name == tz.name())
 }
 
 pub fn build() -> Command {
