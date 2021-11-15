@@ -1,11 +1,10 @@
-# timezoner-discord-bot
+# timezoner
 [![talk to me - join discord server](https://img.shields.io/badge/talk_to_me-join_discord_server-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/RQhskPjrGv)
 
 goodbye to timezone conversions! this bot tries to make sharing times/dates with your friends all over the world easier
 
-## commands
-
-### /set_timezone
+## commands
+### /set_timezone
 yes you need this because time sucks, it's just a one-time copy-paste from [a timezone picker](https://kevinnovak.github.io/Time-Zone-Picker) though
 ### /time
 give it an hour and give it a minute, and it will send a magical little message that shows that time in everyone's own timezone!
