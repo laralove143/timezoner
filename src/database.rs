@@ -18,7 +18,7 @@ impl AsI64 for NonZeroU64 {
 pub async fn new() -> Result<SqlitePool> {
     let db = SqlitePool::connect_with(
         SqliteConnectOptions::new()
-            .filename("database.sqlite")
+            .filename("timezoner.sqlite")
             .create_if_missing(true),
     )
     .await?;
