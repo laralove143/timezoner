@@ -2,8 +2,6 @@ mod date;
 mod set_timezone;
 mod time;
 
-use std::num::NonZeroU64;
-
 use anyhow::{bail, Result};
 use twilight_http::Client;
 use twilight_model::{
@@ -11,7 +9,7 @@ use twilight_model::{
         callback::InteractionResponse,
         interaction::{ApplicationCommand, Interaction},
     },
-    id::{GuildId, UserId},
+    id::UserId,
 };
 use twilight_util::builder::CallbackDataBuilder;
 
@@ -47,14 +45,9 @@ pub async fn handle(ctx: Context, interaction: Interaction) -> Result<()> {
 }
 
 pub async fn create(http: &Client) -> Result<()> {
-    let guild_id = GuildId(NonZeroU64::new(903367565349384202).unwrap());
-
-    http.set_guild_commands(
-        guild_id,
-        &[time::build(), date::build(), set_timezone::build()],
-    )?
-    .exec()
-    .await?;
+    http.set_global_commands(&[time::build(), date::build(), set_timezone::build()])?
+        .exec()
+        .await?;
 
     Ok(())
 }
