@@ -13,7 +13,7 @@ useful for like sharing your wedding date since you don't want your friends to b
 
 ## nerdy stuff
 made with [Rust](https://www.rust-lang.org) and [Twilight](https://github.com/twilight-rs/twilight) and SQLite.. basically meaning it's good™️
-### self-hosting (only linux supported)
+### self-hosting (only linux supported)
 set `TIMEZONER_BOT_TOKEN` to your bot's token, [get the latest release](https://github.com/laralove143/timezoner-discord-bot/releases/latest) and run it in cli
 
 *made by me (laralove143), licensed MIT*
