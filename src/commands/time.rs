@@ -98,8 +98,8 @@ pub async fn run_datetime(
         Some(tz) => tz,
         None => {
             return Ok(
-                "it looks like i don't know your timezone yet, use `/set_timezone` please"
-                    .to_string(),
+                "it looks like i don't know your timezone yet, copy it from https://kevinnovak.github.io/Time-Zone-Picker and tell it to me using `/set_timezone` please"
+                .to_string(),
             )
         }
     };
