@@ -22,7 +22,7 @@ async fn main() -> Result<()> {
     let intents = Intents::empty();
     let event_types = EventTypeFlags::INTERACTION_CREATE;
 
-    let token = env::var("TEST_BOT_TOKEN")?;
+    let token = env::var("TIMEZONER_BOT_TOKEN")?;
 
     let (cluster, mut events) = Cluster::builder(&token, intents)
         .event_types(event_types)
