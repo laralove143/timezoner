@@ -1,4 +1,3 @@
-mod date;
 mod set_timezone;
 mod time;
 
@@ -25,7 +24,6 @@ pub async fn handle(ctx: Context, interaction: Interaction) -> Result<()> {
 
     let reply = match command.data.name.as_str() {
         "time" => time::run(&ctx.db, user_id, command.data.options).await?,
-        "date" => date::run(&ctx.db, user_id, command.data.options).await?,
         "set_timezone" => set_timezone::run(&ctx.db, user_id, command.data.options).await?,
         _ => bail!("unknown command: {:?}", command),
     };
@@ -45,7 +43,7 @@ pub async fn handle(ctx: Context, interaction: Interaction) -> Result<()> {
 }
 
 pub async fn create(http: &Client) -> Result<()> {
-    http.set_global_commands(&[time::build(), date::build(), set_timezone::build()])?
+    http.set_global_commands(&[time::build(), set_timezone::build()])?
         .exec()
         .await?;
 

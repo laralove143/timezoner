@@ -1,6 +1,6 @@
 use anyhow::{bail, Result};
 
-use chrono::{TimeZone, Utc};
+use chrono::{Datelike, Utc};
 use sqlx::SqlitePool;
 use twilight_mention::{
     timestamp::{Timestamp, TimestampStyle},
@@ -25,9 +25,93 @@ enum AmPm {
 pub async fn run(
     db: &SqlitePool,
     user_id: UserId,
-    options: Vec<CommandDataOption>,
+    mut options: Vec<CommandDataOption>,
 ) -> Result<String> {
-    run_datetime(db, user_id, &options[0], &options[1], &options[2], None).await
+    let am_pm = if let CommandOptionValue::String(option) = options.remove(2).value {
+        match option.as_str() {
+            "am" => AmPm::Am,
+            "pm" => AmPm::Pm,
+            _ => bail!("am_pm option is not am or pm: {:?}", options),
+        }
+    } else {
+        bail!("am_pm option is not string: {:?}", options);
+    };
+
+    let hour = if let CommandOptionValue::Integer(option) = options.remove(0).value {
+        if !(1..=12).contains(&option) {
+            return Ok("hour has to be between 0 and 12 please :(".to_string());
+        }
+        to_24_hour(option as u32, am_pm)
+    } else {
+        bail!("hour option is not an integer: {:?}", options);
+    };
+
+    let minute = if let CommandOptionValue::Integer(option) = options.remove(0).value {
+        if !(0..60).contains(&option) {
+            return Ok("minute has to be between 0 and 59 please :(".to_string());
+        }
+        option as u32
+    } else {
+        bail!("minute option is not an integer: {:?}", options);
+    };
+
+    let tz = match database::timezone(db, user_id).await? {
+        Some(tz) => tz,
+        None => {
+            return Ok(
+                "it looks like i don't know your timezone yet, copy it from https://kevinnovak.github.io/Time-Zone-Picker and tell it to me using `/set_timezone` please"
+                .to_string(),
+            )
+        }
+    };
+
+    let mut datetime = Utc::today().with_timezone(&tz).and_hms(hour, minute, 0);
+    let mut style = TimestampStyle::ShortTime;
+
+    for option in &options {
+        match option.name.as_str() {
+            "day" => {
+                if let CommandOptionValue::Integer(option) = option.value {
+                    if !(1..=31).contains(&option) {
+                        return Ok("day has to be between 1 and 31 please :(".to_string());
+                    }
+                    style = TimestampStyle::LongDateTime;
+                    datetime = datetime.with_day(option as u32).unwrap();
+                } else {
+                    bail!("day option is not an integer: {:?}", options);
+                }
+            }
+            "month" => {
+                if let CommandOptionValue::Integer(option) = option.value {
+                    if !(1..=12).contains(&option) {
+                        return Ok("month has to be between 1 and 12 please :(".to_string());
+                    }
+                    style = TimestampStyle::LongDateTime;
+                    datetime = datetime.with_month(option as u32).unwrap();
+                } else {
+                    bail!("hour option is not an integer: {:?}", options);
+                }
+            }
+            "year" => {
+                if let CommandOptionValue::Integer(option) = option.value {
+                    match u16::try_from(option) {
+                        Ok(year) => {
+                            style = TimestampStyle::LongDateTime;
+                            datetime = datetime.with_year(year.into()).unwrap()
+                        }
+                        Err(_) => return Ok("the year is too big or negative ;-;".to_string()),
+                    }
+                } else {
+                    bail!("hour option is not an integer: {:?}", options);
+                }
+            }
+            _ => bail!("unmatched option: {:?}", options),
+        }
+    }
+
+    Ok(Timestamp::new(datetime.timestamp() as u64, Some(style))
+        .mention()
+        .to_string())
 }
 
 pub fn build() -> Command {
@@ -55,106 +139,19 @@ pub fn build() -> Command {
             ])
             .required(true),
     )
+    .option(IntegerBuilder::new(
+        "day".to_string(),
+        "leave empty for today".to_string(),
+    ))
+    .option(IntegerBuilder::new(
+        "month".to_string(),
+        "leave empty for this month".to_string(),
+    ))
+    .option(IntegerBuilder::new(
+        "year".to_string(),
+        "leave empty for this year".to_string(),
+    ))
     .build()
-}
-
-pub async fn run_datetime(
-    db: &SqlitePool,
-    user_id: UserId,
-    hour: &CommandDataOption,
-    minute: &CommandDataOption,
-    am_pm: &CommandDataOption,
-    day_month_year: Option<(&CommandDataOption, &CommandDataOption, &CommandDataOption)>,
-) -> Result<String> {
-    let am_pm = if let CommandOptionValue::String(am_pm) = &am_pm.value {
-        match am_pm.as_str() {
-            "am" => AmPm::Am,
-            "pm" => AmPm::Pm,
-            _ => bail!("am_pm option is not am or pm: {:?}", am_pm),
-        }
-    } else {
-        bail!("am_pm option is not string: {:?}", am_pm);
-    };
-
-    let hour = if let CommandOptionValue::Integer(hour) = hour.value {
-        if !(0..=12).contains(&hour) {
-            return Ok("hour has to be between 0 and 12 please :(".to_string());
-        }
-        to_24_hour(hour as u32, am_pm)
-    } else {
-        bail!("hour option is not an integer: {:?}", hour);
-    };
-
-    let minute = if let CommandOptionValue::Integer(minute) = minute.value {
-        if !(0..60).contains(&minute) {
-            return Ok("minute has to be between 0 and 59 please :(".to_string());
-        }
-        minute as u32
-    } else {
-        bail!("minute option is not integer: {:?}", minute);
-    };
-
-    let tz = match database::timezone(db, user_id).await? {
-        Some(tz) => tz,
-        None => {
-            return Ok(
-                "it looks like i don't know your timezone yet, copy it from https://kevinnovak.github.io/Time-Zone-Picker and tell it to me using `/set_timezone` please"
-                .to_string(),
-            )
-        }
-    };
-
-    match day_month_year {
-        Some((day, month, year)) => {
-            let day = if let CommandOptionValue::Integer(day) = day.value {
-                if !(1..=31).contains(&day) {
-                    return Ok("day has to be between 1 and 31 please :(".to_string());
-                }
-                day as u32
-            } else {
-                bail!("day option is not an integer {:?}", day);
-            };
-
-            let month = if let CommandOptionValue::Integer(month) = month.value {
-                if !(1..=12).contains(&month) {
-                    return Ok("month has to be between 1 and 12 please :(".to_string());
-                }
-                month as u32
-            } else {
-                bail!("month option is not an integer {:?}", month);
-            };
-
-            let year = if let CommandOptionValue::Integer(year) = year.value {
-                match year.try_into() {
-                    Ok(year) => year,
-                    Err(_) => return Ok("the year is too big or too small".to_string()),
-                }
-            } else {
-                bail!("year option is not an integer {:?}", year);
-            };
-
-            let timestamp = tz
-                .ymd(year, month, day)
-                .and_hms(hour, minute, 0)
-                .timestamp() as u64;
-
-            return Ok(
-                Timestamp::new(timestamp, Some(TimestampStyle::LongDateTime))
-                    .mention()
-                    .to_string(),
-            );
-        }
-        None => {
-            let timestamp = Utc::today()
-                .with_timezone(&tz)
-                .and_hms(hour, minute, 0)
-                .timestamp() as u64;
-
-            return Ok(Timestamp::new(timestamp, Some(TimestampStyle::ShortTime))
-                .mention()
-                .to_string());
-        }
-    }
 }
 
 fn to_24_hour(hour: u32, am_pm: AmPm) -> u32 {
