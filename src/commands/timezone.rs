@@ -42,8 +42,8 @@ pub fn build() -> Command {
     .option(
         StringBuilder::new(
             "timezone".to_string(),
-            "see my profile to learn what to put here.. sorry for the inconvenience >.<"
-                .to_string(),
+            "use `/time` (with a random hour and minute) to learn what to put here.. sorry for the inconvenience >.<"
+            .to_string(),
         )
         .required(true),
     )
