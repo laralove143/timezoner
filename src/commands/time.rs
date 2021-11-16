@@ -27,21 +27,11 @@ pub async fn run(
     user_id: UserId,
     mut options: Vec<CommandDataOption>,
 ) -> Result<String> {
-    let am_pm = if let CommandOptionValue::String(option) = options.remove(2).value {
-        match option.as_str() {
-            "am" => AmPm::Am,
-            "pm" => AmPm::Pm,
-            _ => bail!("am_pm option is not am or pm: {:?}", options),
+    let mut hour = if let CommandOptionValue::Integer(option) = options.remove(0).value {
+        if !(0..=24).contains(&option) {
+            return Ok("hour has to be between 0 and 24 please :(".to_string());
         }
-    } else {
-        bail!("am_pm option is not string: {:?}", options);
-    };
-
-    let hour = if let CommandOptionValue::Integer(option) = options.remove(0).value {
-        if !(1..=12).contains(&option) {
-            return Ok("hour has to be between 0 and 12 please :(".to_string());
-        }
-        to_24_hour(option as u32, am_pm)
+        option as u32
     } else {
         bail!("hour option is not an integer: {:?}", options);
     };
@@ -70,6 +60,20 @@ pub async fn run(
 
     for option in &options {
         match option.name.as_str() {
+            "am_pm" => {
+                match if let CommandOptionValue::String(option) = &option.value {
+                    match option.as_str() {
+                        "am" => to_24_hour(hour, AmPm::Am),
+                        "pm" => to_24_hour(hour, AmPm::Pm),
+                        _ => bail!("am_pm option is not am or pm: {:?}", options),
+                    }
+                } else {
+                    bail!("am_pm option is not string: {:?}", options);
+                } {
+                    Some(option) => hour = option,
+                    None => return Ok("hour has to be between 0 and 12 please :(".to_string()),
+                }
+            }
             "day" => {
                 if let CommandOptionValue::Integer(option) = option.value {
                     if !(1..=31).contains(&option) {
@@ -121,8 +125,11 @@ pub fn build() -> Command {
         CommandType::ChatInput,
     )
     .option(
-        IntegerBuilder::new("hour".to_string(), "in am/pm format please".to_string())
-            .required(true),
+        IntegerBuilder::new(
+            "hour".to_string(),
+            "in am/pm or 24-hour format ^^".to_string(),
+        )
+        .required(true),
     )
     .option(
         IntegerBuilder::new(
@@ -132,12 +139,14 @@ pub fn build() -> Command {
         .required(true),
     )
     .option(
-        StringBuilder::new("am_pm".to_string(), "is it am or is it pm?".to_string())
-            .choices([
-                ("am".to_string(), "am".to_string()),
-                ("pm".to_string(), "pm".to_string()),
-            ])
-            .required(true),
+        StringBuilder::new(
+            "am_pm".to_string(),
+            "leave empty if you used 24-hour format".to_string(),
+        )
+        .choices([
+            ("am".to_string(), "am".to_string()),
+            ("pm".to_string(), "pm".to_string()),
+        ]),
     )
     .option(IntegerBuilder::new(
         "day".to_string(),
@@ -154,8 +163,12 @@ pub fn build() -> Command {
     .build()
 }
 
-fn to_24_hour(hour: u32, am_pm: AmPm) -> u32 {
-    match am_pm {
+fn to_24_hour(hour: u32, am_pm: AmPm) -> Option<u32> {
+    if hour > 12 {
+        return None;
+    }
+
+    Some(match am_pm {
         AmPm::Am => {
             if hour == 12 {
                 hour - 12
@@ -170,5 +183,5 @@ fn to_24_hour(hour: u32, am_pm: AmPm) -> u32 {
                 hour + 12
             }
         }
-    }
+    })
 }
