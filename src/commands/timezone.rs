@@ -25,7 +25,7 @@ pub async fn run(
             Err(_) => return Ok("i couldn't find that timezone >.< if you're sure it's right see my profile to report please".to_string()),
         }
     } else {
-        bail!("first option for set_timezone is not string: {:?}", options);
+        bail!("first option for timezone is not string: {:?}", options);
     };
 
     database::set_timezone(db, user_id, &tz).await?;
@@ -35,7 +35,7 @@ pub async fn run(
 
 pub fn build() -> Command {
     CommandBuilder::new(
-        "set_timezone".to_string(),
+        "timezone".to_string(),
         "set your time zone so that you can actually use the `/time` command".to_string(),
         CommandType::ChatInput,
     )

@@ -1,5 +1,5 @@
-mod set_timezone;
 mod time;
+mod timezone;
 
 use anyhow::{bail, Result};
 use twilight_http::Client;
@@ -24,7 +24,7 @@ pub async fn handle(ctx: Context, interaction: Interaction) -> Result<()> {
 
     let reply = match command.data.name.as_str() {
         "time" => time::run(&ctx.db, user_id, command.data.options).await?,
-        "set_timezone" => set_timezone::run(&ctx.db, user_id, command.data.options).await?,
+        "timezone" => timezone::run(&ctx.db, user_id, command.data.options).await?,
         _ => bail!("unknown command: {:?}", command),
     };
 
@@ -43,7 +43,7 @@ pub async fn handle(ctx: Context, interaction: Interaction) -> Result<()> {
 }
 
 pub async fn create(http: &Client) -> Result<()> {
-    http.set_global_commands(&[time::build(), set_timezone::build()])?
+    http.set_global_commands(&[time::build(), timezone::build()])?
         .exec()
         .await?;
 

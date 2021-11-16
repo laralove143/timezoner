@@ -59,7 +59,7 @@ pub async fn run(
         Some(tz) => tz,
         None => {
             return Ok(
-                "it looks like i don't know your timezone yet, copy it from https://kevinnovak.github.io/Time-Zone-Picker and tell it to me using `/set_timezone` please"
+                "it looks like i don't know your timezone yet, copy it from https://kevinnovak.github.io/Time-Zone-Picker and tell it to me using `/timezone` please"
                 .to_string(),
             )
         }
