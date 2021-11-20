@@ -42,7 +42,7 @@ pub fn build() -> Command {
     .option(
         StringBuilder::new(
             "timezone".to_string(),
-            "use `/time` (with a random hour and minute) to learn what to put here.. sorry for the inconvenience >.<"
+            "use `/time` (with a random hour/minute) to learn what to put here.. sorry for the inconvenience >.<"
             .to_string(),
         )
         .required(true),
