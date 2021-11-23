@@ -1,6 +1,6 @@
 use anyhow::{bail, Result};
 
-use chrono::{Datelike, Utc};
+use chrono::{Datelike, Timelike, Utc};
 use sqlx::SqlitePool;
 use twilight_mention::{
     timestamp::{Timestamp, TimestampStyle},
@@ -27,7 +27,7 @@ pub async fn run(
     user_id: UserId,
     mut options: Vec<CommandDataOption>,
 ) -> Result<String> {
-    let mut hour = if let CommandOptionValue::Integer(option) = options.remove(0).value {
+    let hour = if let CommandOptionValue::Integer(option) = options.remove(0).value {
         if !(0..=24).contains(&option) {
             return Ok("hour has to be between 0 and 24 please :(".to_string());
         }
@@ -70,7 +70,7 @@ pub async fn run(
                 } else {
                     bail!("am_pm option is not string: {:?}", options);
                 } {
-                    Some(option) => hour = option,
+                    Some(hour) => datetime = datetime.with_hour(hour).unwrap(),
                     None => return Ok("hour has to be between 0 and 12 please :(".to_string()),
                 }
             }
