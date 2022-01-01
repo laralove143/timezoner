@@ -7,6 +7,8 @@ goodbye to timezone conversions! this bot makes sharing times/dates with your fr
 
 now instead of *"i'll be home in 1, 2, 3, 4.. 6 hours? i think?"* and have people count you can just do *"i'll be home at 4pm"* and people will see 5am and realize they'd be asleep by then..
 
+![desktop example](desktop-example.gif)
+
 ## commands
 ### /timezone [timezone]
 yes you need this because time sucks, it's just a one-time copy-paste from [a timezone picker](https://kevinnovak.github.io/Time-Zone-Picker) though
