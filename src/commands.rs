@@ -6,10 +6,11 @@ use twilight_http::Client;
 use twilight_model::{
     application::{
         callback::InteractionResponse,
-        interaction::{ApplicationCommand, Interaction},
+        interaction::{Interaction},
     },
-    id::UserId,
 };
+use twilight_model::id::Id;
+use twilight_model::id::marker::ApplicationMarker;
 use twilight_util::builder::CallbackDataBuilder;
 
 use crate::Context;
@@ -20,7 +21,8 @@ pub async fn handle(ctx: Context, interaction: Interaction) -> Result<()> {
     } else {
         bail!("unknown interaction: {:?}", interaction);
     };
-    let user_id = get_user_id(&command).unwrap();
+    let client = ctx.http.interaction(ctx.application_id);
+    let user_id = command.as_ref().member.as_ref().unwrap().user.as_ref().unwrap().id;
 
     let reply = match command.data.name.as_str() {
         "time" => time::run(&ctx.db, user_id, command.data.options).await?,
@@ -30,7 +32,7 @@ pub async fn handle(ctx: Context, interaction: Interaction) -> Result<()> {
 
     let callback = CallbackDataBuilder::new().content(reply).build();
 
-    ctx.http
+    client
         .interaction_callback(
             command.id,
             &command.token,
@@ -42,20 +44,10 @@ pub async fn handle(ctx: Context, interaction: Interaction) -> Result<()> {
     Ok(())
 }
 
-pub async fn create(http: &Client) -> Result<()> {
-    http.set_global_commands(&[time::build(), timezone::build()])?
+pub async fn create(http: &Client, application_id: Id<ApplicationMarker>) -> Result<()> {
+    http.interaction(application_id).set_global_commands(&[time::build(), timezone::build()])
         .exec()
         .await?;
 
     Ok(())
-}
-
-fn get_user_id(command: &ApplicationCommand) -> Option<UserId> {
-    if let Some(member) = &command.member {
-        Some(member.user.as_ref()?.id)
-    } else if let Some(user) = &command.user {
-        Some(user.id)
-    } else {
-        None
-    }
 }

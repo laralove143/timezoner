@@ -6,13 +6,12 @@ use twilight_mention::{
     timestamp::{Timestamp, TimestampStyle},
     Mention,
 };
-use twilight_model::{
-    application::{
-        command::{Command, CommandType},
-        interaction::application_command::{CommandDataOption, CommandOptionValue},
-    },
-    id::UserId,
+use twilight_model::application::{
+    command::{Command, CommandType},
+    interaction::application_command::{CommandDataOption, CommandOptionValue},
 };
+use twilight_model::id::marker::UserMarker;
+use twilight_model::id::Id;
 use twilight_util::builder::command::{CommandBuilder, IntegerBuilder, StringBuilder};
 
 use crate::database;
@@ -24,7 +23,7 @@ enum AmPm {
 
 pub async fn run(
     db: &SqlitePool,
-    user_id: UserId,
+    user_id: Id<UserMarker>,
     mut options: Vec<CommandDataOption>,
 ) -> Result<String> {
     let hour = if let CommandOptionValue::Integer(option) = options.remove(0).value {

@@ -3,20 +3,19 @@ use std::str::FromStr;
 use anyhow::{bail, Result};
 use chrono_tz::Tz;
 use sqlx::SqlitePool;
-use twilight_model::{
-    application::{
-        command::{Command, CommandType},
-        interaction::application_command::{CommandDataOption, CommandOptionValue},
-    },
-    id::UserId,
+use twilight_model::application::{
+    command::{Command, CommandType},
+    interaction::application_command::{CommandDataOption, CommandOptionValue},
 };
+use twilight_model::id::marker::UserMarker;
+use twilight_model::id::Id;
 use twilight_util::builder::command::{CommandBuilder, StringBuilder};
 
 use crate::database;
 
 pub async fn run(
     db: &SqlitePool,
-    user_id: UserId,
+    user_id: Id<UserMarker>,
     options: Vec<CommandDataOption>,
 ) -> Result<String> {
     let tz = if let CommandOptionValue::String(tz_name) = &options[0].value {

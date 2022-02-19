@@ -5,7 +5,7 @@ use crate::{commands, Context};
 
 pub async fn handle(ctx: Context, event: Event) {
     if let Err(err) = match event {
-        Event::InteractionCreate(interaction) => commands::handle(ctx, interaction.0).await,
+        Event::InteractionCreate(interaction) => commands::handle(ctx, (*interaction).0).await,
         _ => Err(anyhow!("unknown event: {:?}", event)),
     } {
         eprintln!("{}", err);
