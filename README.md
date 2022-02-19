@@ -16,6 +16,6 @@ yes you need this because time sucks, it's just a one-time copy-paste from [a ti
 give it an hour and give it a minute, in am-pm or in 24-hour, maybe it a day, maybe a month, maybe a year, and it will send a magical little message that shows that time or date in everyone's own timezone!
 
 ## nerdy stuff
-made with [rust](https://www.rust-lang.org) and [twilight](https://github.com/twilight-rs/twilight) and sqlite.. basically meaning it's good™
+made with [rust](https://www.rust-lang.org) and [twilight](https://github.com/twilight-rs/twilight) and sqlite
 
 *made by me (laralove143), licensed MIT*
