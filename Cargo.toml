@@ -9,12 +9,10 @@ tokio = { version = "1.13", features = ["macros", "rt-multi-thread"] }
 futures = { version = "0.3", default-features = false }
 twilight-gateway = { version = "0.7", default-features = false, features = [
     "rustls",
-    "simd-json",
     "zlib-simd",
 ] }
 twilight-http = { version = "0.7", default-features = false, features = [
     "rustls",
-    "simd-json",
     "decompression",
 ] }
 twilight-model = "0.7"
