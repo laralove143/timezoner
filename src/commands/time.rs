@@ -1,6 +1,5 @@
-use anyhow::{bail, Result};
-
-use chrono::{Datelike, Timelike, Utc};
+use anyhow::{Context, Result};
+use chrono::{Datelike, Utc};
 use sqlx::SqlitePool;
 use twilight_interactions::command::{CommandModel, CommandOption, CreateCommand, CreateOption};
 use twilight_mention::{
@@ -14,8 +13,14 @@ use twilight_model::{
 
 use crate::database;
 
+#[derive(CreateOption, CommandOption, Clone, Copy)]
+/// the choices for `am_pm` option
 enum AmPm {
+    /// time is am
+    #[option(name = "am", value = "am")]
     Am,
+    /// time is pm
+    #[option(name = "pm", value = "pm")]
     Pm,
 }
 
@@ -108,7 +113,9 @@ pub async fn run(
     )
 }
 
-fn to_24_hour(hour: u32, am_pm: AmPm) -> Option<u32> {
+/// converts 12-hour to 24-hour format
+#[allow(clippy::integer_arithmetic)]
+const fn to_24_hour(hour: u32, am_pm: AmPm) -> Option<u32> {
     if hour > 12 {
         return None;
     }

@@ -1,21 +1,9 @@
-use std::{num::NonZeroU64, str::FromStr};
-
-use anyhow::{bail, Result};
+use anyhow::{anyhow, Result};
 use chrono_tz::Tz;
 use sqlx::{query, query_scalar, sqlite::SqliteConnectOptions, SqlitePool};
-use twilight_model::id::marker::UserMarker;
-use twilight_model::id::Id;
+use twilight_model::id::{marker::UserMarker, Id};
 
-trait AsI64 {
-    fn as_i64(&self) -> i64;
-}
-
-impl AsI64 for NonZeroU64 {
-    fn as_i64(&self) -> i64 {
-        self.get() as i64
-    }
-}
-
+/// connect to the database
 pub async fn new() -> Result<SqlitePool> {
     let db =
         SqlitePool::connect_with(SqliteConnectOptions::new().filename("timezoner.sqlite")).await?;
@@ -23,33 +11,34 @@ pub async fn new() -> Result<SqlitePool> {
     Ok(db)
 }
 
-pub async fn set_timezone(db: &SqlitePool, user_id: Id<UserMarker>, tz: &Tz) -> Result<()> {
-    let user_id: i64 = user_id.get().try_into()?;
-    let tz = tz.to_string();
+/// update a user's timezone info
+#[allow(clippy::integer_arithmetic)]
+pub async fn set_timezone(db: &SqlitePool, user_id: Id<UserMarker>, tz: Tz) -> Result<()> {
+    let id: i64 = user_id.get().try_into()?;
+    let tz_str = tz.to_string();
 
-    query!(
-        "INSERT OR REPLACE INTO timezones VALUES (?, ?)",
-        user_id,
-        tz
-    )
-    .execute(db)
-    .await?;
+    query!("INSERT OR REPLACE INTO timezones VALUES (?, ?)", id, tz_str)
+        .execute(db)
+        .await?;
 
     Ok(())
 }
 
+/// retrieve a user's timezone info
+#[allow(clippy::integer_arithmetic)]
 pub async fn timezone(db: &SqlitePool, user_id: Id<UserMarker>) -> Result<Option<Tz>> {
-    let user_id: i64 = user_id.get().try_into()?;
+    let id: i64 = user_id.get().try_into()?;
 
-    let tz = query_scalar!("SELECT timezone FROM timezones WHERE user_id = ?", user_id)
+    let tz = match query_scalar!("SELECT timezone FROM timezones WHERE user_id = ?", id)
         .fetch_optional(db)
-        .await?;
+        .await?
+    {
+        Some(tz) => tz,
+        None => return Ok(None),
+    };
 
-    match tz {
-        Some(tz) => match Tz::from_str(&tz) {
-            Ok(tz) => Ok(Some(tz)),
-            Err(string) => bail!("couldn't parse timezone from string: {}", string),
-        },
-        None => Ok(None),
-    }
+    Ok(Some(
+        tz.parse()
+            .map_err(|s| anyhow!("saved timezone is invalid: {s}"))?,
+    ))
 }

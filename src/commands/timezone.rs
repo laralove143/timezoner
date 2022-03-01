@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use anyhow::{bail, Result};
+use anyhow::Result;
 use chrono_tz::Tz;
 use sqlx::SqlitePool;
 use twilight_interactions::command::{CommandModel, CreateCommand};
