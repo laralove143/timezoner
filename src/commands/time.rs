@@ -2,17 +2,15 @@ use anyhow::{bail, Result};
 
 use chrono::{Datelike, Timelike, Utc};
 use sqlx::SqlitePool;
+use twilight_interactions::command::{CommandModel, CommandOption, CreateCommand, CreateOption};
 use twilight_mention::{
     timestamp::{Timestamp, TimestampStyle},
     Mention,
 };
-use twilight_model::application::{
-    command::{Command, CommandType},
-    interaction::application_command::{CommandDataOption, CommandOptionValue},
+use twilight_model::{
+    application::interaction::application_command::CommandData,
+    id::{marker::UserMarker, Id},
 };
-use twilight_model::id::marker::UserMarker;
-use twilight_model::id::Id;
-use twilight_util::builder::command::{CommandBuilder, IntegerBuilder, StringBuilder};
 
 use crate::database;
 
@@ -21,145 +19,93 @@ enum AmPm {
     Pm,
 }
 
+#[derive(CommandModel, CreateCommand)]
+#[command(
+    name = "time",
+    desc = "send a time that magically appears in everyone's own timezone"
+)]
+/// the time command's options
+pub struct Time {
+    #[command(desc = "in am/pm or 24-hour format ^^", min_value = 0, max_value = 23)]
+    /// the hour to show
+    hour: i64,
+    #[command(desc = "between 0 and 59 obviously", min_value = 0, max_value = 59)]
+    /// the minute to show
+    minute: i64,
+    #[command(desc = "leave empty if you used 24-hour format")]
+    /// whether the time is am or pm or 24-hour
+    am_pm: Option<AmPm>,
+    #[command(desc = "leave empty for today", min_value = 0, max_value = 31)]
+    /// the day of the date
+    day: Option<i64>,
+    #[command(desc = "leave empty for this month", min_value = 0, max_value = 12)]
+    /// the month of the date
+    month: Option<i64>,
+    #[command(desc = "leave empty for this year", min_value = 0, max_value = 65535)]
+    /// the year of the date
+    year: Option<i64>,
+}
+
+/// run the command, returning the formatted string or the error message
 pub async fn run(
     db: &SqlitePool,
     user_id: Id<UserMarker>,
-    mut options: Vec<CommandDataOption>,
+    command_data: CommandData,
 ) -> Result<String> {
-    let hour = if let CommandOptionValue::Integer(option) = options.remove(0).value {
-        if !(0..=24).contains(&option) {
-            return Ok("hour has to be between 0 and 24 please :(".to_string());
-        }
-        option as u32
-    } else {
-        bail!("hour option is not an integer: {:?}", options);
-    };
-
-    let minute = if let CommandOptionValue::Integer(option) = options.remove(0).value {
-        if !(0..60).contains(&option) {
-            return Ok("minute has to be between 0 and 59 please :(".to_string());
-        }
-        option as u32
-    } else {
-        bail!("minute option is not an integer: {:?}", options);
-    };
+    let options = Time::from_interaction(command_data.into())?;
 
     let tz = match database::timezone(db, user_id).await? {
         Some(tz) => tz,
         None => {
-            return Ok(
-                "it looks like i don't know your timezone yet, copy it from https://kevinnovak.github.io/Time-Zone-Picker and tell it to me using `/timezone` please"
-                .to_string(),
-            )
+            return Ok("i don't know your timezone yet, copy it from \
+            https://kevinnovak.github.io/Time-Zone-Picker and tell me using `/timezone` please"
+                .to_owned())
         }
     };
 
-    let mut datetime = Utc::today().with_timezone(&tz).and_hms(hour, minute, 0);
-    let mut style = TimestampStyle::ShortTime;
+    let hour = match options.am_pm {
+        Some(am_pm) => match to_24_hour(options.hour.try_into()?, am_pm) {
+            Some(hour) => hour,
+            None => {
+                return Ok("either keep am_pm empty or put an hour between 0 and 12...".to_owned())
+            }
+        },
+        None => options.hour.try_into()?,
+    };
 
-    for option in &options {
-        match option.name.as_str() {
-            "am_pm" => {
-                match if let CommandOptionValue::String(option) = &option.value {
-                    match option.as_str() {
-                        "am" => to_24_hour(hour, AmPm::Am),
-                        "pm" => to_24_hour(hour, AmPm::Pm),
-                        _ => bail!("am_pm option is not am or pm: {:?}", options),
-                    }
-                } else {
-                    bail!("am_pm option is not string: {:?}", options);
-                } {
-                    Some(hour) => datetime = datetime.with_hour(hour).unwrap(),
-                    None => return Ok("hour has to be between 0 and 12 please :(".to_string()),
-                }
-            }
-            "day" => {
-                if let CommandOptionValue::Integer(option) = option.value {
-                    if !(1..=31).contains(&option) {
-                        return Ok("day has to be between 1 and 31 please :(".to_string());
-                    }
-                    style = TimestampStyle::LongDateTime;
-                    datetime = datetime.with_day(option as u32).unwrap();
-                } else {
-                    bail!("day option is not an integer: {:?}", options);
-                }
-            }
-            "month" => {
-                if let CommandOptionValue::Integer(option) = option.value {
-                    if !(1..=12).contains(&option) {
-                        return Ok("month has to be between 1 and 12 please :(".to_string());
-                    }
-                    style = TimestampStyle::LongDateTime;
-                    datetime = datetime.with_month(option as u32).unwrap();
-                } else {
-                    bail!("hour option is not an integer: {:?}", options);
-                }
-            }
-            "year" => {
-                if let CommandOptionValue::Integer(option) = option.value {
-                    match u16::try_from(option) {
-                        Ok(year) => {
-                            style = TimestampStyle::LongDateTime;
-                            datetime = datetime.with_year(year.into()).unwrap()
-                        }
-                        Err(_) => return Ok("the year is too big or negative ;-;".to_string()),
-                    }
-                } else {
-                    bail!("hour option is not an integer: {:?}", options);
-                }
-            }
-            _ => bail!("unmatched option: {:?}", options),
-        }
-    }
+    let mut datetime = Utc::today()
+        .with_timezone(&tz)
+        .and_hms(hour, options.minute.try_into()?, 0);
 
-    Ok(Timestamp::new(datetime.timestamp() as u64, Some(style))
-        .mention()
-        .to_string())
-}
+    let style = if options.day.or(options.month).or(options.year).is_some() {
+        TimestampStyle::LongDateTime
+    } else {
+        TimestampStyle::ShortTime
+    };
 
-pub fn build() -> Command {
-    CommandBuilder::new(
-        "time".to_string(),
-        "send a time that magically appears in everyone's own timezone".to_string(),
-        CommandType::ChatInput,
+    if let Some(day) = options.day {
+        datetime = datetime
+            .with_day(day.try_into()?)
+            .context("the day is invalid")?;
+    };
+
+    if let Some(month) = options.month {
+        datetime = datetime
+            .with_month(month.try_into()?)
+            .context("the month is invalid")?;
+    };
+
+    if let Some(year) = options.year {
+        datetime = datetime
+            .with_year(year.try_into()?)
+            .context("the year is invalid")?;
+    };
+
+    Ok(
+        Timestamp::new(datetime.timestamp().try_into()?, Some(style))
+            .mention()
+            .to_string(),
     )
-    .option(
-        IntegerBuilder::new(
-            "hour".to_string(),
-            "in am/pm or 24-hour format ^^".to_string(),
-        )
-        .required(true),
-    )
-    .option(
-        IntegerBuilder::new(
-            "minute".to_string(),
-            "between 0 and 59 obviously".to_string(),
-        )
-        .required(true),
-    )
-    .option(
-        StringBuilder::new(
-            "am_pm".to_string(),
-            "leave empty if you used 24-hour format".to_string(),
-        )
-        .choices([
-            ("am".to_string(), "am".to_string()),
-            ("pm".to_string(), "pm".to_string()),
-        ]),
-    )
-    .option(IntegerBuilder::new(
-        "day".to_string(),
-        "leave empty for today".to_string(),
-    ))
-    .option(IntegerBuilder::new(
-        "month".to_string(),
-        "leave empty for this month".to_string(),
-    ))
-    .option(IntegerBuilder::new(
-        "year".to_string(),
-        "leave empty for this year".to_string(),
-    ))
-    .build()
 }
 
 fn to_24_hour(hour: u32, am_pm: AmPm) -> Option<u32> {

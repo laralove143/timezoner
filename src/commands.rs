@@ -3,17 +3,17 @@ mod timezone;
 
 use anyhow::{bail, Result};
 use twilight_http::Client;
+use twilight_interactions::command::CreateCommand;
 use twilight_model::{
-    application::{
-        callback::InteractionResponse,
-        interaction::{Interaction},
-    },
+    application::{callback::InteractionResponse, interaction::Interaction},
+    id::{marker::ApplicationMarker, Id},
 };
-use twilight_model::id::Id;
-use twilight_model::id::marker::ApplicationMarker;
 use twilight_util::builder::CallbackDataBuilder;
 
-use crate::Context;
+use crate::{
+    commands::{time::Time, timezone::Timezone},
+    Context,
+};
 
 pub async fn handle(ctx: Context, interaction: Interaction) -> Result<()> {
     let command = if let Interaction::ApplicationCommand(command) = interaction {

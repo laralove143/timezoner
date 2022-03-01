@@ -1,6 +1,10 @@
 [package]
 name = "timezoner-discord-bot"
+description = "a discord bot that makes timezone conversions really easy"
 version = "0.1.0"
+repository = "https://github.com/laralove143/timezoner-discord-bot"
+keywords = ["discord", "bot", "time"]
+categories = ["web-programming::http-client"]
 edition = "2021"
 license = "MIT"
 
@@ -19,6 +23,7 @@ twilight-http = { version = "0.9", default-features = false, features = [
 twilight-util = { version = "0.9", features = ["builder"] }
 twilight-model = "0.9"
 twilight-mention = "0.9"
+twilight-interactions = "0.9"
 sqlx = { version = "0.5", default-features = false, features = [
     "runtime-tokio-rustls",
     "macros",
