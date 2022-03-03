@@ -2,7 +2,10 @@ use anyhow::{bail, Context as _, Result};
 use twilight_http::Client;
 use twilight_interactions::command::CreateCommand;
 use twilight_model::{
-    application::{callback::InteractionResponse, interaction::Interaction},
+    application::{
+        callback::InteractionResponse,
+        interaction::{ApplicationCommand, Interaction, MessageComponentInteraction},
+    },
     id::{marker::ApplicationMarker, Id},
 };
 
@@ -16,7 +19,8 @@ mod time;
 /// functions to build and run the timezone command
 mod timezone;
 
-/// handle a slash command
+/// handle an interaction
+#[allow(clippy::wildcard_enum_match_arm)]
 pub async fn handle(ctx: Context, interaction: Interaction) -> Result<()> {
     let command = if let Interaction::ApplicationCommand(command) = interaction {
         command
@@ -24,6 +28,11 @@ pub async fn handle(ctx: Context, interaction: Interaction) -> Result<()> {
         bail!("unknown interaction: {:?}", interaction);
     };
 
+    Ok(())
+}
+
+/// handle a slash command
+async fn handle_command(ctx: &Context, command: ApplicationCommand) -> Result<()> {
     let client = ctx.http.interaction(ctx.application_id);
 
     let user_id = command
@@ -46,6 +55,28 @@ pub async fn handle(ctx: Context, interaction: Interaction) -> Result<()> {
             command.id,
             &command.token,
             &InteractionResponse::ChannelMessageWithSource(callback),
+        )
+        .exec()
+        .await?;
+
+    Ok(())
+}
+
+/// handle a component interaction
+async fn handle_component(ctx: &Context, component: MessageComponentInteraction) -> Result<()> {
+    let client = ctx.http.interaction(ctx.application_id);
+
+    let callback = match component.data.custom_id.as_str() {
+        "copy" => time::run_copy(component.message.content),
+        "undo_copy" => time::run_undo_copy(component.message.content),
+        _ => bail!("unknown custom id for component: {:?}", component),
+    };
+
+    client
+        .interaction_callback(
+            component.id,
+            &component.token,
+            &InteractionResponse::UpdateMessage(callback),
         )
         .exec()
         .await?;
