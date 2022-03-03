@@ -4,9 +4,8 @@ use anyhow::Result;
 use chrono_tz::Tz;
 use sqlx::SqlitePool;
 use twilight_interactions::command::{CommandModel, CreateCommand};
-use twilight_model::application::callback::CallbackData;
 use twilight_model::{
-    application::interaction::application_command::CommandData,
+    application::{callback::CallbackData, interaction::application_command::CommandData},
     id::{marker::UserMarker, Id},
 };
 use twilight_util::builder::CallbackDataBuilder;
