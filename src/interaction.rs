@@ -22,10 +22,12 @@ mod timezone;
 /// handle an interaction
 #[allow(clippy::wildcard_enum_match_arm)]
 pub async fn handle(ctx: Context, interaction: Interaction) -> Result<()> {
-    let command = if let Interaction::ApplicationCommand(command) = interaction {
-        command
-    } else {
-        bail!("unknown interaction: {:?}", interaction);
+    match interaction {
+        Interaction::ApplicationCommand(command) => handle_command(&ctx, *command).await?,
+        Interaction::MessageComponent(component) => handle_component(&ctx, *component).await?,
+        _ => {
+            bail!("unknown interaction: {:?}", interaction);
+        }
     };
 
     Ok(())
