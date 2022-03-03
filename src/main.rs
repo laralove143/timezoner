@@ -8,13 +8,13 @@
     clippy::pattern_type_mismatch
 )]
 
-/// functions to create and handle commands
-mod commands;
 /// functions to set up, update and retrieve timezone information from the
 /// sqlite database
 mod database;
 /// functions to handle events
-mod events;
+mod event;
+/// functions to create and handle interaction
+mod interaction;
 
 use std::{env, sync::Arc};
 
@@ -61,7 +61,7 @@ async fn main() -> Result<()> {
         .await?
         .id;
 
-    commands::create(&http, application_id).await?;
+    interaction::create(&http, application_id).await?;
 
     let db = database::new().await?;
 
@@ -72,7 +72,7 @@ async fn main() -> Result<()> {
     });
 
     while let Some((_, event)) = events.next().await {
-        tokio::spawn(events::handle(Arc::clone(&ctx), event));
+        tokio::spawn(event::handle(Arc::clone(&ctx), event));
     }
 
     Ok(())

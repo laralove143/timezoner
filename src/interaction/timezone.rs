@@ -50,8 +50,8 @@ async fn _run(db: &SqlitePool, user_id: Id<UserMarker>, options: Timezone) -> Re
         tz
     } else {
         return Ok(
-            "i couldn't find that timezone >.< if you're sure it's right check my discord \
-                 profile for my page to report please..",
+            "i couldn't find that timezone >.< if you're sure it's right check my discord profile \
+             for my page to report please..",
         );
     };
 

@@ -7,7 +7,7 @@ use twilight_model::{
 };
 
 use crate::{
-    commands::{time::Time, timezone::Timezone},
+    interaction::{time::Time, timezone::Timezone},
     Context,
 };
 
