@@ -53,7 +53,7 @@ pub async fn handle(ctx: Context, interaction: Interaction) -> Result<()> {
     Ok(())
 }
 
-/// create commands globally
+/// create interaction globally
 pub async fn create(http: &Client, application_id: Id<ApplicationMarker>) -> Result<()> {
     http.interaction(application_id)
         .set_global_commands(&[
