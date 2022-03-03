@@ -6,10 +6,12 @@ use twilight_mention::{
     timestamp::{Timestamp, TimestampStyle},
     Mention,
 };
+use twilight_model::application::callback::CallbackData;
 use twilight_model::{
     application::interaction::application_command::CommandData,
     id::{marker::UserMarker, Id},
 };
+use twilight_util::builder::CallbackDataBuilder;
 
 use crate::database;
 
@@ -51,14 +53,19 @@ pub struct Time {
     year: Option<i64>,
 }
 
-/// run the command, returning the formatted string or the error message
+/// run the command, returning the callback data
 pub async fn run(
     db: &SqlitePool,
     user_id: Id<UserMarker>,
     command_data: CommandData,
-) -> Result<String> {
-    let options = Time::from_interaction(command_data.into())?;
+) -> Result<CallbackData> {
+    let reply = _run(db, user_id, Time::from_interaction(command_data.into())?).await?;
 
+    Ok(CallbackDataBuilder::new().content(reply).build())
+}
+
+/// run the command, returning the formatted string or the error message
+async fn _run(db: &SqlitePool, user_id: Id<UserMarker>, options: Time) -> Result<String> {
     let tz = match database::timezone(db, user_id).await? {
         Some(tz) => tz,
         None => {

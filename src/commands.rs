@@ -5,7 +5,6 @@ use twilight_model::{
     application::{callback::InteractionResponse, interaction::Interaction},
     id::{marker::ApplicationMarker, Id},
 };
-use twilight_util::builder::CallbackDataBuilder;
 
 use crate::{
     commands::{time::Time, timezone::Timezone},
@@ -36,15 +35,11 @@ pub async fn handle(ctx: Context, interaction: Interaction) -> Result<()> {
         .context("the member info sent in the command doesn't have an attached user")?
         .id;
 
-    let reply = match command.data.name.as_str() {
+    let callback = match command.data.name.as_str() {
         "time" => time::run(&ctx.db, user_id, command.data).await?,
-        "timezone" => timezone::run(&ctx.db, user_id, command.data)
-            .await?
-            .to_owned(),
+        "timezone" => timezone::run(&ctx.db, user_id, command.data).await?,
         _ => bail!("unknown command: {:?}", command),
     };
-
-    let callback = CallbackDataBuilder::new().content(reply).build();
 
     client
         .interaction_callback(
