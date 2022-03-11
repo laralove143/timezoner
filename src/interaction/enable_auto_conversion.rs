@@ -3,6 +3,7 @@ use sqlx::SqlitePool;
 use twilight_interactions::command::{CommandModel, CreateCommand};
 use twilight_model::{
     application::callback::CallbackData,
+    channel::{message::MessageFlags, Message},
     guild::{PartialMember, Permissions},
     id::{marker::GuildMarker, Id},
 };
@@ -33,7 +34,10 @@ pub async fn run(
     )
     .await?;
 
-    Ok(CallbackDataBuilder::new().content(reply.to_owned()).build())
+    Ok(CallbackDataBuilder::new()
+        .flags(MessageFlags::EPHEMERAL)
+        .content(reply.to_owned())
+        .build())
 }
 
 /// run the command, returning the success or error message
