@@ -20,6 +20,8 @@ twilight-http = { version = "0.9", default-features = false, features = [
     "rustls-native-roots",
     "trust-dns",
 ] }
+twilight-model = "0.9"
+twilight-cache-inmemory = { version = "0.9", features = ["permission-calculator"] }
 twilight-util = { version = "0.9", features = ["builder"] }
 twilight-model = "0.9"
 twilight-mention = "0.9"
@@ -32,3 +34,4 @@ sqlx = { version = "0.5", default-features = false, features = [
 chrono = "0.4"
 chrono-tz = "0.6"
 anyhow = "1.0"
+once_cell = "1.10"

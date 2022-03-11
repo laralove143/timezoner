@@ -15,15 +15,22 @@ mod database;
 mod event;
 /// functions to create and handle interaction
 mod interaction;
+/// functions to parse date/time from strings and format them into discord's
+/// epoch formatting
+mod parse;
 
 use std::{env, sync::Arc};
 
 use anyhow::Result;
 use futures::StreamExt;
 use sqlx::SqlitePool;
+use twilight_cache_inmemory::{InMemoryCache, ResourceType};
 use twilight_gateway::{Cluster, EventTypeFlags, Intents};
 use twilight_http::Client;
-use twilight_model::id::{marker::ApplicationMarker, Id};
+use twilight_model::id::{
+    marker::{ApplicationMarker, UserMarker},
+    Id,
+};
 
 /// arced context data for thread safety
 type Context = Arc<ContextValue>;
@@ -32,16 +39,36 @@ type Context = Arc<ContextValue>;
 pub struct ContextValue {
     /// used to make http requests to discord
     http: Client,
+    /// used to check send messages permissions
+    cache: InMemoryCache,
     /// used for the user's timezone information
     db: SqlitePool,
     /// used for creating the interaction client
     application_id: Id<ApplicationMarker>,
+    /// used for permissions cache
+    user_id: Id<UserMarker>,
 }
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    let intents = Intents::empty();
-    let event_types = EventTypeFlags::INTERACTION_CREATE;
+    let intents = Intents::GUILD_MESSAGES | Intents::GUILDS;
+    let event_types = EventTypeFlags::INTERACTION_CREATE
+        | EventTypeFlags::MESSAGE_CREATE
+        | EventTypeFlags::GUILD_CREATE
+        | EventTypeFlags::GUILD_UPDATE
+        | EventTypeFlags::GUILD_DELETE
+        | EventTypeFlags::ROLE_CREATE
+        | EventTypeFlags::ROLE_UPDATE
+        | EventTypeFlags::ROLE_DELETE
+        | EventTypeFlags::CHANNEL_CREATE
+        | EventTypeFlags::CHANNEL_UPDATE
+        | EventTypeFlags::CHANNEL_DELETE
+        | EventTypeFlags::MEMBER_ADD
+        | EventTypeFlags::MEMBER_CHUNK
+        | EventTypeFlags::MEMBER_UPDATE
+        | EventTypeFlags::MEMBER_REMOVE;
+    let resource_types =
+        ResourceType::GUILD | ResourceType::CHANNEL | ResourceType::MEMBER | ResourceType::ROLE;
 
     let token = env::var("TIMEZONER_BOT_TOKEN")?;
 
@@ -60,18 +87,25 @@ async fn main() -> Result<()> {
         .model()
         .await?
         .id;
+    let user_id = http.current_user().exec().await?.model().await?.id;
 
     interaction::create(&http, application_id).await?;
 
     let db = database::new().await?;
+    let cache = InMemoryCache::builder()
+        .resource_types(resource_types)
+        .build();
 
     let ctx = Arc::new(ContextValue {
         http,
+        cache,
         db,
         application_id,
+        user_id,
     });
 
     while let Some((_, event)) = events.next().await {
+        ctx.cache.update(&event);
         tokio::spawn(event::handle(Arc::clone(&ctx), event));
     }
 
