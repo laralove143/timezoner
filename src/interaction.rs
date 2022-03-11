@@ -11,10 +11,12 @@ use twilight_model::{
 };
 
 use crate::{
-    interaction::{time::Time, timezone::Timezone},
+    interaction::{enable_auto_conversion::EnableAutoConversion, time::Time, timezone::Timezone},
     Context,
 };
 
+/// functions to enable or disable parsing for a guild
+mod enable_auto_conversion;
 /// functions to build and run the time command
 pub mod time;
 /// functions to build and run the timezone command
@@ -42,6 +44,18 @@ pub fn undo_copy_button() -> Component {
     Component::Button(Button {
         custom_id: Some("undo_copy".to_owned()),
         label: Some("Undo Copy".to_owned()),
+        style: ButtonStyle::Danger,
+        disabled: false,
+        emoji: None,
+        url: None,
+    })
+}
+
+/// make the disable parsing button
+pub fn disable_parsing_button() -> Component {
+    Component::Button(Button {
+        custom_id: Some("parsing_disable".to_owned()),
+        label: Some("Disable auto-conversion".to_owned()),
         style: ButtonStyle::Danger,
         disabled: false,
         emoji: None,
@@ -79,6 +93,9 @@ async fn handle_command(ctx: &Context, command: ApplicationCommand) -> Result<()
     let callback = match command.data.name.as_str() {
         "time" => time::run(&ctx.db, user_id, command.data).await?,
         "timezone" => timezone::run(&ctx.db, user_id, command.data).await?,
+        "enable_auto_conversion" => {
+            enable_auto_conversion::run(&ctx.db, command.guild_id, command.member, true).await?
+        }
         _ => bail!("unknown command: {:?}", command),
     };
 
@@ -98,30 +115,33 @@ async fn handle_command(ctx: &Context, command: ApplicationCommand) -> Result<()
 async fn handle_component(ctx: &Context, component: MessageComponentInteraction) -> Result<()> {
     let client = ctx.http.interaction(ctx.application_id);
 
-    let callback = match component.data.custom_id.as_str() {
-        "copy" => time::run_copy(component.message.content),
-        "undo_copy" => time::run_undo_copy(component.message.content),
+    let response = match component.data.custom_id.as_str() {
+        "copy" => InteractionResponse::UpdateMessage(time::run_copy(component.message.content)),
+        "undo_copy" => {
+            InteractionResponse::UpdateMessage(time::run_undo_copy(component.message.content))
+        }
+        "parsing_disable" => InteractionResponse::ChannelMessageWithSource(
+            enable_auto_conversion::run(&ctx.db, component.guild_id, component.member, false)
+                .await?,
+        ),
         _ => bail!("unknown custom id for component: {:?}", component),
     };
 
     client
-        .interaction_callback(
-            component.id,
-            &component.token,
-            &InteractionResponse::UpdateMessage(callback),
-        )
+        .interaction_callback(component.id, &component.token, &response)
         .exec()
         .await?;
 
     Ok(())
 }
 
-/// create interaction globally
+/// create the slash commands globally
 pub async fn create(http: &Client, application_id: Id<ApplicationMarker>) -> Result<()> {
     http.interaction(application_id)
         .set_global_commands(&[
             Time::create_command().into(),
             Timezone::create_command().into(),
+            EnableAutoConversion::create_command().into(),
         ])
         .exec()
         .await?;

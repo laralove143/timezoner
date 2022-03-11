@@ -11,7 +11,7 @@ use twilight_model::{channel::Message, guild::Permissions, id::Id};
 
 use crate::{
     database,
-    interaction::{action_row, copy_button, time::AmPm},
+    interaction::{action_row, copy_button, disable_parsing_button, time::AmPm},
     Context,
 };
 
@@ -34,6 +34,13 @@ pub async fn send_time(ctx: Context, message: Message) -> Result<()> {
                     | Permissions::ADD_REACTIONS
                     | Permissions::USE_EXTERNAL_EMOJIS,
             )
+        || database::parsing_disabled(
+            &ctx.db,
+            message
+                .guild_id
+                .context("message to parse is not in a guild")?,
+        )
+        .await?
     {
         return Ok(());
     }
@@ -69,7 +76,7 @@ pub async fn send_time(ctx: Context, message: Message) -> Result<()> {
     ctx.http
         .create_message(message.channel_id)
         .content(&timestamp)?
-        .components(&[action_row(vec![copy_button()])])?
+        .components(&[action_row(vec![copy_button(), disable_parsing_button()])])?
         .exec()
         .await?;
 
