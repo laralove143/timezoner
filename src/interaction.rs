@@ -20,31 +20,32 @@ pub mod time;
 /// functions to build and run the timezone command
 mod timezone;
 
-/// make the action row with the copy button
+/// make an action row with the given components
+pub const fn action_row(components: Vec<Component>) -> Component {
+    Component::ActionRow(ActionRow { components })
+}
+
+/// make the copy button
 pub fn copy_button() -> Component {
-    Component::ActionRow(ActionRow {
-        components: vec![Component::Button(Button {
-            custom_id: Some("copy".to_owned()),
-            label: Some("Copy".to_owned()),
-            style: ButtonStyle::Primary,
-            disabled: false,
-            emoji: None,
-            url: None,
-        })],
+    Component::Button(Button {
+        custom_id: Some("copy".to_owned()),
+        label: Some("Copy".to_owned()),
+        style: ButtonStyle::Primary,
+        disabled: false,
+        emoji: None,
+        url: None,
     })
 }
 
-/// make the action row with the undo copy button
+/// make the undo copy button
 pub fn undo_copy_button() -> Component {
-    Component::ActionRow(ActionRow {
-        components: vec![Component::Button(Button {
-            custom_id: Some("undo_copy".to_owned()),
-            label: Some("Undo Copy".to_owned()),
-            style: ButtonStyle::Danger,
-            disabled: false,
-            emoji: None,
-            url: None,
-        })],
+    Component::Button(Button {
+        custom_id: Some("undo_copy".to_owned()),
+        label: Some("Undo Copy".to_owned()),
+        style: ButtonStyle::Danger,
+        disabled: false,
+        emoji: None,
+        url: None,
     })
 }
 

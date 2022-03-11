@@ -11,7 +11,7 @@ use twilight_model::{channel::Message, guild::Permissions, id::Id};
 
 use crate::{
     database,
-    interaction::{copy_button, time::AmPm},
+    interaction::{action_row, copy_button, time::AmPm},
     Context,
 };
 
@@ -69,7 +69,7 @@ pub async fn send_time(ctx: Context, message: Message) -> Result<()> {
     ctx.http
         .create_message(message.channel_id)
         .content(&timestamp)?
-        .components(&[copy_button()])?
+        .components(&[action_row(vec![copy_button()])])?
         .exec()
         .await?;
 

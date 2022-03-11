@@ -14,7 +14,7 @@ use twilight_util::builder::CallbackDataBuilder;
 
 use crate::{
     database,
-    interaction::{copy_button, undo_copy_button},
+    interaction::{action_row, copy_button, undo_copy_button},
     parse::to_24_hour,
 };
 
@@ -65,7 +65,7 @@ pub async fn run(
     let reply = _run(db, user_id, Time::from_interaction(command_data.into())?).await?;
 
     let callback = if reply.starts_with('<') {
-        CallbackDataBuilder::new().components([copy_button()])
+        CallbackDataBuilder::new().components([action_row(vec![copy_button()])])
     } else {
         CallbackDataBuilder::new()
     };
@@ -137,7 +137,7 @@ pub fn run_copy(mut content: String) -> CallbackData {
 
     CallbackDataBuilder::new()
         .content(content)
-        .components([undo_copy_button()])
+        .components([action_row(vec![undo_copy_button()])])
         .build()
 }
 
@@ -149,6 +149,6 @@ pub fn run_undo_copy(mut content: String) -> CallbackData {
 
     CallbackDataBuilder::new()
         .content(content)
-        .components([copy_button()])
+        .components([action_row(vec![copy_button()])])
         .build()
 }
