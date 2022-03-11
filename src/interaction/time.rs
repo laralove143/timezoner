@@ -7,48 +7,20 @@ use twilight_mention::{
     Mention,
 };
 use twilight_model::{
-    application::{
-        callback::CallbackData,
-        component::{button::ButtonStyle, ActionRow, Button, Component},
-        interaction::application_command::CommandData,
-    },
+    application::{callback::CallbackData, interaction::application_command::CommandData},
     id::{marker::UserMarker, Id},
 };
 use twilight_util::builder::CallbackDataBuilder;
 
-use crate::database;
-
-/// make the action row with the copy button
-fn make_copy_button() -> Component {
-    Component::ActionRow(ActionRow {
-        components: vec![Component::Button(Button {
-            custom_id: Some("copy".to_owned()),
-            label: Some("Copy".to_owned()),
-            style: ButtonStyle::Primary,
-            disabled: false,
-            emoji: None,
-            url: None,
-        })],
-    })
-}
-
-/// make the action row with the undo copy button
-fn make_undo_copy_button() -> Component {
-    Component::ActionRow(ActionRow {
-        components: vec![Component::Button(Button {
-            custom_id: Some("undo_copy".to_owned()),
-            label: Some("Undo Copy".to_owned()),
-            style: ButtonStyle::Danger,
-            disabled: false,
-            emoji: None,
-            url: None,
-        })],
-    })
-}
+use crate::{
+    database,
+    interaction::{copy_button, undo_copy_button},
+    parse::to_24_hour,
+};
 
 #[derive(CreateOption, CommandOption, Clone, Copy)]
 /// the choices for `am_pm` option
-enum AmPm {
+pub enum AmPm {
     /// time is am
     #[option(name = "am", value = "am")]
     Am,
@@ -93,7 +65,7 @@ pub async fn run(
     let reply = _run(db, user_id, Time::from_interaction(command_data.into())?).await?;
 
     let callback = if reply.starts_with('<') {
-        CallbackDataBuilder::new().components([make_copy_button()])
+        CallbackDataBuilder::new().components([copy_button()])
     } else {
         CallbackDataBuilder::new()
     };
@@ -165,7 +137,7 @@ pub fn run_copy(mut content: String) -> CallbackData {
 
     CallbackDataBuilder::new()
         .content(content)
-        .components([make_undo_copy_button()])
+        .components([undo_copy_button()])
         .build()
 }
 
@@ -177,31 +149,6 @@ pub fn run_undo_copy(mut content: String) -> CallbackData {
 
     CallbackDataBuilder::new()
         .content(content)
-        .components([make_copy_button()])
+        .components([copy_button()])
         .build()
-}
-
-/// converts 12-hour to 24-hour format
-#[allow(clippy::integer_arithmetic)]
-const fn to_24_hour(hour: u32, am_pm: AmPm) -> Option<u32> {
-    if hour > 12 {
-        return None;
-    }
-
-    Some(match am_pm {
-        AmPm::Am => {
-            if hour == 12 {
-                hour - 12
-            } else {
-                hour
-            }
-        }
-        AmPm::Pm => {
-            if hour == 12 {
-                hour
-            } else {
-                hour + 12
-            }
-        }
-    })
 }

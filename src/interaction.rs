@@ -4,6 +4,7 @@ use twilight_interactions::command::CreateCommand;
 use twilight_model::{
     application::{
         callback::InteractionResponse,
+        component::{button::ButtonStyle, ActionRow, Button, Component},
         interaction::{ApplicationCommand, Interaction, MessageComponentInteraction},
     },
     id::{marker::ApplicationMarker, Id},
@@ -15,9 +16,37 @@ use crate::{
 };
 
 /// functions to build and run the time command
-mod time;
+pub mod time;
 /// functions to build and run the timezone command
 mod timezone;
+
+/// make the action row with the copy button
+pub fn copy_button() -> Component {
+    Component::ActionRow(ActionRow {
+        components: vec![Component::Button(Button {
+            custom_id: Some("copy".to_owned()),
+            label: Some("Copy".to_owned()),
+            style: ButtonStyle::Primary,
+            disabled: false,
+            emoji: None,
+            url: None,
+        })],
+    })
+}
+
+/// make the action row with the undo copy button
+pub fn undo_copy_button() -> Component {
+    Component::ActionRow(ActionRow {
+        components: vec![Component::Button(Button {
+            custom_id: Some("undo_copy".to_owned()),
+            label: Some("Undo Copy".to_owned()),
+            style: ButtonStyle::Danger,
+            disabled: false,
+            emoji: None,
+            url: None,
+        })],
+    })
+}
 
 /// handle an interaction
 #[allow(clippy::wildcard_enum_match_arm)]
