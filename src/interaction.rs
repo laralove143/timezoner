@@ -94,7 +94,7 @@ async fn handle_command(ctx: &Context, command: ApplicationCommand) -> Result<()
         "time" => time::run(&ctx.db, user_id, command.data).await?,
         "timezone" => timezone::run(&ctx.db, user_id, command.data).await?,
         "enable_auto_conversion" => {
-            enable_auto_conversion::run(&ctx.db, command.guild_id, command.member, true).await?
+            enable_auto_conversion::run(&ctx.db, command.guild_id, command.member, None).await?
         }
         _ => bail!("unknown command: {:?}", command),
     };
@@ -121,8 +121,13 @@ async fn handle_component(ctx: &Context, component: MessageComponentInteraction)
             InteractionResponse::UpdateMessage(time::run_undo_copy(component.message.content))
         }
         "parsing_disable" => InteractionResponse::ChannelMessageWithSource(
-            enable_auto_conversion::run(&ctx.db, component.guild_id, component.member, false)
-                .await?,
+            enable_auto_conversion::run(
+                &ctx.db,
+                component.guild_id,
+                component.member,
+                Some((&ctx.http, component.message)),
+            )
+            .await?,
         ),
         _ => bail!("unknown custom id for component: {:?}", component),
     };
