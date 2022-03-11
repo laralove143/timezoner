@@ -7,7 +7,11 @@ use twilight_mention::{
     timestamp::{Timestamp, TimestampStyle},
     Mention,
 };
-use twilight_model::{channel::Message, guild::Permissions, id::Id};
+use twilight_model::{
+    channel::{ChannelType, Message},
+    guild::Permissions,
+    id::Id,
+};
 
 use crate::{
     database,
@@ -25,6 +29,10 @@ const UNKNOWN_TIMEZONE_EMOJI: RequestReactionType = RequestReactionType::Custom 
 /// discord formatted timestamp to the message's channel
 pub async fn send_time(ctx: Context, message: Message) -> Result<()> {
     if message.author.bot
+        || ctx
+            .cache
+            .guild_channel(message.channel_id)
+            .map_or(true, |c| c.kind() != ChannelType::GuildText)
         || !ctx
             .cache
             .permissions()
