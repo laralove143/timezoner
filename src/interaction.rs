@@ -55,7 +55,7 @@ pub fn undo_copy_button() -> Component {
 pub fn disable_parsing_button() -> Component {
     Component::Button(Button {
         custom_id: Some("parsing_disable".to_owned()),
-        label: Some("Disable auto-conversion".to_owned()),
+        label: Some("Disable auto-conversion (moderator only)".to_owned()),
         style: ButtonStyle::Danger,
         disabled: false,
         emoji: None,
