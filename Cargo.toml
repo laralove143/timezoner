@@ -9,8 +9,6 @@ edition = "2021"
 license = "MIT"
 
 [dependencies]
-tokio = { version = "1.16", features = ["macros", "rt-multi-thread"] }
-futures = { version = "0.3", default-features = false }
 twilight-gateway = { version = "0.9", default-features = false, features = [
     "rustls-native-roots",
     "zlib-simd",
@@ -20,7 +18,7 @@ twilight-http = { version = "0.9", default-features = false, features = [
     "rustls-native-roots",
     "trust-dns",
 ] }
-twilight-model = "0.9"
+twilight-model = { version = "0.9", default-features = false }
 twilight-cache-inmemory = { version = "0.9", features = ["permission-calculator"] }
 twilight-util = { version = "0.9", features = ["builder"] }
 twilight-mention = "0.9"
@@ -30,6 +28,9 @@ sqlx = { version = "0.5", default-features = false, features = [
     "macros",
     "sqlite",
 ] }
+tokio = { version = "1.17", features = ["macros", "rt-multi-thread"] }
+futures = { version = "0.3", default-features = false }
+anyhow = "1.0"
 chrono = "0.4"
 chrono-tz = "0.6"
 anyhow = "1.0"
