@@ -4,7 +4,10 @@ use twilight_interactions::command::CreateCommand;
 use twilight_model::{
     application::{
         component::{button::ButtonStyle, ActionRow, Button, Component},
-        interaction::{ApplicationCommand, Interaction, MessageComponentInteraction},
+        interaction::{
+            ApplicationCommand, ApplicationCommandAutocomplete, Interaction,
+            MessageComponentInteraction,
+        },
     },
     http::interaction::{InteractionResponse, InteractionResponseType},
     id::{marker::ApplicationMarker, Id},
@@ -68,6 +71,9 @@ pub fn disable_parsing_button() -> Component {
 pub async fn handle(ctx: Context, interaction: Interaction) -> Result<()> {
     match interaction {
         Interaction::ApplicationCommand(command) => handle_command(&ctx, *command).await?,
+        Interaction::ApplicationCommandAutocomplete(autocomplete) => {
+            handle_autocomplete(&ctx, *autocomplete).await?;
+        }
         Interaction::MessageComponent(component) => handle_component(&ctx, *component).await?,
         _ => {
             bail!("unknown interaction: {:?}", interaction);
@@ -90,7 +96,7 @@ async fn handle_command(ctx: &Context, command: ApplicationCommand) -> Result<()
         .context("the member info sent in the command doesn't have an attached user")?
         .id;
 
-    let callback = match command.data.name.as_str() {
+    let response = match command.data.name.as_str() {
         "time" => time::run(&ctx.db, user_id, command.data).await?,
         "timezone" => timezone::run(&ctx.db, user_id, command.data).await?,
         "enable_auto_conversion" => {
@@ -105,7 +111,34 @@ async fn handle_command(ctx: &Context, command: ApplicationCommand) -> Result<()
             &command.token,
             &InteractionResponse {
                 kind: InteractionResponseType::ChannelMessageWithSource,
-                data: Some(callback),
+                data: Some(response),
+            },
+        )
+        .exec()
+        .await?;
+
+    Ok(())
+}
+
+/// handle a sent autocomplete data
+async fn handle_autocomplete(
+    ctx: &Context,
+    autocomplete: ApplicationCommandAutocomplete,
+) -> Result<()> {
+    let client = ctx.http.interaction(ctx.application_id);
+
+    let response = match autocomplete.data.name.as_str() {
+        "timezone" => timezone::run_autocomplete(ctx, autocomplete.data.options.into())?,
+        _ => bail!("unknown autocomplete command: {:?}", autocomplete),
+    };
+
+    client
+        .create_response(
+            autocomplete.id,
+            &autocomplete.token,
+            &InteractionResponse {
+                kind: InteractionResponseType::ApplicationCommandAutocompleteResult,
+                data: Some(response),
             },
         )
         .exec()
@@ -155,7 +188,7 @@ pub async fn create(http: &Client, application_id: Id<ApplicationMarker>) -> Res
     http.interaction(application_id)
         .set_global_commands(&[
             Time::create_command().into(),
-            Timezone::create_command().into(),
+            Timezone::build(),
             EnableAutoConversion::create_command().into(),
         ])
         .exec()

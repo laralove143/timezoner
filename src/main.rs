@@ -19,11 +19,12 @@ mod interaction;
 /// epoch formatting
 mod parse;
 
-use std::{env, sync::Arc};
+use std::{env, path::Path, sync::Arc};
 
 use anyhow::Result;
 use futures::StreamExt;
 use sqlx::SqlitePool;
+use tantivy::{Index, IndexReader};
 use twilight_cache_inmemory::{InMemoryCache, ResourceType};
 use twilight_gateway::{Cluster, EventTypeFlags, Intents};
 use twilight_http::Client;
@@ -47,6 +48,8 @@ pub struct ContextValue {
     application_id: Id<ApplicationMarker>,
     /// used for permissions cache
     user_id: Id<UserMarker>,
+    /// used for timezone autocomplete
+    searcher: (Index, IndexReader),
 }
 
 #[tokio::main]
@@ -96,12 +99,18 @@ async fn main() -> Result<()> {
         .resource_types(resource_types)
         .build();
 
+    let mut timezones_index = Index::open_in_dir(Path::new("timezones_index"))?;
+    timezones_index.set_default_multithread_executor()?;
+    let timezones_reader = timezones_index.reader()?;
+    let searcher = (timezones_index, timezones_reader);
+
     let ctx = Arc::new(ContextValue {
         http,
         cache,
         db,
         application_id,
         user_id,
+        searcher,
     });
 
     while let Some((_, event)) = events.next().await {

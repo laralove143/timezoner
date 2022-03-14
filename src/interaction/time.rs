@@ -79,9 +79,9 @@ async fn _run(db: &SqlitePool, user_id: Id<UserMarker>, options: Time) -> Result
     let tz = match database::timezone(db, user_id).await? {
         Some(tz) => tz,
         None => {
-            return Ok("i don't know your timezone yet, copy it from \
-            https://kevinnovak.github.io/Time-Zone-Picker and tell me using `/timezone` please"
-                .to_owned())
+            return Ok(
+                "i don't know your timezone yet, and tell me using `/timezone` please".to_owned(),
+            )
         }
     };
 
