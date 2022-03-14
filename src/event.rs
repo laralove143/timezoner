@@ -21,7 +21,7 @@ pub async fn handle(ctx: Context, event: Event) {
 #[allow(clippy::wildcard_enum_match_arm)]
 pub async fn _handle(ctx: Context, event: Event) -> Result<()> {
     match event {
-        Event::InteractionCreate(interaction) => interaction::handle(ctx, (*interaction).0).await?,
+        Event::InteractionCreate(interaction) => interaction::handle(ctx, interaction.0).await?,
         Event::MessageCreate(message) => parse::send_time(ctx, (*message).0).await?,
         _ => (),
     }

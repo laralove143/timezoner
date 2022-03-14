@@ -31,8 +31,8 @@ pub async fn send_time(ctx: Context, message: Message) -> Result<()> {
     if message.author.bot
         || ctx
             .cache
-            .guild_channel(message.channel_id)
-            .map_or(true, |c| c.kind() != ChannelType::GuildText)
+            .channel(message.channel_id)
+            .map_or(true, |c| c.kind != ChannelType::GuildText)
         || !ctx
             .cache
             .permissions()

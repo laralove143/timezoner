@@ -5,11 +5,12 @@ use chrono_tz::Tz;
 use sqlx::SqlitePool;
 use twilight_interactions::command::{CommandModel, CreateCommand};
 use twilight_model::{
-    application::{callback::CallbackData, interaction::application_command::CommandData},
+    application::interaction::application_command::CommandData,
     channel::message::MessageFlags,
+    http::interaction::InteractionResponseData,
     id::{marker::UserMarker, Id},
 };
-use twilight_util::builder::CallbackDataBuilder;
+use twilight_util::builder::InteractionResponseDataBuilder;
 
 use crate::database;
 
@@ -33,7 +34,7 @@ pub async fn run(
     db: &SqlitePool,
     user_id: Id<UserMarker>,
     command_data: CommandData,
-) -> Result<CallbackData> {
+) -> Result<InteractionResponseData> {
     let reply = _run(
         db,
         user_id,
@@ -41,7 +42,7 @@ pub async fn run(
     )
     .await?;
 
-    Ok(CallbackDataBuilder::new()
+    Ok(InteractionResponseDataBuilder::new()
         .flags(MessageFlags::EPHEMERAL)
         .content(reply.to_owned())
         .build())

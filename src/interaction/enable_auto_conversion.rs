@@ -3,12 +3,12 @@ use sqlx::SqlitePool;
 use twilight_http::Client;
 use twilight_interactions::command::{CommandModel, CreateCommand};
 use twilight_model::{
-    application::callback::CallbackData,
     channel::{message::MessageFlags, Message},
     guild::{PartialMember, Permissions},
+    http::interaction::InteractionResponseData,
     id::{marker::GuildMarker, Id},
 };
-use twilight_util::builder::CallbackDataBuilder;
+use twilight_util::builder::InteractionResponseDataBuilder;
 
 use crate::database;
 
@@ -26,7 +26,7 @@ pub async fn run(
     guild_id: Option<Id<GuildMarker>>,
     member: Option<PartialMember>,
     disable_message: Option<(&Client, Message)>,
-) -> Result<CallbackData> {
+) -> Result<InteractionResponseData> {
     let reply = _run(
         db,
         guild_id.context("enable_auto_conversion command isn't run in a guild")?,
@@ -35,7 +35,7 @@ pub async fn run(
     )
     .await?;
 
-    Ok(CallbackDataBuilder::new()
+    Ok(InteractionResponseDataBuilder::new()
         .flags(MessageFlags::EPHEMERAL)
         .content(reply.to_owned())
         .build())

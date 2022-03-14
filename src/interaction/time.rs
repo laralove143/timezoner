@@ -7,10 +7,11 @@ use twilight_mention::{
     Mention,
 };
 use twilight_model::{
-    application::{callback::CallbackData, interaction::application_command::CommandData},
+    application::interaction::application_command::CommandData,
+    http::interaction::InteractionResponseData,
     id::{marker::UserMarker, Id},
 };
-use twilight_util::builder::CallbackDataBuilder;
+use twilight_util::builder::InteractionResponseDataBuilder;
 
 use crate::{
     database,
@@ -61,13 +62,13 @@ pub async fn run(
     db: &SqlitePool,
     user_id: Id<UserMarker>,
     command_data: CommandData,
-) -> Result<CallbackData> {
+) -> Result<InteractionResponseData> {
     let reply = _run(db, user_id, Time::from_interaction(command_data.into())?).await?;
 
     let callback = if reply.starts_with('<') {
-        CallbackDataBuilder::new().components([action_row(vec![copy_button()])])
+        InteractionResponseDataBuilder::new().components([action_row(vec![copy_button()])])
     } else {
-        CallbackDataBuilder::new()
+        InteractionResponseDataBuilder::new()
     };
 
     Ok(callback.content(reply).build())
@@ -131,11 +132,11 @@ async fn _run(db: &SqlitePool, user_id: Id<UserMarker>, options: Time) -> Result
 
 /// get the callback data with the time wrapped in backticks and the undo copy
 /// button
-pub fn run_copy(mut content: String) -> CallbackData {
+pub fn run_copy(mut content: String) -> InteractionResponseData {
     content.insert(0, '`');
     content.push('`');
 
-    CallbackDataBuilder::new()
+    InteractionResponseDataBuilder::new()
         .content(content)
         .components([action_row(vec![undo_copy_button()])])
         .build()
@@ -143,11 +144,11 @@ pub fn run_copy(mut content: String) -> CallbackData {
 
 /// get the callback data with the time unwrapped from backticks and the copy
 /// button
-pub fn run_undo_copy(mut content: String) -> CallbackData {
+pub fn run_undo_copy(mut content: String) -> InteractionResponseData {
     content.remove(0);
     content.pop();
 
-    CallbackDataBuilder::new()
+    InteractionResponseDataBuilder::new()
         .content(content)
         .components([action_row(vec![copy_button()])])
         .build()

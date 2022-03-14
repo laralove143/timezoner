@@ -3,10 +3,10 @@ use twilight_http::Client;
 use twilight_interactions::command::CreateCommand;
 use twilight_model::{
     application::{
-        callback::InteractionResponse,
         component::{button::ButtonStyle, ActionRow, Button, Component},
         interaction::{ApplicationCommand, Interaction, MessageComponentInteraction},
     },
+    http::interaction::{InteractionResponse, InteractionResponseType},
     id::{marker::ApplicationMarker, Id},
 };
 
@@ -100,10 +100,13 @@ async fn handle_command(ctx: &Context, command: ApplicationCommand) -> Result<()
     };
 
     client
-        .interaction_callback(
+        .create_response(
             command.id,
             &command.token,
-            &InteractionResponse::ChannelMessageWithSource(callback),
+            &InteractionResponse {
+                kind: InteractionResponseType::ChannelMessageWithSource,
+                data: Some(callback),
+            },
         )
         .exec()
         .await?;
@@ -116,24 +119,31 @@ async fn handle_component(ctx: &Context, component: MessageComponentInteraction)
     let client = ctx.http.interaction(ctx.application_id);
 
     let response = match component.data.custom_id.as_str() {
-        "copy" => InteractionResponse::UpdateMessage(time::run_copy(component.message.content)),
-        "undo_copy" => {
-            InteractionResponse::UpdateMessage(time::run_undo_copy(component.message.content))
-        }
-        "parsing_disable" => InteractionResponse::ChannelMessageWithSource(
-            enable_auto_conversion::run(
-                &ctx.db,
-                component.guild_id,
-                component.member,
-                Some((&ctx.http, component.message)),
-            )
-            .await?,
-        ),
+        "copy" => InteractionResponse {
+            kind: InteractionResponseType::UpdateMessage,
+            data: Some(time::run_copy(component.message.content)),
+        },
+        "undo_copy" => InteractionResponse {
+            kind: InteractionResponseType::UpdateMessage,
+            data: Some(time::run_undo_copy(component.message.content)),
+        },
+        "parsing_disable" => InteractionResponse {
+            kind: InteractionResponseType::ChannelMessageWithSource,
+            data: Some(
+                enable_auto_conversion::run(
+                    &ctx.db,
+                    component.guild_id,
+                    component.member,
+                    Some((&ctx.http, component.message)),
+                )
+                .await?,
+            ),
+        },
         _ => bail!("unknown custom id for component: {:?}", component),
     };
 
     client
-        .interaction_callback(component.id, &component.token, &response)
+        .create_response(component.id, &component.token, &response)
         .exec()
         .await?;
 

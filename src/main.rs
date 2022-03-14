@@ -51,7 +51,7 @@ pub struct ContextValue {
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    let intents = Intents::GUILD_MESSAGES | Intents::GUILDS;
+    let intents = Intents::GUILD_MESSAGES | Intents::MESSAGE_CONTENT | Intents::GUILDS;
     let event_types = EventTypeFlags::INTERACTION_CREATE
         | EventTypeFlags::MESSAGE_CREATE
         | EventTypeFlags::GUILD_CREATE
