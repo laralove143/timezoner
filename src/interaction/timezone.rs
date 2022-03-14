@@ -45,7 +45,7 @@ impl Timezone {
     /// return the command to register
     pub fn build() -> Command {
         CommandBuilder::new(
-            "timezone".to_owned(),
+            "set_timezone".to_owned(),
             "set your time zone so that you can actually use me".to_owned(),
             CommandType::ChatInput,
         )
