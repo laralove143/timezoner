@@ -76,7 +76,7 @@ pub async fn handle(ctx: Context, interaction: Interaction) -> Result<()> {
         }
         Interaction::MessageComponent(component) => handle_component(&ctx, *component).await?,
         _ => {
-            bail!("unknown interaction: {:?}", interaction);
+            bail!("unknown interaction: {interaction:#?}");
         }
     };
 
@@ -102,7 +102,7 @@ async fn handle_command(ctx: &Context, command: ApplicationCommand) -> Result<()
         "enable_auto_conversion" => {
             enable_auto_conversion::run(&ctx.db, command.guild_id, command.member, None).await?
         }
-        _ => bail!("unknown command: {:?}", command),
+        _ => bail!("unknown command: {command:#?}"),
     };
 
     client
@@ -129,7 +129,7 @@ async fn handle_autocomplete(
 
     let response = match autocomplete.data.name.as_str() {
         "timezone" => timezone::run_autocomplete(ctx, autocomplete.data.options.into())?,
-        _ => bail!("unknown autocomplete command: {:?}", autocomplete),
+        _ => bail!("unknown autocomplete command: {autocomplete:#?}"),
     };
 
     client
@@ -172,7 +172,7 @@ async fn handle_component(ctx: &Context, component: MessageComponentInteraction)
                 .await?,
             ),
         },
-        _ => bail!("unknown custom id for component: {:?}", component),
+        _ => bail!("unknown custom id for component: {component:#?}"),
     };
 
     client

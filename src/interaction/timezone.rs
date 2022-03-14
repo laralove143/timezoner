@@ -28,6 +28,7 @@ use twilight_util::builder::{
 use crate::{database, Context};
 
 /// the value for the timezone option of the timezone command
+#[derive(Debug)]
 enum TimezoneOption {
     /// the interaction is sent completely
     Complete(String),
@@ -36,6 +37,7 @@ enum TimezoneOption {
 }
 
 /// the timezone command
+#[derive(Debug)]
 pub struct Timezone {
     /// the timezone option of the timezone command
     timezone: TimezoneOption,
@@ -74,7 +76,7 @@ impl TryFrom<Vec<CommandDataOption>> for Timezone {
                 {
                     tz
                 } else {
-                    bail!("timezone command's first option is not string")
+                    bail!("timezone command's first option is not string: {options:#?}")
                 },
             ),
         })
@@ -116,7 +118,7 @@ async fn _run(
     let tz_option = if let TimezoneOption::Complete(tz) = timezone.timezone {
         tz
     } else {
-        bail!("tried to run timezone command with partial option")
+        bail!("tried to run timezone command with partial option: {timezone:#?}")
     };
 
     let tz = if let Ok(tz) = Tz::from_str(&tz_option) {
@@ -157,7 +159,7 @@ fn _run_autocomplete(ctx: &Context, timezone: Timezone) -> Result<Vec<String>> {
     let partial = if let TimezoneOption::Partial(option) = timezone.timezone {
         option
     } else {
-        bail!("tried to run timezone autocomplete with a complete option")
+        bail!("tried to run timezone autocomplete with a complete option: {timezone:#?}")
     };
 
     if partial.len() < 3 {
