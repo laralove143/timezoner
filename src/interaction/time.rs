@@ -57,7 +57,7 @@ pub struct Time {
     year: Option<i64>,
 }
 
-/// run the command, returning the callback data
+/// run the command, returning the response data
 pub async fn run(
     db: &SqlitePool,
     user_id: Id<UserMarker>,
@@ -65,13 +65,13 @@ pub async fn run(
 ) -> Result<InteractionResponseData> {
     let reply = _run(db, user_id, Time::from_interaction(command_data.into())?).await?;
 
-    let callback = if reply.starts_with('<') {
+    let response = if reply.starts_with('<') {
         InteractionResponseDataBuilder::new().components([action_row(vec![copy_button()])])
     } else {
         InteractionResponseDataBuilder::new()
     };
 
-    Ok(callback.content(reply).build())
+    Ok(response.content(reply).build())
 }
 
 /// run the command, returning the formatted string or the error message
@@ -130,7 +130,7 @@ async fn _run(db: &SqlitePool, user_id: Id<UserMarker>, options: Time) -> Result
     )
 }
 
-/// get the callback data with the time wrapped in backticks and the undo copy
+/// get the response data with the time wrapped in backticks and the undo copy
 /// button
 pub fn run_copy(mut content: String) -> InteractionResponseData {
     content.insert(0, '`');
@@ -142,7 +142,7 @@ pub fn run_copy(mut content: String) -> InteractionResponseData {
         .build()
 }
 
-/// get the callback data with the time unwrapped from backticks and the copy
+/// get the response data with the time unwrapped from backticks and the copy
 /// button
 pub fn run_undo_copy(mut content: String) -> InteractionResponseData {
     content.remove(0);

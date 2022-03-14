@@ -20,7 +20,7 @@ use crate::database;
 /// the `enable_auto_conversion` command
 pub struct EnableAutoConversion {}
 
-/// run the command, returning the callback data
+/// run the command, returning the response data
 pub async fn run(
     db: &SqlitePool,
     guild_id: Option<Id<GuildMarker>>,

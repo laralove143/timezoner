@@ -95,7 +95,7 @@ impl From<Vec<ApplicationCommandAutocompleteDataOption>> for Timezone {
     }
 }
 
-/// run the command, returning the callback data
+/// run the command, returning the response data
 pub async fn run(
     db: &SqlitePool,
     user_id: Id<UserMarker>,
