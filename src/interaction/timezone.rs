@@ -172,14 +172,10 @@ fn _run_autocomplete(ctx: &Context, timezone: Timezone) -> Result<Vec<String>> {
     };
     let searcher = ctx.searcher.1.searcher();
     let docs = searcher.search(&query, &TopDocs::with_limit(10))?;
-    println!("{docs:#?}");
 
     for (_, address) in docs {
-        println!("address there!");
         let doc = searcher.doc(address)?;
-        println!("{doc:#?}");
         for field in doc {
-            println!("{field:#?}");
             if let Value::Str(val) = field.value {
                 suggestions.push(val);
             };
