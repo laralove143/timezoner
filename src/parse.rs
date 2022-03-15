@@ -22,7 +22,7 @@ use crate::{
 /// the reaction request with the unknown timezone emoji
 const UNKNOWN_TIMEZONE_EMOJI: RequestReactionType = RequestReactionType::Custom {
     id: Id::new(950_033_075_440_603_186),
-    name: Some("use_timezone_command"),
+    name: Some("use_set_timezone_command"),
 };
 
 /// extracts a date/time from text and the user's saved timezone and sends

@@ -14,16 +14,18 @@ use twilight_model::{
 };
 
 use crate::{
-    interaction::{enable_auto_conversion::EnableAutoConversion, time::Time, timezone::Timezone},
+    interaction::{
+        enable_auto_conversion::EnableAutoConversion, set_timezone::SetTimezone, time::Time,
+    },
     Context,
 };
 
 /// functions to enable or disable parsing for a guild
 mod enable_auto_conversion;
+/// functions to build and run the `set_timezone` command
+mod set_timezone;
 /// functions to build and run the time command
 pub mod time;
-/// functions to build and run the timezone command
-mod timezone;
 
 /// make an action row with the given components
 pub const fn action_row(components: Vec<Component>) -> Component {
@@ -98,7 +100,7 @@ async fn handle_command(ctx: &Context, command: ApplicationCommand) -> Result<()
 
     let response = match command.data.name.as_str() {
         "time" => time::run(&ctx.db, user_id, command.data).await?,
-        "timezone" => timezone::run(&ctx.db, user_id, command.data).await?,
+        "set_timezone" => set_timezone::run(&ctx.db, user_id, command.data).await?,
         "enable_auto_conversion" => {
             enable_auto_conversion::run(&ctx.db, command.guild_id, command.member, None).await?
         }
@@ -128,7 +130,7 @@ async fn handle_autocomplete(
     let client = ctx.http.interaction(ctx.application_id);
 
     let response = match autocomplete.data.name.as_str() {
-        "timezone" => timezone::run_autocomplete(ctx, autocomplete.data.options.into())?,
+        "set_timezone" => set_timezone::run_autocomplete(ctx, autocomplete.data.options.into())?,
         _ => bail!("unknown autocomplete command: {autocomplete:#?}"),
     };
 
@@ -188,7 +190,7 @@ pub async fn create(http: &Client, application_id: Id<ApplicationMarker>) -> Res
     http.interaction(application_id)
         .set_global_commands(&[
             Time::create_command().into(),
-            Timezone::build(),
+            SetTimezone::build(),
             EnableAutoConversion::create_command().into(),
         ])
         .exec()

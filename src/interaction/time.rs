@@ -80,7 +80,8 @@ async fn _run(db: &SqlitePool, user_id: Id<UserMarker>, options: Time) -> Result
         Some(tz) => tz,
         None => {
             return Ok(
-                "i don't know your timezone yet, and tell me using `/timezone` please".to_owned(),
+                "i don't know your timezone yet, and tell me using `/set_timezone` please"
+                    .to_owned(),
             )
         }
     };
