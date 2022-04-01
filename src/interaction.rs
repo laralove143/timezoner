@@ -178,14 +178,11 @@ async fn handle_component(ctx: &Context, component: MessageComponentInteraction)
 /// create the slash commands globally
 pub async fn create(http: &Client, application_id: Id<ApplicationMarker>) -> Result<()> {
     http.interaction(application_id)
-        .set_guild_commands(
-            Id::new(903367565349384202),
-            &[
-                Time::create_command().into(),
-                Timezone::build(),
-                ToggleAutoConversion::create_command().into(),
-            ],
-        )
+        .set_global_commands(&[
+            Time::create_command().into(),
+            Timezone::build(),
+            ToggleAutoConversion::create_command().into(),
+        ])
         .exec()
         .await?;
 
