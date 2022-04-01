@@ -46,26 +46,20 @@ pub async fn timezone(db: &SqlitePool, user_id: Id<UserMarker>) -> Result<Option
     ))
 }
 
-/// disable parsing for a guild
-#[allow(clippy::integer_arithmetic)]
-pub async fn disable_parsing(db: &SqlitePool, guild_id: Id<GuildMarker>) -> Result<()> {
-    let id: i64 = guild_id.get().try_into()?;
-
-    query!("INSERT OR IGNORE INTO parse_disabled VALUES (?)", id)
-        .execute(db)
-        .await?;
-
-    Ok(())
-}
-
 /// enable parsing for a guild
 #[allow(clippy::integer_arithmetic)]
-pub async fn enable_parsing(db: &SqlitePool, guild_id: Id<GuildMarker>) -> Result<()> {
+pub async fn toggle_parsing(db: &SqlitePool, guild_id: Id<GuildMarker>) -> Result<()> {
     let id: i64 = guild_id.get().try_into()?;
 
-    query!("DELETE FROM parse_disabled WHERE guild_id = ?", id)
-        .execute(db)
-        .await?;
+    if parsing_disabled(db, guild_id).await? {
+        query!("DELETE FROM parse_disabled WHERE guild_id = ?", id)
+            .execute(db)
+            .await?;
+    } else {
+        query!("INSERT OR IGNORE INTO parse_disabled VALUES (?)", id)
+            .execute(db)
+            .await?;
+    }
 
     Ok(())
 }

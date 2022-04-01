@@ -14,18 +14,16 @@ use twilight_model::{
 };
 
 use crate::{
-    interaction::{
-        enable_auto_conversion::EnableAutoConversion, set_timezone::SetTimezone, time::Time,
-    },
+    interaction::{time::Time, timezone::Timezone, toggle_auto_conversion::ToggleAutoConversion},
     Context,
 };
 
-/// functions to enable or disable parsing for a guild
-mod enable_auto_conversion;
-/// functions to build and run the `set_timezone` command
-mod set_timezone;
 /// functions to build and run the time command
 pub mod time;
+/// functions to build and run the `set_timezone` command
+mod timezone;
+/// functions to enable or disable parsing for a guild
+mod toggle_auto_conversion;
 
 /// make an action row with the given components
 pub const fn action_row(components: Vec<Component>) -> Component {
@@ -56,11 +54,11 @@ pub fn undo_copy_button() -> Component {
     })
 }
 
-/// make the disable parsing button
-pub fn disable_parsing_button() -> Component {
+/// make the disable message button
+pub fn delete_button() -> Component {
     Component::Button(Button {
-        custom_id: Some("parsing_disable".to_owned()),
-        label: Some("Disable auto-conversion (moderator only)".to_owned()),
+        custom_id: Some("delete".to_owned()),
+        label: Some("Delete".to_owned()),
         style: ButtonStyle::Danger,
         disabled: false,
         emoji: None,
@@ -100,9 +98,9 @@ async fn handle_command(ctx: &Context, command: ApplicationCommand) -> Result<()
 
     let response = match command.data.name.as_str() {
         "time" => time::run(&ctx.db, user_id, command.data).await?,
-        "set_timezone" => set_timezone::run(&ctx.db, user_id, command.data).await?,
-        "enable_auto_conversion" => {
-            enable_auto_conversion::run(&ctx.db, command.guild_id, command.member, None).await?
+        "timezone" => timezone::run(&ctx.db, user_id, command.data).await?,
+        "toggle_auto_conversion" => {
+            toggle_auto_conversion::run(&ctx.db, command.guild_id, command.member).await?
         }
         _ => bail!("unknown command: {command:#?}"),
     };
@@ -130,7 +128,7 @@ async fn handle_autocomplete(
     let client = ctx.http.interaction(ctx.application_id);
 
     let response = match autocomplete.data.name.as_str() {
-        "set_timezone" => set_timezone::run_autocomplete(ctx, autocomplete.data.options.into())?,
+        "timezone" => timezone::run_autocomplete(ctx, autocomplete.data.options.into())?,
         _ => bail!("unknown autocomplete command: {autocomplete:#?}"),
     };
 
@@ -162,17 +160,9 @@ async fn handle_component(ctx: &Context, component: MessageComponentInteraction)
             kind: InteractionResponseType::UpdateMessage,
             data: Some(time::run_undo_copy(component.message.content)),
         },
-        "parsing_disable" => InteractionResponse {
+        "delete" => InteractionResponse {
             kind: InteractionResponseType::ChannelMessageWithSource,
-            data: Some(
-                enable_auto_conversion::run(
-                    &ctx.db,
-                    component.guild_id,
-                    component.member,
-                    Some((&ctx.http, component.message)),
-                )
-                .await?,
-            ),
+            data: Some(time::run_delete(&ctx.http, component.message).await?),
         },
         _ => bail!("unknown custom id for component: {component:#?}"),
     };
@@ -188,11 +178,14 @@ async fn handle_component(ctx: &Context, component: MessageComponentInteraction)
 /// create the slash commands globally
 pub async fn create(http: &Client, application_id: Id<ApplicationMarker>) -> Result<()> {
     http.interaction(application_id)
-        .set_global_commands(&[
-            Time::create_command().into(),
-            SetTimezone::build(),
-            EnableAutoConversion::create_command().into(),
-        ])
+        .set_guild_commands(
+            Id::new(903367565349384202),
+            &[
+                Time::create_command().into(),
+                Timezone::build(),
+                ToggleAutoConversion::create_command().into(),
+            ],
+        )
         .exec()
         .await?;
 

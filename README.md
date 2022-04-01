@@ -12,8 +12,8 @@ goodbye to timezone conversions! just type some time in chat and everyone magica
 you only need to do this once, just type something and it'll suggest timezones
 ### /time `hour` `minute` `am_pm` `day` `month` `year`
 an alternative to auto-convert, also supports dates
-### /enable_auto_convert
-enables auto-convert feature again
+### /toggle_auto_convert
+enables or disables auto-convert feature
 
 ## nerdy stuff
 made with [rust](https://www.rust-lang.org) and [twilight](https://github.com/twilight-rs/twilight) and sqlite
