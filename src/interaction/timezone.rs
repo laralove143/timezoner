@@ -38,16 +38,16 @@ enum TimezoneOption {
 
 /// the `set_timezone` command's options
 #[derive(Debug)]
-pub struct SetTimezone {
+pub struct Timezone {
     /// the timezone option
     timezone: TimezoneOption,
 }
 
-impl SetTimezone {
+impl Timezone {
     /// return the command to register
     pub fn build() -> Command {
         CommandBuilder::new(
-            "set_timezone".to_owned(),
+            "timezone".to_owned(),
             "set your time zone so that you can actually use me".to_owned(),
             CommandType::ChatInput,
         )
@@ -63,7 +63,7 @@ impl SetTimezone {
     }
 }
 
-impl TryFrom<Vec<CommandDataOption>> for SetTimezone {
+impl TryFrom<Vec<CommandDataOption>> for Timezone {
     type Error = anyhow::Error;
 
     fn try_from(mut options: Vec<CommandDataOption>) -> Result<Self> {
@@ -71,19 +71,19 @@ impl TryFrom<Vec<CommandDataOption>> for SetTimezone {
             timezone: TimezoneOption::Complete(
                 if let CommandOptionValue::String(tz) = options
                     .pop()
-                    .context("set_timezone command has no options")?
+                    .context("timezone command has no options")?
                     .value
                 {
                     tz
                 } else {
-                    bail!("set_timezone command's first option is not string: {options:#?}")
+                    bail!("timezone command's first option is not string: {options:#?}")
                 },
             ),
         })
     }
 }
 
-impl From<Vec<ApplicationCommandAutocompleteDataOption>> for SetTimezone {
+impl From<Vec<ApplicationCommandAutocompleteDataOption>> for Timezone {
     fn from(mut options: Vec<ApplicationCommandAutocompleteDataOption>) -> Self {
         Self {
             timezone: TimezoneOption::Partial(
@@ -110,15 +110,11 @@ pub async fn run(
 }
 
 /// run the command, returning the success or error message
-async fn _run(
-    db: &SqlitePool,
-    user_id: Id<UserMarker>,
-    options: SetTimezone,
-) -> Result<&'static str> {
+async fn _run(db: &SqlitePool, user_id: Id<UserMarker>, options: Timezone) -> Result<&'static str> {
     let tz_option = if let TimezoneOption::Complete(tz) = options.timezone {
         tz
     } else {
-        bail!("tried to run set_timezone command with partial option: {options:#?}")
+        bail!("tried to run timezone command with partial option: {options:#?}")
     };
 
     let tz = if let Ok(tz) = Tz::from_str(&tz_option) {
@@ -132,12 +128,12 @@ async fn _run(
 
     database::set_timezone(db, user_id, tz).await?;
 
-    Ok("tada! now you can use the `/time` command ^^")
+    Ok("tada! now you can send times ^^")
 }
 
 /// return the interaction response data with the suggestions based on the
 /// partial input
-pub fn run_autocomplete(ctx: &Context, options: SetTimezone) -> Result<InteractionResponseData> {
+pub fn run_autocomplete(ctx: &Context, options: Timezone) -> Result<InteractionResponseData> {
     let suggestions = _run_autocomplete(ctx, options)?;
 
     Ok(InteractionResponseDataBuilder::new()
@@ -153,7 +149,7 @@ pub fn run_autocomplete(ctx: &Context, options: SetTimezone) -> Result<Interacti
 }
 
 /// return suggestions based on the partial input
-fn _run_autocomplete(ctx: &Context, options: SetTimezone) -> Result<Vec<String>> {
+fn _run_autocomplete(ctx: &Context, options: Timezone) -> Result<Vec<String>> {
     let mut suggestions = Vec::with_capacity(10);
 
     let partial = if let TimezoneOption::Partial(option) = options.timezone {

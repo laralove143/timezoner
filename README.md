@@ -8,7 +8,7 @@ goodbye to timezone conversions! just type some time in chat and everyone magica
 ![example](example.gif)
 
 ## commands
-### /set_timezone `timezone`
+### /timezone `timezone`
 you only need to do this once, just type something and it'll suggest timezones
 ### /time `hour` `minute` `am_pm` `day` `month` `year`
 an alternative to auto-convert, also supports dates
