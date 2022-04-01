@@ -1,6 +1,7 @@
 use anyhow::{Context, Result};
 use chrono::{Datelike, Utc};
 use sqlx::SqlitePool;
+use twilight_http::Client;
 use twilight_interactions::command::{CommandModel, CommandOption, CreateCommand, CreateOption};
 use twilight_mention::{
     timestamp::{Timestamp, TimestampStyle},
@@ -8,6 +9,7 @@ use twilight_mention::{
 };
 use twilight_model::{
     application::interaction::application_command::CommandData,
+    channel::{message::MessageFlags, Message},
     http::interaction::InteractionResponseData,
     id::{marker::UserMarker, Id},
 };
@@ -15,7 +17,7 @@ use twilight_util::builder::InteractionResponseDataBuilder;
 
 use crate::{
     database,
-    interaction::{action_row, copy_button, undo_copy_button},
+    interaction::{action_row, copy_button, delete_button, undo_copy_button},
     parse::to_24_hour,
 };
 
@@ -139,7 +141,7 @@ pub fn run_copy(mut content: String) -> InteractionResponseData {
 
     InteractionResponseDataBuilder::new()
         .content(content)
-        .components([action_row(vec![undo_copy_button()])])
+        .components([action_row(vec![undo_copy_button(), delete_button()])])
         .build()
 }
 
@@ -151,6 +153,18 @@ pub fn run_undo_copy(mut content: String) -> InteractionResponseData {
 
     InteractionResponseDataBuilder::new()
         .content(content)
-        .components([action_row(vec![copy_button()])])
+        .components([action_row(vec![copy_button(), delete_button()])])
         .build()
+}
+
+/// delete the message and return the response
+pub async fn run_delete(http: &Client, message: Message) -> Result<InteractionResponseData> {
+    http.delete_message(message.channel_id, message.id)
+        .exec()
+        .await?;
+
+    Ok(InteractionResponseDataBuilder::new()
+        .flags(MessageFlags::EPHEMERAL)
+        .content("done!".to_owned())
+        .build())
 }
