@@ -15,7 +15,7 @@ use twilight_model::{
 
 use crate::{
     database,
-    interaction::{action_row, copy_button, delete_button, time::AmPm},
+    interaction::{action_row, copy_button, time::AmPm},
     webhooks, Context,
 };
 

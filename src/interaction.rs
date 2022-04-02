@@ -54,18 +54,6 @@ pub fn undo_copy_button() -> Component {
     })
 }
 
-/// make the disable message button
-pub fn delete_button() -> Component {
-    Component::Button(Button {
-        custom_id: Some("delete".to_owned()),
-        label: Some("Delete".to_owned()),
-        style: ButtonStyle::Danger,
-        disabled: false,
-        emoji: None,
-        url: None,
-    })
-}
-
 /// handle an interaction
 #[allow(clippy::wildcard_enum_match_arm)]
 pub async fn handle(ctx: Context, interaction: Interaction) -> Result<()> {
@@ -159,10 +147,6 @@ async fn handle_component(ctx: &Context, component: MessageComponentInteraction)
         "undo_copy" => InteractionResponse {
             kind: InteractionResponseType::UpdateMessage,
             data: Some(time::run_undo_copy(component.message.content)),
-        },
-        "delete" => InteractionResponse {
-            kind: InteractionResponseType::ChannelMessageWithSource,
-            data: Some(time::run_delete(&ctx.http, component.message).await?),
         },
         _ => bail!("unknown custom id for component: {component:#?}"),
     };
