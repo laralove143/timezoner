@@ -134,8 +134,8 @@ async fn _run(db: &SqlitePool, user_id: Id<UserMarker>, options: Time) -> Result
 /// get the response data with the time wrapped in backticks and the undo copy
 /// button
 pub fn run_copy(mut content: String) -> InteractionResponseData {
-    content.insert(0, '`');
-    content.push('`');
+    content = content.replace('<', "`<");
+    content = content.replace('>', ">`");
 
     InteractionResponseDataBuilder::new()
         .content(content)
@@ -146,8 +146,7 @@ pub fn run_copy(mut content: String) -> InteractionResponseData {
 /// get the response data with the time unwrapped from backticks and the copy
 /// button
 pub fn run_undo_copy(mut content: String) -> InteractionResponseData {
-    content.remove(0);
-    content.pop();
+    content.retain(|c| c != '`');
 
     InteractionResponseDataBuilder::new()
         .content(content)
