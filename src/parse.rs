@@ -16,7 +16,7 @@ use twilight_model::{
 use crate::{
     database,
     interaction::{action_row, copy_button, delete_button, time::AmPm},
-    Context,
+    webhooks, Context,
 };
 
 /// the reaction request with the unknown timezone emoji
@@ -38,7 +38,7 @@ pub async fn send_time(ctx: Context, message: Message) -> Result<()> {
             .permissions()
             .in_channel(ctx.user_id, message.channel_id)?
             .contains(
-                Permissions::SEND_MESSAGES
+                Permissions::MANAGE_WEBHOOKS
                     | Permissions::ADD_REACTIONS
                     | Permissions::USE_EXTERNAL_EMOJIS,
             )
@@ -81,12 +81,17 @@ pub async fn send_time(ctx: Context, message: Message) -> Result<()> {
     .mention()
     .to_string();
 
-    ctx.http
-        .create_message(message.channel_id)
-        .content(&timestamp)?
-        .components(&[action_row(vec![copy_button(), delete_button()])])?
-        .exec()
-        .await?;
+    webhooks::send_as_member(
+        &ctx,
+        message.channel_id,
+        &message
+            .member
+            .context("message doesn't have member attached")?,
+        &message.author,
+        &timestamp,
+        Some(&[action_row(vec![copy_button(), delete_button()])]),
+    )
+    .await?;
 
     Ok(())
 }

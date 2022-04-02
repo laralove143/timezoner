@@ -18,16 +18,21 @@ mod interaction;
 /// functions to parse date/time from strings and format them into discord's
 /// epoch formatting
 mod parse;
+/// creating, caching, retrieving and sending webhooks
+mod webhooks;
 
 use std::{env, path::Path, sync::Arc};
 
+use crate::webhooks::CachedWebhook;
 use anyhow::Result;
+use dashmap::DashMap;
 use futures::StreamExt;
 use sqlx::SqlitePool;
 use tantivy::{Index, IndexReader};
 use twilight_cache_inmemory::{InMemoryCache, ResourceType};
 use twilight_gateway::{Cluster, EventTypeFlags, Intents};
 use twilight_http::Client;
+use twilight_model::id::marker::ChannelMarker;
 use twilight_model::id::{
     marker::{ApplicationMarker, UserMarker},
     Id,
@@ -42,6 +47,8 @@ pub struct ContextValue {
     http: Client,
     /// used to check send messages permissions
     cache: InMemoryCache,
+    /// used to impersonate message authors
+    webhooks: DashMap<Id<ChannelMarker>, CachedWebhook>,
     /// used for the user's timezone information
     db: SqlitePool,
     /// used for creating the interaction client
@@ -54,8 +61,12 @@ pub struct ContextValue {
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    let intents = Intents::GUILD_MESSAGES | Intents::MESSAGE_CONTENT | Intents::GUILDS;
+    let intents = Intents::GUILDS
+        | Intents::GUILD_WEBHOOKS
+        | Intents::GUILD_MESSAGES
+        | Intents::MESSAGE_CONTENT;
     let event_types = EventTypeFlags::INTERACTION_CREATE
+        | EventTypeFlags::WEBHOOKS_UPDATE
         | EventTypeFlags::MESSAGE_CREATE
         | EventTypeFlags::GUILD_CREATE
         | EventTypeFlags::GUILD_UPDATE
@@ -66,6 +77,12 @@ async fn main() -> Result<()> {
         | EventTypeFlags::CHANNEL_CREATE
         | EventTypeFlags::CHANNEL_UPDATE
         | EventTypeFlags::CHANNEL_DELETE
+        | EventTypeFlags::THREAD_CREATE
+        | EventTypeFlags::THREAD_DELETE
+        | EventTypeFlags::THREAD_UPDATE
+        | EventTypeFlags::THREAD_LIST_SYNC
+        | EventTypeFlags::THREAD_MEMBER_UPDATE
+        | EventTypeFlags::THREAD_MEMBERS_UPDATE
         | EventTypeFlags::MEMBER_ADD
         | EventTypeFlags::MEMBER_CHUNK
         | EventTypeFlags::MEMBER_UPDATE
@@ -98,6 +115,7 @@ async fn main() -> Result<()> {
     let cache = InMemoryCache::builder()
         .resource_types(resource_types)
         .build();
+    let webhooks = DashMap::new();
 
     let mut timezones_index = Index::open_in_dir(Path::new("timezones_index"))?;
     timezones_index.set_default_multithread_executor()?;
@@ -107,6 +125,7 @@ async fn main() -> Result<()> {
     let ctx = Arc::new(ContextValue {
         http,
         cache,
+        webhooks,
         db,
         application_id,
         user_id,
