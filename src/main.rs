@@ -15,7 +15,7 @@ mod database;
 mod event;
 /// functions to create and handle interaction
 mod interaction;
-/// functions to parse date/time from strings and format them into discord's
+/// functions to parse time from strings and format them into discord's
 /// epoch formatting
 mod parse;
 /// creating, caching, retrieving and sending webhooks
@@ -23,7 +23,6 @@ mod webhooks;
 
 use std::{env, path::Path, sync::Arc};
 
-use crate::webhooks::CachedWebhook;
 use anyhow::Result;
 use dashmap::DashMap;
 use futures::StreamExt;
@@ -32,11 +31,12 @@ use tantivy::{Index, IndexReader};
 use twilight_cache_inmemory::{InMemoryCache, ResourceType};
 use twilight_gateway::{Cluster, EventTypeFlags, Intents};
 use twilight_http::Client;
-use twilight_model::id::marker::ChannelMarker;
 use twilight_model::id::{
-    marker::{ApplicationMarker, UserMarker},
+    marker::{ApplicationMarker, ChannelMarker, UserMarker},
     Id,
 };
+
+use crate::webhooks::CachedWebhook;
 
 /// arced context data for thread safety
 type Context = Arc<ContextValue>;

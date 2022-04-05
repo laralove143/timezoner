@@ -1,6 +1,5 @@
 use anyhow::{Context as _, Result};
 use dashmap::mapref::one::Ref;
-use twilight_model::application::component::Component;
 use twilight_model::{
     channel::webhook::Webhook,
     guild::PartialMember,
@@ -35,7 +34,8 @@ impl TryFrom<Webhook> for CachedWebhook {
     }
 }
 
-/// get a webhook from the cache, falling back to the http api, then to creating the webhook
+/// get a webhook from the cache, falling back to the http api, then to creating
+/// the webhook
 pub async fn get(
     ctx: &Context,
     channel_id: Id<ChannelMarker>,
@@ -99,7 +99,6 @@ pub async fn send_as_member(
     member: &PartialMember,
     user: &User,
     content: &str,
-    component: Option<&[Component]>,
 ) -> Result<()> {
     let channel = ctx
         .cache
@@ -127,10 +126,6 @@ pub async fn send_as_member(
 
     if is_thread {
         exec = exec.thread_id(channel_id);
-    }
-
-    if let Some(components) = component {
-        exec = exec.components(components)?;
     }
 
     match member.avatar.or(user.avatar) {

@@ -25,7 +25,18 @@ const UNKNOWN_TIMEZONE_EMOJI: RequestReactionType = RequestReactionType::Custom 
     name: Some("use_set_timezone_command"),
 };
 
-/// adds discord formatted timestamp after times from message content and its author's saved timezone and sends it to the message's channel impersonating the author
+/// whether the time is am or pm, if 12-hour
+#[derive(Clone, Copy)]
+pub enum AmPm {
+    /// time is am
+    Am,
+    /// time is pm
+    Pm,
+}
+
+/// adds discord formatted timestamp after times from message content and its
+/// author's saved timezone and sends it to the message's channel impersonating
+/// the author
 pub async fn send_time(ctx: Context, message: Message) -> Result<()> {
     if message.author.bot
         || ctx
@@ -125,9 +136,10 @@ pub async fn send_time(ctx: Context, message: Message) -> Result<()> {
     Ok(())
 }
 
-/// parses one possible occurrence of a time, returning that and the index thats iterated over so far
+/// parses one possible occurrence of a time, returning that and the index thats
+/// iterated over so far
 #[allow(clippy::integer_arithmetic)]
-fn try_time(chars: &mut CharIndices) -> Option<NaiveTime> {
+pub fn try_time(chars: &mut CharIndices) -> Option<NaiveTime> {
     let mut current;
     let mut min_given = false;
 

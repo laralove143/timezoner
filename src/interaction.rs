@@ -2,25 +2,19 @@ use anyhow::{bail, Context as _, Result};
 use twilight_http::Client;
 use twilight_interactions::command::CreateCommand;
 use twilight_model::{
-    application::{
-        component::{button::ButtonStyle, ActionRow, Button, Component},
-        interaction::{
-            ApplicationCommand, ApplicationCommandAutocomplete, Interaction,
-            MessageComponentInteraction,
-        },
-    },
+    application::interaction::{ApplicationCommand, ApplicationCommandAutocomplete, Interaction},
     http::interaction::{InteractionResponse, InteractionResponseType},
     id::{marker::ApplicationMarker, Id},
 };
 
 use crate::{
-    interaction::{time::Time, timezone::Timezone, toggle_auto_conversion::ToggleAutoConversion},
+    interaction::{copy::Copy, timezone::Timezone},
     Context,
 };
 
-/// functions to build and run the time command
-pub mod time;
-/// functions to build and run the `set_timezone` command
+/// functions to build and run the copy command
+mod copy;
+/// functions to build and run the `timezone` command
 mod timezone;
 /// functions to enable or disable parsing for a guild
 mod toggle_auto_conversion;
@@ -62,7 +56,6 @@ pub async fn handle(ctx: Context, interaction: Interaction) -> Result<()> {
         Interaction::ApplicationCommandAutocomplete(autocomplete) => {
             handle_autocomplete(&ctx, *autocomplete).await?;
         }
-        Interaction::MessageComponent(component) => handle_component(&ctx, *component).await?,
         _ => {
             bail!("unknown interaction: {interaction:#?}");
         }
@@ -85,7 +78,7 @@ async fn handle_command(ctx: &Context, command: ApplicationCommand) -> Result<()
         .id;
 
     let response = match command.data.name.as_str() {
-        "time" => time::run(&ctx.db, user_id, command.data).await?,
+        "copy" => copy::run(&ctx.db, user_id, command.data).await?,
         "timezone" => timezone::run(&ctx.db, user_id, command.data).await?,
         "toggle_auto_conversion" => {
             toggle_auto_conversion::run(&ctx.db, command.guild_id, command.member).await?
@@ -135,38 +128,10 @@ async fn handle_autocomplete(
     Ok(())
 }
 
-/// handle a component interaction
-async fn handle_component(ctx: &Context, component: MessageComponentInteraction) -> Result<()> {
-    let client = ctx.http.interaction(ctx.application_id);
-
-    let response = match component.data.custom_id.as_str() {
-        "copy" => InteractionResponse {
-            kind: InteractionResponseType::UpdateMessage,
-            data: Some(time::run_copy(component.message.content)),
-        },
-        "undo_copy" => InteractionResponse {
-            kind: InteractionResponseType::UpdateMessage,
-            data: Some(time::run_undo_copy(component.message.content)),
-        },
-        _ => bail!("unknown custom id for component: {component:#?}"),
-    };
-
-    client
-        .create_response(component.id, &component.token, &response)
-        .exec()
-        .await?;
-
-    Ok(())
-}
-
 /// create the slash commands globally
 pub async fn create(http: &Client, application_id: Id<ApplicationMarker>) -> Result<()> {
     http.interaction(application_id)
-        .set_global_commands(&[
-            Time::create_command().into(),
-            Timezone::build(),
-            ToggleAutoConversion::create_command().into(),
-        ])
+        .set_global_commands(&[Copy::create_command().into(), Timezone::build()])
         .exec()
         .await?;
 
