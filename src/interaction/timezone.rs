@@ -27,7 +27,7 @@ use twilight_util::builder::{
 
 use crate::{database, Context};
 
-/// the timezone option of the `set_timezone` command
+/// the timezone option of the `timezone` command
 #[derive(Debug)]
 enum TimezoneOption {
     /// the interaction is sent completely
@@ -36,7 +36,7 @@ enum TimezoneOption {
     Partial(String),
 }
 
-/// the `set_timezone` command's options
+/// the `timezone` command's options
 #[derive(Debug)]
 pub struct Timezone {
     /// the timezone option

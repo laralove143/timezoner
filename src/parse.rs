@@ -13,16 +13,12 @@ use twilight_model::{
     id::Id,
 };
 
-use crate::{
-    database,
-    interaction::{action_row, copy_button, time::AmPm},
-    webhooks, Context,
-};
+use crate::{database, webhooks, Context};
 
 /// the reaction request with the unknown timezone emoji
 const UNKNOWN_TIMEZONE_EMOJI: RequestReactionType = RequestReactionType::Custom {
     id: Id::new(950_033_075_440_603_186),
-    name: Some("use_set_timezone_command"),
+    name: Some("use_timezone_command"),
 };
 
 /// whether the time is am or pm, if 12-hour
@@ -122,7 +118,6 @@ pub async fn send_time(ctx: Context, message: Message) -> Result<()> {
             .context("message doesn't have member attached")?,
         &message.author,
         &content,
-        Some(&[action_row(vec![copy_button()])]),
     )
     .await?;
 
