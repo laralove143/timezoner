@@ -31,9 +31,15 @@ use tantivy::{Index, IndexReader};
 use twilight_cache_inmemory::{InMemoryCache, ResourceType};
 use twilight_gateway::{Cluster, EventTypeFlags, Intents};
 use twilight_http::Client;
-use twilight_model::id::{
-    marker::{ApplicationMarker, ChannelMarker, UserMarker},
-    Id,
+use twilight_model::{
+    gateway::{
+        payload::outgoing::update_presence::UpdatePresencePayload,
+        presence::{ActivityType, MinimalActivity, Status},
+    },
+    id::{
+        marker::{ApplicationMarker, ChannelMarker, UserMarker},
+        Id,
+    },
 };
 
 use crate::webhooks::CachedWebhook;
@@ -94,6 +100,19 @@ async fn main() -> Result<()> {
 
     let (cluster, mut events) = Cluster::builder(token.clone(), intents)
         .event_types(event_types)
+        .presence(UpdatePresencePayload::new(
+            vec![MinimalActivity {
+                kind: ActivityType::default(),
+                name: "if i stopped working, its probably because the updates i got need new \
+                       permissions, try kicking me and inviting me again!"
+                    .to_owned(),
+                url: None,
+            }
+            .into()],
+            false,
+            None,
+            Status::DoNotDisturb,
+        )?)
         .build()
         .await?;
     let cluster_spawn = Arc::new(cluster);
