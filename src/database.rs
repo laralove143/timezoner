@@ -1,10 +1,7 @@
 use anyhow::{anyhow, Result};
 use chrono_tz::Tz;
 use sqlx::{query, query_scalar, sqlite::SqliteConnectOptions, SqlitePool};
-use twilight_model::id::{
-    marker::{GuildMarker, UserMarker},
-    Id,
-};
+use twilight_model::id::{marker::UserMarker, Id};
 
 /// connect to the database
 pub async fn new() -> Result<SqlitePool> {
@@ -44,35 +41,4 @@ pub async fn timezone(db: &SqlitePool, user_id: Id<UserMarker>) -> Result<Option
         tz.parse()
             .map_err(|s| anyhow!("saved timezone is invalid: {s}"))?,
     ))
-}
-
-/// enable parsing for a guild
-#[allow(clippy::integer_arithmetic)]
-pub async fn toggle_parsing(db: &SqlitePool, guild_id: Id<GuildMarker>) -> Result<()> {
-    let id: i64 = guild_id.get().try_into()?;
-
-    if parsing_disabled(db, guild_id).await? {
-        query!("DELETE FROM parse_disabled WHERE guild_id = ?", id)
-            .execute(db)
-            .await?;
-    } else {
-        query!("INSERT OR IGNORE INTO parse_disabled VALUES (?)", id)
-            .execute(db)
-            .await?;
-    }
-
-    Ok(())
-}
-
-/// retrieve whether parsing is disabled in a guild
-#[allow(clippy::integer_arithmetic)]
-pub async fn parsing_disabled(db: &SqlitePool, guild_id: Id<GuildMarker>) -> Result<bool> {
-    let id: i64 = guild_id.get().try_into()?;
-
-    Ok(
-        query_scalar!("SELECT 1 FROM parse_disabled WHERE guild_id = ?", id)
-            .fetch_optional(db)
-            .await?
-            .is_some(),
-    )
 }

@@ -53,13 +53,6 @@ pub async fn send_time(ctx: Context, message: Message) -> Result<()> {
                     | Permissions::ADD_REACTIONS
                     | Permissions::USE_EXTERNAL_EMOJIS,
             )
-        || database::parsing_disabled(
-            &ctx.db,
-            message
-                .guild_id
-                .context("message to parse is not in a guild")?,
-        )
-        .await?
     {
         return Ok(());
     }
