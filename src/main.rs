@@ -45,7 +45,7 @@ type Context = Arc<ContextValue>;
 pub struct ContextValue {
     /// used to make http requests to discord
     http: Client,
-    /// used to check send messages permissions
+    /// used to check permissions and channels
     cache: InMemoryCache,
     /// used to impersonate message authors
     webhooks: DashMap<Id<ChannelMarker>, CachedWebhook>,
