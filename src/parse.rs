@@ -128,13 +128,12 @@ pub async fn send_time(ctx: Context, message: Message) -> Result<()> {
 /// iterated over so far
 #[allow(clippy::integer_arithmetic)]
 pub fn try_time(chars: &mut CharIndices) -> Option<NaiveTime> {
-    let mut current;
     let mut min_given = false;
 
     let mut hour = chars.find_map(|(_, c)| c.to_digit(10))?;
     let mut min = 0;
 
-    current = chars.next()?;
+    let mut current = chars.next()?;
     if let Some(digit) = current.1.to_digit(10) {
         hour = hour * 10 + digit;
         current = chars.next()?;
