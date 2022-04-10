@@ -40,10 +40,9 @@ async fn handle_command(ctx: &Context, command: ApplicationCommand) -> Result<()
     let user_id = command
         .member
         .as_ref()
-        .context("command is not run in a guild")?
-        .user
+        .map_or(&command.user, |member| &member.user)
         .as_ref()
-        .context("the member info sent in the command doesn't have an attached user")?
+        .context("the command doesn't have any attached user")?
         .id;
 
     let response = match command.data.name.as_str() {
