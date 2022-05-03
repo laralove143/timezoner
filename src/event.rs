@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use anyhow::Result;
+use anyhow::{IntoResult, Result};
 use twilight_gateway::Event;
 use twilight_http::Client;
 
@@ -11,9 +11,9 @@ use crate::{interaction, parse, webhooks, Context};
 pub async fn handle(ctx: Context, event: Event) {
     if let Err(err) = _handle(Arc::clone(&ctx), event).await {
         if let Err(inform_error) = inform_owner(&ctx.http).await {
-            eprintln!("informing the owner also failed: {}", inform_error);
+            eprintln!("informing the owner also failed: {inform_error:?}");
         }
-        eprintln!("{err}");
+        eprintln!("{err:?}");
     }
 }
 
@@ -39,6 +39,7 @@ async fn inform_owner(http: &Client) -> Result<()> {
                 .model()
                 .await?
                 .owner
+                .ok()?
                 .id,
         )
         .exec()
