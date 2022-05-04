@@ -1,7 +1,7 @@
-use std::str::CharIndices;
-
-use anyhow::{Context as _, Result};
-use chrono::{NaiveTime, Utc};
+use anyhow::{bail, Context as _, IntoResult, Result};
+use chrono::Utc;
+use chrono_tz::Tz;
+use regex::{Captures, Regex};
 use twilight_http::request::channel::reaction::RequestReactionType;
 use twilight_mention::{
     timestamp::{Timestamp, TimestampStyle},
@@ -30,6 +30,29 @@ pub enum AmPm {
     Pm,
 }
 
+/// whether the time is 12-hour or 24-hour format
+#[derive(Clone, Copy)]
+pub enum Format {
+    /// time is in 12-hour format
+    Hour12,
+    /// time is in 24-hour format
+    Hour24,
+}
+
+/// returns the regex to parse times in 12 hour format
+pub fn regex_12_hour() -> Result<Regex> {
+    Ok(Regex::new(
+        r"(?:^|\s)(?P<hour>1[0-2]|0?[1-9])(?::(?P<minute>[0-5]\d))?\s*(?P<am_pm>am|pm)\b",
+    )?)
+}
+
+/// returns the regex to parse times in 24 hour format
+pub fn regex_24_hour() -> Result<Regex> {
+    Ok(Regex::new(
+        r"(?:^|\s)(?P<hour>[0-1]?\d|2[0-3]):(?P<minute>[0-5]\d)\b",
+    )?)
+}
+
 /// adds discord formatted timestamp after times from message content and its
 /// author's saved timezone and sends it to the message's channel impersonating
 /// the author
@@ -53,57 +76,53 @@ pub async fn send_time(ctx: Context, message: Message) -> Result<()> {
         return Ok(());
     }
 
-    let timezone = database::timezone(&ctx.db, message.author.id).await?;
+    let mut top_captures: Vec<(Captures, Format)> = ctx
+        .regex_12_hour
+        .captures_iter(&message.content)
+        .map(|captures| (captures, Format::Hour12))
+        .chain(
+            ctx.regex_24_hour
+                .captures_iter(&message.content)
+                .map(|captures| (captures, Format::Hour24)),
+        )
+        .collect();
 
-    let mut chars = message.content.char_indices();
-    let mut pushed_idx = 0;
-    let mut content = "".to_owned();
-    while chars.size_hint().0 != 0 {
-        if let Some(time) = try_time(&mut chars) {
-            let tz = if let Some(tz) = timezone {
-                tz
-            } else {
-                ctx.http
-                    .create_reaction(message.channel_id, message.id, &UNKNOWN_TIMEZONE_EMOJI)
-                    .exec()
-                    .await?;
-                return Ok(());
-            };
+    top_captures.sort_unstable_by(|old, new| {
+        old.0
+            .get(0)
+            .map_or(0, |m| m.start())
+            .cmp(&new.0.get(0).map_or(0, |m| m.start()))
+    });
 
-            let idx = chars.next().map_or(message.content.len(), |(idx, _)| idx);
-            content.push_str(
-                message
-                    .content
-                    .get(pushed_idx..idx)
-                    .context("chars index is larger than string length")?,
-            );
-            pushed_idx = idx;
-            content.push_str(&format!(
-                " *({} in your clock)*",
-                Timestamp::new(
-                    Utc::today()
-                        .with_timezone(&tz)
-                        .and_time(time)
-                        .context("parsed naive time is invalid")?
-                        .timestamp()
-                        .try_into()?,
-                    Some(TimestampStyle::ShortTime),
-                )
-                .mention()
-            ));
-        }
-    }
-
-    if content.is_empty() {
+    if top_captures.is_empty() {
         return Ok(());
-    }
+    };
 
-    content.push_str(
-        message
-            .content
-            .get(pushed_idx..message.content.len())
-            .context("message content length is larger than message content length?")?,
-    );
+    let tz = if let Some(tz) = database::timezone(&ctx.db, message.author.id).await? {
+        tz
+    } else {
+        ctx.http
+            .create_reaction(message.channel_id, message.id, &UNKNOWN_TIMEZONE_EMOJI)
+            .exec()
+            .await?;
+        return Ok(());
+    };
+
+    let mut content = String::with_capacity(70);
+    let mut last_pushed_idx = 0;
+    for captures in top_captures {
+        let timestamp = time(&captures.0, captures.1, tz)?;
+
+        let push_idx = captures.0.iter().last().ok()?.ok()?.end();
+        let old_content = message.content.get(last_pushed_idx..push_idx).ok()?;
+        last_pushed_idx = push_idx;
+        content.push_str(&format!(
+            "{} ({} in your timezone)",
+            old_content,
+            timestamp.mention()
+        ));
+    }
+    content.push_str(message.content.get(last_pushed_idx..).ok()?);
 
     ctx.http
         .delete_message(message.channel_id, message.id)
@@ -124,56 +143,61 @@ pub async fn send_time(ctx: Context, message: Message) -> Result<()> {
     Ok(())
 }
 
-/// parses one possible occurrence of a time, returning that and the index thats
-/// iterated over so far
-#[allow(clippy::integer_arithmetic)]
-pub fn try_time(chars: &mut CharIndices) -> Option<NaiveTime> {
-    let mut min_given = false;
-
-    let mut hour = chars.find_map(|(_, c)| c.to_digit(10))?;
-    let mut min = 0;
-
-    let mut current = chars.next()?;
-    if let Some(digit) = current.1.to_digit(10) {
-        hour = hour * 10 + digit;
-        current = chars.next()?;
+/// parses a time from captures
+pub fn time(captures: &Captures, format: Format, tz: Tz) -> Result<Timestamp> {
+    match format {
+        Format::Hour12 => parse_12_hour(captures, tz),
+        Format::Hour24 => parse_24_hour(captures, tz),
     }
+}
 
-    if current.1 == ':' {
-        min = chars.next()?.1.to_digit(10)? * 10 + chars.next()?.1.to_digit(10)?;
-        current = match chars.next() {
-            Some(c) => c,
-            None => return NaiveTime::from_hms_opt(hour, min, 0),
-        };
-        min_given = true;
-    }
+/// parses a time in 24 hour format from captures
+fn parse_24_hour(captures: &Captures, tz: Tz) -> Result<Timestamp> {
+    let hour: u32 = captures.name("hour").ok()?.as_str().parse()?;
+    let minute: u32 = captures
+        .name("minute")
+        .map_or("0", |m| m.as_str())
+        .parse()?;
 
-    if current.1 == ' ' {
-        current = chars.next()?;
-    }
+    Ok(Timestamp::new(
+        Utc::today()
+            .with_timezone(&tz)
+            .and_hms_opt(hour, minute, 0)
+            .ok()?
+            .timestamp()
+            .try_into()?,
+        Some(TimestampStyle::ShortTime),
+    ))
+}
 
-    match chars.next().and_then(|(_, char)| {
-        if let 'm' | 'M' = char {
-            if let 'a' | 'A' = current.1 {
-                Some(AmPm::Am)
-            } else if let 'p' | 'P' = current.1 {
-                Some(AmPm::Pm)
-            } else {
-                None
-            }
-        } else {
-            None
-        }
-    }) {
-        Some(am_pm) => hour = to_24_hour(hour, am_pm)?,
-        None => {
-            if !min_given {
-                return None;
-            }
-        }
-    }
+/// parses a time in 12 hour format from captures
+fn parse_12_hour(captures: &Captures, tz: Tz) -> Result<Timestamp> {
+    let hour: u32 = captures.name("hour").ok()?.as_str().parse()?;
+    let minute: u32 = captures
+        .name("minute")
+        .map_or("0", |m| m.as_str())
+        .parse()?;
+    let am_pm = match captures
+        .name("am_pm")
+        .ok()?
+        .as_str()
+        .to_lowercase()
+        .as_ref()
+    {
+        "am" => AmPm::Am,
+        "pm" => AmPm::Pm,
+        _ => bail!("am_pm capture isn't am or pm"),
+    };
 
-    NaiveTime::from_hms_opt(hour, min, 0)
+    Ok(Timestamp::new(
+        Utc::today()
+            .with_timezone(&tz)
+            .and_hms_opt(to_24_hour(hour, am_pm).ok()?, minute, 0)
+            .ok()?
+            .timestamp()
+            .try_into()?,
+        Some(TimestampStyle::ShortTime),
+    ))
 }
 
 /// converts 12-hour to 24-hour format

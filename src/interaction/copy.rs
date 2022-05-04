@@ -1,11 +1,6 @@
 use anyhow::Result;
-use chrono::{Timelike, Utc};
-use sqlx::SqlitePool;
 use twilight_interactions::command::{CommandModel, CreateCommand};
-use twilight_mention::{
-    timestamp::{Timestamp, TimestampStyle},
-    Mention,
-};
+use twilight_mention::Mention;
 use twilight_model::{
     application::interaction::application_command::CommandData,
     channel::message::MessageFlags,
@@ -14,7 +9,7 @@ use twilight_model::{
 };
 use twilight_util::builder::InteractionResponseDataBuilder;
 
-use crate::{database, parse};
+use crate::{database, parse, parse::Format, Context};
 
 #[derive(CommandModel, CreateCommand)]
 #[command(
@@ -30,11 +25,11 @@ pub struct Copy {
 
 /// run the command, returning the response data
 pub async fn run(
-    db: &SqlitePool,
+    ctx: &Context,
     user_id: Id<UserMarker>,
     command_data: CommandData,
 ) -> Result<InteractionResponseData> {
-    let reply = _run(db, user_id, Copy::from_interaction(command_data.into())?).await?;
+    let reply = _run(ctx, user_id, Copy::from_interaction(command_data.into())?).await?;
 
     Ok(InteractionResponseDataBuilder::new()
         .content(reply)
@@ -43,30 +38,36 @@ pub async fn run(
 }
 
 /// run the command, returning the formatted string or the error message
-async fn _run(db: &SqlitePool, user_id: Id<UserMarker>, options: Copy) -> Result<String> {
-    let tz = match database::timezone(db, user_id).await? {
+async fn _run(ctx: &Context, user_id: Id<UserMarker>, options: Copy) -> Result<String> {
+    let tz = match database::timezone(&ctx.db, user_id).await? {
         Some(tz) => tz,
         None => {
             return Ok(
-                "i don't know your timezone yet, and tell me using `/timezone` please".to_owned(),
+                "i don't know your timezone yet, tell me using `/timezone` please".to_owned(),
             )
         }
     };
 
-    let time = if let Some(time) = parse::try_time(&mut options.time.char_indices()) {
-        Utc::today()
-            .with_timezone(&tz)
-            .and_hms(time.hour(), time.minute(), 0)
+    let captures = if let Some(captures) = ctx
+        .regex_12_hour
+        .captures_iter(&options.time)
+        .next()
+        .map_or_else(
+            || {
+                ctx.regex_24_hour
+                    .captures_iter(&options.time)
+                    .next()
+                    .map(|captures| (captures, Format::Hour24))
+            },
+            |captures| Some((captures, Format::Hour12)),
+        ) {
+        captures
     } else {
         return Ok("i couldn't find a time there, sorry :(".to_owned());
     };
 
     Ok(format!(
         "`{}`",
-        Timestamp::new(
-            time.timestamp().try_into()?,
-            Some(TimestampStyle::ShortTime)
-        )
-        .mention()
+        parse::time(&captures.0, captures.1, tz)?.mention()
     ))
 }
