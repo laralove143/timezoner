@@ -4,7 +4,7 @@ use anyhow::{IntoResult, Result};
 use twilight_gateway::Event;
 use twilight_http::Client;
 
-use crate::{interaction, parse, webhooks, Context};
+use crate::{interaction, parse, Context};
 
 /// handles the event, prints the returned error to stderr and tells the owner
 #[allow(clippy::print_stderr)]
@@ -22,7 +22,11 @@ pub async fn handle(ctx: Context, event: Event) {
 pub async fn _handle(ctx: Context, event: Event) -> Result<()> {
     match event {
         Event::InteractionCreate(interaction) => interaction::handle(ctx, interaction.0).await?,
-        Event::WebhooksUpdate(update) => webhooks::update(ctx, update.channel_id).await?,
+        Event::WebhooksUpdate(webhooks) => {
+            ctx.webhooks
+                .validate(&ctx.http, webhooks.channel_id)
+                .await?;
+        }
         Event::MessageCreate(message) => parse::send_time(ctx, (*message).0).await?,
         _ => (),
     }

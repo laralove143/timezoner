@@ -23,6 +23,7 @@ twilight-cache-inmemory = { version = "0.10", features = ["permission-calculator
 twilight-util = { version = "0.10", features = ["builder"] }
 twilight-mention = "0.10"
 twilight-interactions = "0.10"
+twilight-webhook = "0.10"
 sqlx = { version = "0.5", default-features = false, features = [
     "runtime-tokio-rustls",
     "macros",

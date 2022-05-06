@@ -18,13 +18,10 @@ mod interaction;
 /// functions to parse time from strings and format them into discord's
 /// epoch formatting
 mod parse;
-/// creating, caching, retrieving and sending webhooks
-mod webhooks;
 
 use std::{env, path::Path, sync::Arc};
 
 use anyhow::Result;
-use dashmap::DashMap;
 use futures::StreamExt;
 use regex::Regex;
 use sqlx::SqlitePool;
@@ -33,11 +30,10 @@ use twilight_cache_inmemory::{InMemoryCache, ResourceType};
 use twilight_gateway::{Cluster, EventTypeFlags, Intents};
 use twilight_http::Client;
 use twilight_model::id::{
-    marker::{ApplicationMarker, ChannelMarker, UserMarker},
+    marker::{ApplicationMarker, UserMarker},
     Id,
 };
-
-use crate::webhooks::CachedWebhook;
+use twilight_webhook::cache::Cache as WebhookCache;
 
 /// arced context data for thread safety
 type Context = Arc<ContextValue>;
@@ -49,7 +45,7 @@ pub struct ContextValue {
     /// used to check permissions and channels
     cache: InMemoryCache,
     /// used to impersonate message authors
-    webhooks: DashMap<Id<ChannelMarker>, CachedWebhook>,
+    webhooks: WebhookCache,
     /// used for the user's timezone information
     db: SqlitePool,
     /// used for creating the interaction client
@@ -120,7 +116,7 @@ async fn main() -> Result<()> {
     let cache = InMemoryCache::builder()
         .resource_types(resource_types)
         .build();
-    let webhooks = DashMap::new();
+    let webhooks = WebhookCache::new();
 
     let mut timezones_index = Index::open_in_dir(Path::new("timezones_index"))?;
     timezones_index.set_default_multithread_executor()?;

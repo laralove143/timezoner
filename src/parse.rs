@@ -12,8 +12,9 @@ use twilight_model::{
     guild::Permissions,
     id::Id,
 };
+use twilight_webhook::util::{MinimalMember, MinimalWebhook};
 
-use crate::{database, webhooks, Context};
+use crate::{database, Context};
 
 /// the reaction request with the unknown timezone emoji
 const UNKNOWN_TIMEZONE_EMOJI: RequestReactionType = RequestReactionType::Custom {
@@ -129,16 +130,26 @@ pub async fn send_time(ctx: Context, message: Message) -> Result<()> {
         .exec()
         .await?;
 
-    webhooks::send_as_member(
-        &ctx,
-        message.channel_id,
-        &message
-            .member
-            .context("message doesn't have member attached")?,
-        &message.author,
-        &content,
-    )
-    .await?;
+    let webhook = ctx
+        .webhooks
+        .get_infallible(&ctx.http, message.channel_id, "time sender")
+        .await?;
+
+    MinimalWebhook::try_from(&*webhook)?
+        .execute_as_member(
+            &ctx.http,
+            None,
+            &MinimalMember::from_partial_member(
+                &message
+                    .member
+                    .context("message doesn't have member attached")?,
+                Some(message.guild_id.context("message isn't in a guild")?),
+                &message.author,
+            ),
+        )
+        .content(&content)?
+        .exec()
+        .await?;
 
     Ok(())
 }
