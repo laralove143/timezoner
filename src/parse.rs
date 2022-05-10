@@ -117,11 +117,7 @@ pub async fn send_time(ctx: Context, message: Message) -> Result<()> {
         let push_idx = captures.0.iter().last().ok()?.ok()?.end();
         let old_content = message.content.get(last_pushed_idx..push_idx).ok()?;
         last_pushed_idx = push_idx;
-        content.push_str(&format!(
-            "{} ({} in your timezone)",
-            old_content,
-            timestamp.mention()
-        ));
+        content.push_str(&format!("{} ({})", old_content, timestamp.mention()));
     }
     content.push_str(message.content.get(last_pushed_idx..).ok()?);
 
