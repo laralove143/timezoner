@@ -1,7 +1,7 @@
 use anyhow::{bail, Context as _, IntoResult, Result};
 use chrono::Utc;
 use chrono_tz::Tz;
-use regex::{Captures, Regex};
+use regex::{Captures, Regex, RegexBuilder};
 use twilight_http::request::channel::reaction::RequestReactionType;
 use twilight_mention::{
     timestamp::{Timestamp, TimestampStyle},
@@ -42,16 +42,22 @@ pub enum Format {
 
 /// returns the regex to parse times in 12 hour format
 pub fn regex_12_hour() -> Result<Regex> {
-    Ok(Regex::new(
+    Ok(RegexBuilder::new(
         r"(?:^|\s)(?P<hour>1[0-2]|0?[1-9])(?::(?P<minute>[0-5]\d))?\s*(?P<am_pm>am|pm)\b",
-    )?)
+    )
+    .case_insensitive(true)
+    .multi_line(true)
+    .build()?)
 }
 
 /// returns the regex to parse times in 24 hour format
 pub fn regex_24_hour() -> Result<Regex> {
-    Ok(Regex::new(
-        r"(?:^|\s)(?P<hour>[0-1]?\d|2[0-3]):(?P<minute>[0-5]\d)\b",
-    )?)
+    Ok(
+        RegexBuilder::new(r"(?:^|\s)(?P<hour>[0-1]?\d|2[0-3]):(?P<minute>[0-5]\d)\b")
+            .case_insensitive(true)
+            .multi_line(true)
+            .build()?,
+    )
 }
 
 /// adds discord formatted timestamp after times from message content and its
