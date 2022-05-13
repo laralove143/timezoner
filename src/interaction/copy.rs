@@ -1,4 +1,5 @@
 use anyhow::Result;
+use logos::Logos;
 use twilight_interactions::command::{CommandModel, CreateCommand};
 use twilight_mention::Mention;
 use twilight_model::{
@@ -9,7 +10,7 @@ use twilight_model::{
 };
 use twilight_util::builder::InteractionResponseDataBuilder;
 
-use crate::{database, parse, parse::Format, Context};
+use crate::{database, parse::token::Format, Context};
 
 #[derive(CommandModel, CreateCommand)]
 #[command(
@@ -48,26 +49,11 @@ async fn _run(ctx: &Context, user_id: Id<UserMarker>, options: Copy) -> Result<S
         }
     };
 
-    let captures = if let Some(captures) = ctx
-        .regex_12_hour
-        .captures_iter(&options.time)
-        .next()
+    let mut lex = Format::lexer(&options.time);
+    lex.next()
+        .and_then(|format| format.timestamp(tz))
         .map_or_else(
-            || {
-                ctx.regex_24_hour
-                    .captures_iter(&options.time)
-                    .next()
-                    .map(|captures| (captures, Format::Hour24))
-            },
-            |captures| Some((captures, Format::Hour12)),
-        ) {
-        captures
-    } else {
-        return Ok("i couldn't find a time there, sorry :(".to_owned());
-    };
-
-    Ok(format!(
-        "`{}`",
-        parse::time(&captures.0, captures.1, tz)?.mention()
-    ))
+            || Ok("i can't find a time there :(".to_owned()),
+            |timestamp| Ok(format!("`{}`", timestamp.mention())),
+        )
 }

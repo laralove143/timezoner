@@ -23,7 +23,6 @@ use std::{env, path::Path, sync::Arc};
 
 use anyhow::Result;
 use futures::StreamExt;
-use regex::Regex;
 use sqlx::SqlitePool;
 use tantivy::{Index, IndexReader};
 use twilight_cache_inmemory::{InMemoryCache, ResourceType};
@@ -54,10 +53,6 @@ pub struct ContextValue {
     user_id: Id<UserMarker>,
     /// used for timezone autocomplete
     searcher: (Index, IndexReader),
-    /// used to parse times in 12 hour format
-    regex_12_hour: Regex,
-    /// used to parse times in 24 hour format
-    regex_24_hour: Regex,
 }
 
 #[tokio::main]
@@ -123,9 +118,6 @@ async fn main() -> Result<()> {
     let timezones_reader = timezones_index.reader()?;
     let searcher = (timezones_index, timezones_reader);
 
-    let regex_12_hour = parse::regex_12_hour()?;
-    let regex_24_hour = parse::regex_24_hour()?;
-
     let ctx = Arc::new(ContextValue {
         http,
         cache,
@@ -134,8 +126,6 @@ async fn main() -> Result<()> {
         application_id,
         user_id,
         searcher,
-        regex_12_hour,
-        regex_24_hour,
     });
 
     while let Some((_, event)) = events.next().await {
