@@ -59,18 +59,19 @@ pub mod token {
     impl Format {
         /// returns the timestamp of the parsed time, if any
         pub fn timestamp(self, tz: Tz) -> Option<Timestamp> {
-            if let Format::Hour24(time) | Format::Hour12(time) | Format::Hour12Minute(time) = self {
-                Some(Timestamp::new(
-                    Utc::today()
-                        .with_timezone(&tz)
-                        .and_time(time)?
-                        .timestamp()
-                        .try_into()
-                        .ok()?,
-                    Some(TimestampStyle::ShortTime),
-                ))
-            } else {
-                None
+            match self {
+                Format::Hour24(time) | Format::Hour12(time) | Format::Hour12Minute(time) => {
+                    Some(Timestamp::new(
+                        Utc::today()
+                            .with_timezone(&tz)
+                            .and_time(time)?
+                            .timestamp()
+                            .try_into()
+                            .ok()?,
+                        Some(TimestampStyle::ShortTime),
+                    ))
+                }
+                Format::Error => None,
             }
         }
     }
