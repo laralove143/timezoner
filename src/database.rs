@@ -42,3 +42,28 @@ pub async fn timezone(db: &SqlitePool, user_id: Id<UserMarker>) -> Result<Option
             .map_err(|s| anyhow!("saved timezone is invalid: {s}"))?,
     ))
 }
+
+/// set a user as dmed
+#[allow(clippy::integer_arithmetic)]
+pub async fn set_dmed(db: &SqlitePool, user_id: Id<UserMarker>) -> Result<()> {
+    let id: i64 = user_id.get().try_into()?;
+
+    query!("INSERT OR REPLACE INTO dmed VALUES (?)", id)
+        .execute(db)
+        .await?;
+
+    Ok(())
+}
+
+/// get whether a user is already dmed
+#[allow(clippy::integer_arithmetic)]
+pub async fn dmed(db: &SqlitePool, user_id: Id<UserMarker>) -> Result<bool> {
+    let id: i64 = user_id.get().try_into()?;
+
+    Ok(
+        query_scalar!("SELECT user_id FROM dmed WHERE user_id = ?", id)
+            .fetch_optional(db)
+            .await?
+            .is_some(),
+    )
+}

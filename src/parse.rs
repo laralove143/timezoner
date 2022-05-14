@@ -3,22 +3,14 @@ use std::fmt::Write;
 use anyhow::{Context as _, IntoResult, Result};
 use chrono::NaiveTime;
 use logos::{Lexer, Logos};
-use twilight_http::request::channel::reaction::RequestReactionType;
 use twilight_mention::Mention;
 use twilight_model::{
     channel::{ChannelType, Message},
     guild::Permissions,
-    id::Id,
 };
 use twilight_webhook::util::{MinimalMember, MinimalWebhook};
 
 use crate::{database, parse::token::Format, Context};
-
-/// the reaction request with the unknown timezone emoji
-const UNKNOWN_TIMEZONE_EMOJI: RequestReactionType = RequestReactionType::Custom {
-    id: Id::new(950_033_075_440_603_186),
-    name: Some("use_timezone_command"),
-};
 
 /// whether the time is am or pm, if 12-hour
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -104,10 +96,30 @@ pub async fn send_time(ctx: Context, message: Message) -> Result<()> {
     let tz = if let Some(tz) = database::timezone(&ctx.db, message.author.id).await? {
         tz
     } else {
-        ctx.http
-            .create_reaction(message.channel_id, message.id, &UNKNOWN_TIMEZONE_EMOJI)
+        if database::dmed(&ctx.db, message.author.id).await? {
+            return Ok(());
+        }
+        database::set_dmed(&ctx.db, message.author.id).await?;
+        if let Ok(response) = ctx
+            .http
+            .create_private_channel(message.author.id)
             .exec()
-            .await?;
+            .await
+        {
+            let channel = response.model().await?;
+            ctx.http
+                .create_message(channel.id)
+                .content(
+                    "sorry to disturb but if you use `/timezone` to set your timezone, i can \
+                     automatically convert all the times you mention in your message\n\njust type \
+                     `/timezone` then your city, country or its capital and i'll suggest \
+                     timezones for you!\nand you only have to do this once, also the people \
+                     reading your messages don't need to do anything, it works using discord \
+                     magic!\nbtw i won't annoy you with any other dms :)",
+                )?
+                .exec()
+                .await;
+        }
         return Ok(());
     };
 
