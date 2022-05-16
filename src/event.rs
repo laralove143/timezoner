@@ -11,9 +11,9 @@ use crate::{interaction, parse, Context};
 pub async fn handle(ctx: Context, event: Event) {
     if let Err(err) = _handle(Arc::clone(&ctx), event).await {
         if let Err(inform_error) = inform_owner(&ctx.http).await {
-            eprintln!("informing the owner also failed: {inform_error:#?}");
+            eprintln!("informing the owner also failed: {inform_error:?}");
         }
-        eprintln!("{err:#?}");
+        eprintln!("{err:?}");
     }
 }
 

@@ -31,7 +31,7 @@ sqlx = { version = "0.5", default-features = false, features = [
 ] }
 tokio = { version = "1.17", features = ["macros", "rt-multi-thread"] }
 futures = { version = "0.3", default-features = false }
-anyhow = { git = "https://github.com/laralove143/anyhow", features = ["backtrace"] }
+anyhow = { git = "https://github.com/laralove143/anyhow" }
 dashmap = "5.2"
 logos = "0.12"
 chrono = "0.4"
