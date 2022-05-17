@@ -159,7 +159,7 @@ pub async fn send_time(ctx: Context, message: Message) -> Result<()> {
                 Some(message.guild_id.context("message isn't in a guild")?),
                 &message.author,
             ),
-        )
+        )?
         .content(&content)?
         .exec()
         .await?;

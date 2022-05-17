@@ -24,7 +24,13 @@ pub async fn _handle(ctx: Context, event: Event) -> Result<()> {
         Event::InteractionCreate(interaction) => interaction::handle(ctx, interaction.0).await?,
         Event::WebhooksUpdate(webhooks) => {
             ctx.webhooks
-                .validate(&ctx.http, webhooks.channel_id)
+                .validate(
+                    &ctx.http,
+                    webhooks.channel_id,
+                    ctx.cache
+                        .permissions()
+                        .in_channel(ctx.user_id, webhooks.channel_id)?,
+                )
                 .await?;
         }
         Event::MessageCreate(message) => parse::send_time(ctx, (*message).0).await?,

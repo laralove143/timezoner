@@ -143,6 +143,7 @@ pub fn run_autocomplete(ctx: &Context, options: Timezone) -> Result<InteractionR
                 .map(|s| CommandOptionChoice::String {
                     name: s.clone(),
                     value: s,
+                    name_localizations: None,
                 }),
         )
         .build())
