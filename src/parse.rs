@@ -83,12 +83,7 @@ pub async fn send_time(ctx: Context, message: Message) -> Result<()> {
             .cache
             .permissions()
             .in_channel(ctx.user_id, message.channel_id)?
-            .contains(
-                Permissions::MANAGE_WEBHOOKS
-                    | Permissions::MANAGE_MESSAGES
-                    | Permissions::ADD_REACTIONS
-                    | Permissions::USE_EXTERNAL_EMOJIS,
-            )
+            .contains(Permissions::MANAGE_WEBHOOKS | Permissions::MANAGE_MESSAGES)
     {
         return Ok(());
     }
