@@ -8,12 +8,14 @@ use twilight_model::{
 };
 
 use crate::{
-    interaction::{copy::Copy, timezone::Timezone},
+    interaction::{copy::Copy, help::Help, timezone::Timezone},
     Context,
 };
 
 /// functions to build and run the copy command
 mod copy;
+/// functions to build and run the `help` command
+mod help;
 /// functions to build and run the `timezone` command
 mod timezone;
 
@@ -48,6 +50,7 @@ async fn handle_command(ctx: &Context, command: ApplicationCommand) -> Result<()
     let response = match command.data.name.as_str() {
         "copy" => copy::run(ctx, user_id, command.data).await?,
         "timezone" => timezone::run(&ctx.db, user_id, command.data).await?,
+        "help" => help::run(),
         _ => bail!("unknown command: {command:#?}"),
     };
 
@@ -96,7 +99,11 @@ async fn handle_autocomplete(
 /// create the slash commands globally
 pub async fn create(http: &Client, application_id: Id<ApplicationMarker>) -> Result<()> {
     http.interaction(application_id)
-        .set_global_commands(&[Copy::create_command().into(), Timezone::build()])
+        .set_global_commands(&[
+            Copy::create_command().into(),
+            Timezone::build(),
+            Help::create_command().into(),
+        ])
         .exec()
         .await?;
 
