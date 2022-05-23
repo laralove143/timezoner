@@ -93,40 +93,48 @@ pub async fn send_time(ctx: Context, message: Message) -> Result<()> {
         return Ok(());
     }
 
-    let tz = if let Some(tz) = database::timezone(&ctx.db, message.author.id).await? {
-        tz
-    } else {
-        if database::dmed(&ctx.db, message.author.id).await? {
-            return Ok(());
-        }
-        database::set_dmed(&ctx.db, message.author.id).await?;
-        if let Ok(response) = ctx
-            .http
-            .create_private_channel(message.author.id)
-            .exec()
-            .await
-        {
-            let channel = response.model().await?;
-            ctx.http
-                .create_message(channel.id)
-                .content(
-                    "sorry to disturb but if you use `/timezone` to set your timezone, i can \
-                     automatically convert all the times you mention in your message\n\njust type \
-                     `/timezone` then your city, country or its capital and i'll suggest \
-                     timezones for you!\nand you only have to do this once, also the people \
-                     reading your messages don't need to do anything, it works using discord \
-                     magic!\nbtw i won't annoy you with any other dms :)",
-                )?
-                .exec()
-                .await;
-        }
-        return Ok(());
-    };
-
+    let mut timezone = None;
     let lex = Format::lexer(&message.content).spanned();
     let mut content = String::with_capacity(message.content.len() + 70);
     let mut pushed_until = 0;
     for (format, span) in lex {
+        if format == Format::Error {
+            continue;
+        }
+
+        let tz = if let Some(tz) = timezone {
+            tz
+        } else if let Some(tz) = database::timezone(&ctx.db, message.author.id).await? {
+            timezone = Some(tz);
+            tz
+        } else {
+            if database::dmed(&ctx.db, message.author.id).await? {
+                return Ok(());
+            }
+            database::set_dmed(&ctx.db, message.author.id).await?;
+            if let Ok(response) = ctx
+                .http
+                .create_private_channel(message.author.id)
+                .exec()
+                .await
+            {
+                let channel = response.model().await?;
+                ctx.http
+                    .create_message(channel.id)
+                    .content(
+                        "sorry to disturb but if you use `/timezone` to set your timezone, i can \
+                         automatically convert all the times you mention in your message\n\njust \
+                         type `/timezone` then your city, country or its capital and i'll suggest \
+                         timezones for you!\nand you only have to do this once, also the people \
+                         reading your messages don't need to do anything, it works using discord \
+                         magic!\nbtw i won't annoy you with any other dms :)",
+                    )?
+                    .exec()
+                    .await;
+            }
+            return Ok(());
+        };
+
         if let Some(timestamp) = format.timestamp(tz) {
             content.push_str(message.content.get(pushed_until..span.end).ok()?);
             pushed_until = span.end;
