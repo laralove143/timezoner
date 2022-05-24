@@ -91,7 +91,7 @@ async fn main() -> Result<()> {
     let resource_types =
         ResourceType::GUILD | ResourceType::CHANNEL | ResourceType::MEMBER | ResourceType::ROLE;
 
-    let token = env::var("TEST_BOT_TOKEN")?;
+    let token = env::var("TIMEZONER_BOT_TOKEN")?;
 
     let (cluster, mut events) = Cluster::builder(token.clone(), intents)
         .event_types(event_types)
