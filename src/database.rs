@@ -50,6 +50,13 @@ pub async fn new() -> Result<SqlitePool> {
         .await?;
     }
 
+    for record in query!("SELECT user_id, timezone, nonce FROM timezones")
+        .fetch_all(&db)
+        .await?
+    {
+        dbg!(&record);
+    }
+
     Err(anyhow!("intentional"))
 }
 
