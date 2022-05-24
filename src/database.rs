@@ -36,6 +36,10 @@ pub async fn new() -> Result<SqlitePool> {
         let encrypted = cipher.encrypt(nonce, tz.as_bytes())?;
 
         let id: i64 = record.get("user_id");
+
+        dbg!(&id);
+        dbg!(&tz);
+
         query!(
             "INSERT OR REPLACE INTO timezones VALUES (?, ?, ?)",
             id,
