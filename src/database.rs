@@ -1,63 +1,19 @@
-use std::env;
-
-use aes_gcm_siv::{
-    aead::{Aead, NewAead},
-    Aes128GcmSiv, Nonce,
-};
+use aes_gcm_siv::{aead::Aead, Nonce};
 use anyhow::{anyhow, Result};
 use chrono_tz::Tz;
 use rand::random;
-use sqlx::{query, query_scalar, sqlite::SqliteConnectOptions, Row, SqlitePool};
+use sqlx::{query, query_scalar, sqlite::SqliteConnectOptions, SqlitePool};
 use twilight_model::id::{marker::UserMarker, Id};
 
 use crate::Context;
 
 /// connect to the database
 pub async fn new() -> Result<SqlitePool> {
-    let db_unencrypted = SqlitePool::connect_with(
-        SqliteConnectOptions::new().filename("timezoner_unencrypted.sqlite"),
-    )
-    .await?;
     let db =
         SqlitePool::connect_with(SqliteConnectOptions::new().filename("timezoner_origin.sqlite"))
             .await?;
 
-    for record in query("SELECT user_id, timezone FROM timezones")
-        .fetch_all(&db_unencrypted)
-        .await?
-    {
-        let cipher = Aes128GcmSiv::new_from_slice(&hex::decode(env::var("KEY")?)?)?;
-
-        let arr = random::<[u8; 12]>();
-        let slice = arr.as_slice();
-        let nonce = Nonce::from_slice(slice);
-
-        let tz: String = record.get("timezone");
-        let encrypted = cipher.encrypt(nonce, tz.as_bytes())?;
-
-        let id: i64 = record.get("user_id");
-
-        dbg!(&id);
-        dbg!(&tz);
-
-        query!(
-            "INSERT OR REPLACE INTO timezones VALUES (?, ?, ?)",
-            id,
-            encrypted,
-            slice
-        )
-        .execute(&db)
-        .await?;
-    }
-
-    for record in query!("SELECT user_id, timezone, nonce FROM timezones")
-        .fetch_all(&db)
-        .await?
-    {
-        dbg!(&record);
-    }
-
-    Err(anyhow!("intentional"))
+    Ok(db)
 }
 
 /// update a user's timezone info

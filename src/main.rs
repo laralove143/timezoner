@@ -8,8 +8,6 @@
     clippy::pattern_type_mismatch
 )]
 
-extern crate core;
-
 /// functions to set up, update and retrieve timezone information from the
 /// sqlite database
 mod database;
@@ -21,7 +19,7 @@ mod interaction;
 /// epoch formatting
 mod parse;
 
-use std::{env, fs, path::Path, sync::Arc};
+use std::{env, path::Path, sync::Arc};
 
 use aes_gcm_siv::{aead::NewAead, Aes128GcmSiv};
 use anyhow::Result;
