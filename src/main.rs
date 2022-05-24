@@ -8,6 +8,8 @@
     clippy::pattern_type_mismatch
 )]
 
+extern crate core;
+
 /// functions to set up, update and retrieve timezone information from the
 /// sqlite database
 mod database;
@@ -19,8 +21,9 @@ mod interaction;
 /// epoch formatting
 mod parse;
 
-use std::{env, path::Path, sync::Arc};
+use std::{env, fs, path::Path, sync::Arc};
 
+use aes_gcm_siv::{aead::NewAead, Aes128GcmSiv};
 use anyhow::Result;
 use futures::StreamExt;
 use sqlx::SqlitePool;
@@ -47,6 +50,8 @@ pub struct ContextValue {
     webhooks: WebhookCache,
     /// used for the user's timezone information
     db: SqlitePool,
+    /// used to encrypt the database
+    cipher: Aes128GcmSiv,
     /// used for creating the interaction client
     application_id: Id<ApplicationMarker>,
     /// used for permissions cache
@@ -86,7 +91,7 @@ async fn main() -> Result<()> {
     let resource_types =
         ResourceType::GUILD | ResourceType::CHANNEL | ResourceType::MEMBER | ResourceType::ROLE;
 
-    let token = env::var("TIMEZONER_BOT_TOKEN")?;
+    let token = env::var("TEST_BOT_TOKEN")?;
 
     let (cluster, mut events) = Cluster::builder(token.clone(), intents)
         .event_types(event_types)
@@ -108,6 +113,9 @@ async fn main() -> Result<()> {
     interaction::create(&http, application_id).await?;
 
     let db = database::new().await?;
+
+    let cipher = Aes128GcmSiv::new_from_slice(&hex::decode(env::var("KEY")?)?)?;
+
     let cache = InMemoryCache::builder()
         .resource_types(resource_types)
         .build();
@@ -123,6 +131,7 @@ async fn main() -> Result<()> {
         cache,
         webhooks,
         db,
+        cipher,
         application_id,
         user_id,
         searcher,

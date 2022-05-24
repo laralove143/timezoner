@@ -49,7 +49,7 @@ async fn handle_command(ctx: &Context, command: ApplicationCommand) -> Result<()
 
     let response = match command.data.name.as_str() {
         "copy" => copy::run(ctx, user_id, command.data).await?,
-        "timezone" => timezone::run(&ctx.db, user_id, command.data).await?,
+        "timezone" => timezone::run(ctx, user_id, command.data).await?,
         "help" => help::run(),
         _ => bail!("unknown command: {command:#?}"),
     };

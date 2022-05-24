@@ -1,39 +1,93 @@
+use std::env;
+
+use aes_gcm_siv::{
+    aead::{Aead, NewAead},
+    Aes128GcmSiv, Nonce,
+};
 use anyhow::{anyhow, Result};
 use chrono_tz::Tz;
-use sqlx::{query, query_scalar, sqlite::SqliteConnectOptions, SqlitePool};
+use rand::random;
+use sqlx::{query, query_scalar, sqlite::SqliteConnectOptions, Row, SqlitePool};
 use twilight_model::id::{marker::UserMarker, Id};
+
+use crate::Context;
 
 /// connect to the database
 pub async fn new() -> Result<SqlitePool> {
+    let db_unencrypted = SqlitePool::connect_with(
+        SqliteConnectOptions::new().filename("timezoner_unencrypted.sqlite"),
+    )
+    .await?;
     let db =
-        SqlitePool::connect_with(SqliteConnectOptions::new().filename("timezoner.sqlite")).await?;
+        SqlitePool::connect_with(SqliteConnectOptions::new().filename("timezoner_origin.sqlite"))
+            .await?;
 
-    Ok(db)
+    for record in query("SELECT user_id, timezone FROM timezones")
+        .fetch_all(&db_unencrypted)
+        .await?
+    {
+        let cipher = Aes128GcmSiv::new_from_slice(&hex::decode(env::var("KEY")?)?)?;
+
+        let arr = random::<[u8; 12]>();
+        let slice = arr.as_slice();
+        let nonce = Nonce::from_slice(slice);
+
+        let tz: String = record.get("timezone");
+        let encrypted = cipher.encrypt(nonce, tz.as_bytes())?;
+
+        let id: i64 = record.get("user_id");
+        query!(
+            "INSERT OR REPLACE INTO timezones VALUES (?, ?, ?)",
+            id,
+            encrypted,
+            slice
+        )
+        .execute(&db)
+        .await?;
+    }
+
+    Err(anyhow!("intentional"))
 }
 
 /// update a user's timezone info
 #[allow(clippy::integer_arithmetic)]
-pub async fn set_timezone(db: &SqlitePool, user_id: Id<UserMarker>, tz: Tz) -> Result<()> {
+pub async fn set_timezone(ctx: &Context, user_id: Id<UserMarker>, tz: Tz) -> Result<()> {
     let id: i64 = user_id.get().try_into()?;
-    let tz_str = tz.to_string();
 
-    query!("INSERT OR REPLACE INTO timezones VALUES (?, ?)", id, tz_str)
-        .execute(db)
-        .await?;
+    let arr = random::<[u8; 12]>();
+    let slice = arr.as_slice();
+    let nonce = Nonce::from_slice(slice);
+
+    let encrypted = ctx.cipher.encrypt(nonce, tz.to_string().as_bytes())?;
+
+    query!(
+        "INSERT OR REPLACE INTO timezones VALUES (?, ?, ?)",
+        id,
+        encrypted,
+        slice
+    )
+    .execute(&ctx.db)
+    .await?;
 
     Ok(())
 }
 
 /// retrieve a user's timezone info
 #[allow(clippy::integer_arithmetic)]
-pub async fn timezone(db: &SqlitePool, user_id: Id<UserMarker>) -> Result<Option<Tz>> {
+pub async fn timezone(ctx: &Context, user_id: Id<UserMarker>) -> Result<Option<Tz>> {
     let id: i64 = user_id.get().try_into()?;
 
-    let tz = match query_scalar!("SELECT timezone FROM timezones WHERE user_id = ?", id)
-        .fetch_optional(db)
-        .await?
+    let tz = match query!(
+        "SELECT timezone, nonce FROM timezones WHERE user_id = ?",
+        id
+    )
+    .fetch_optional(&ctx.db)
+    .await?
     {
-        Some(tz) => tz,
+        Some(record) => String::from_utf8(
+            ctx.cipher
+                .decrypt(Nonce::from_slice(&record.nonce), record.timezone.as_slice())?,
+        )?,
         None => return Ok(None),
     };
 

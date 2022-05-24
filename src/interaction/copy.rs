@@ -40,7 +40,7 @@ pub async fn run(
 
 /// run the command, returning the formatted string or the error message
 async fn _run(ctx: &Context, user_id: Id<UserMarker>, options: Copy) -> Result<String> {
-    let tz = match database::timezone(&ctx.db, user_id).await? {
+    let tz = match database::timezone(ctx, user_id).await? {
         Some(tz) => tz,
         None => {
             return Ok(

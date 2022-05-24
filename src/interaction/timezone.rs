@@ -2,7 +2,6 @@ use std::str::FromStr;
 
 use anyhow::{bail, Context as _, Result};
 use chrono_tz::Tz;
-use sqlx::SqlitePool;
 use tantivy::{
     collector::TopDocs,
     query::QueryParser,
@@ -97,11 +96,11 @@ impl From<Vec<ApplicationCommandAutocompleteDataOption>> for Timezone {
 
 /// run the command, returning the response data
 pub async fn run(
-    db: &SqlitePool,
+    ctx: &Context,
     user_id: Id<UserMarker>,
     command_data: CommandData,
 ) -> Result<InteractionResponseData> {
-    let reply = _run(db, user_id, command_data.options.try_into()?).await?;
+    let reply = _run(ctx, user_id, command_data.options.try_into()?).await?;
 
     Ok(InteractionResponseDataBuilder::new()
         .flags(MessageFlags::EPHEMERAL)
@@ -110,7 +109,7 @@ pub async fn run(
 }
 
 /// run the command, returning the success or error message
-async fn _run(db: &SqlitePool, user_id: Id<UserMarker>, options: Timezone) -> Result<&'static str> {
+async fn _run(ctx: &Context, user_id: Id<UserMarker>, options: Timezone) -> Result<&'static str> {
     let tz_option = if let TimezoneOption::Complete(tz) = options.timezone {
         tz
     } else {
@@ -126,7 +125,7 @@ async fn _run(db: &SqlitePool, user_id: Id<UserMarker>, options: Timezone) -> Re
         );
     };
 
-    database::set_timezone(db, user_id, tz).await?;
+    database::set_timezone(ctx, user_id, tz).await?;
 
     Ok("tada! now you can send times ^^")
 }

@@ -99,7 +99,7 @@ pub async fn send_time(ctx: Context, message: Message) -> Result<()> {
 
         let tz = if let Some(tz) = timezone {
             tz
-        } else if let Some(tz) = database::timezone(&ctx.db, message.author.id).await? {
+        } else if let Some(tz) = database::timezone(&ctx, message.author.id).await? {
             timezone = Some(tz);
             tz
         } else {
