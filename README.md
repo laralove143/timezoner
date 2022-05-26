@@ -6,6 +6,7 @@
 goodbye to timezone conversions! just type some time in chat and everyone magically sees it in their own timezone!
 
 ![example](example.gif)
+
 `(10:00 PM)` and `(12:00 AM)` appear in everyone's own timezone!
 
 it also supports formats like `22:25` or `10:25 pm`
