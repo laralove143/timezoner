@@ -21,12 +21,8 @@ to send times, the bot needs to know your timezone first, just type `/timezone` 
 there’s also a `/copy` command that you can use to share times in dms etc.
 
 ## terms of service
-the hosted application is built directly from this repo
-### your data
-- your selected timezone is only used to convert times to timestamps
-- the messages are not saved anywhere
-- your discord information (such as nicknames, avatars) is only cached and used to resend your messages with converted times
 ### self-hosting
+these clauses override all other licenses:
 - you may not advertise the self-hosted bot, such as on websites such as top.gg
 - the self-hosted bot may not be in over 5 guilds
 - you must direct the feedback/support requests to me
@@ -34,9 +30,14 @@ the hosted application is built directly from this repo
 - the webhooks the bot executes copy your message content, nickname and avatar, the bot is not responsible for what it copied
 - if the feedback you gave is implemented without credit, please contact me to be given credit
 - you may not claim you are the owner, developer, motivator or hoster of this bot, the original idea of the bot is mine alone
-- i am the only person responsible for the bot, it has no support etc. team
-### contact
-- if you have negative criticism, please let me know so i can improve it
+- i am the only person responsible for the bot, it has no team
+
+## privacy policy and safety
+- the hosted application is built directly from this repo
+- your currently selected timezone is encrypted then saved, and only used to convert times to timestamps
+- no other data, including message content is saved anywhere
+
+## contact
 - discord server: https://discord.gg/6vAzfFj8xG
 - discord username: laralove#7186
 - email: laralove143@icloud.com
