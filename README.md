@@ -14,6 +14,7 @@ and someone 10 hours ahead sees:
 it also supports formats like `22:25` or `10:25 pm`
 
 ## usage
+
 to send times, the bot needs to know your timezone first, just type `/timezone` and it’ll suggest timezones for you
 - you only do this once of course
 - only the people that type times need to do this, the rest reading the time don't need to do anything!
@@ -21,23 +22,23 @@ to send times, the bot needs to know your timezone first, just type `/timezone` 
 there’s also a `/copy` command that you can use to share times in dms etc.
 
 ## terms of service
+("i" refers to laralove143, the developer of timezoner)
+### content privacy
+- your currently selected timezone is encrypted then saved, and only used to convert times to timestamps
+- no other data, including message content is saved anywhere
+### disclaimers
+- the webhooks the bot executes copy the user's message content, nickname and avatar, i am not responsible for this copied data
+- i am the sole owner and developer of this bot
+- the hosted application is built directly from this repo
 ### self-hosting
 these clauses override all other licenses:
 - you may not advertise the self-hosted bot, such as on websites such as top.gg
 - the self-hosted bot may not be in over 5 guilds
 - you must direct the feedback/support requests to me
-### disclaimers
-- the webhooks the bot executes copy your message content, nickname and avatar, the bot is not responsible for what it copied
-- if the feedback you gave is implemented without credit, please contact me to be given credit
-- you may not claim you are the owner, developer, motivator or hoster of this bot, the original idea of the bot is mine alone
-- i am the only person responsible for the bot, it has no team
-
-## privacy policy and safety
-- the hosted application is built directly from this repo
-- your currently selected timezone is encrypted then saved, and only used to convert times to timestamps
-- no other data, including message content is saved anywhere
 
 ## contact
+
+- i am the only person responsible for the bot, it has no team
 - discord server: https://discord.gg/6vAzfFj8xG
 - discord username: laralove#7186
 - email: laralove143@icloud.com
@@ -45,6 +46,5 @@ these clauses override all other licenses:
 - do not spam these sources
 
 ## nerdy stuff
-made with [rust](https://www.rust-lang.org) and [twilight](https://github.com/twilight-rs/twilight) and sqlite
 
-*made by me (laralove143), licensed MIT*
+made with [rust](https://www.rust-lang.org) and [twilight](https://github.com/twilight-rs/twilight) and sqlite
