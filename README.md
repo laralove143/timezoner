@@ -15,7 +15,7 @@ and someone 10 hours ahead sees:
 
 - does all the conversion automatically in chat, no commands or dms or annoying stuff like that
 - the ones reading the times don't need to do anything
-- supports all the sane formats: `1pm` `1:30 Pm`  `13:30`...
+- supports all the sane formats: `1pm` `1:30 Pm` `13:30`...
 - has a `/copy` command that you can use to share times in dms etc
 - setting up your timezone couldn't be easier with timezones being suggested right inside discord, literally just type `/timezone new york`
 
