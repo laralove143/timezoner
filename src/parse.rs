@@ -17,7 +17,7 @@ sorry to disturb but if you use `/timezone` to set your timezone, i can automati
 
 and you only have to do this once, also the people reading your messages don't need to do anything, it works using discord magic!
 btw i won't annoy you with any other dms :)
-https://github.com/laralove143/timezoner-discord-bot/blob/main/example.png?raw=true"
+https://github.com/laralove143/timezoner-discord-bot/blob/main/example.png?raw=true";
 
 /// whether the time is am or pm, if 12-hour
 #[derive(Clone, Copy, Debug, PartialEq)]
