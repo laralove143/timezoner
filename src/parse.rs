@@ -12,6 +12,13 @@ use twilight_webhook::util::{MinimalMember, MinimalWebhook};
 
 use crate::{database, parse::token::Format, Context};
 
+const TIMEZONE_DM_MESSAGE: &str = "\
+sorry to disturb but if you use `/timezone` to set your timezone, i can automatically convert all the times you mention in your message
+
+and you only have to do this once, also the people reading your messages don't need to do anything, it works using discord magic!
+btw i won't annoy you with any other dms :)
+https://github.com/laralove143/timezoner-discord-bot/blob/main/example.png?raw=true"
+
 /// whether the time is am or pm, if 12-hour
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum AmPm {
@@ -116,14 +123,7 @@ pub async fn send_time(ctx: Context, message: Message) -> Result<()> {
                 let channel = response.model().await?;
                 ctx.http
                     .create_message(channel.id)
-                    .content(
-                        "sorry to disturb but if you use `/timezone` to set your timezone, i can \
-                         automatically convert all the times you mention in your message\n\njust \
-                         type `/timezone` then your city, country or its capital and i'll suggest \
-                         timezones for you!\nand you only have to do this once, also the people \
-                         reading your messages don't need to do anything, it works using discord \
-                         magic!\nbtw i won't annoy you with any other dms :)",
-                    )?
+                    .content(TIMEZONE_DM_MESSAGE)?
                     .exec()
                     .await;
             }
