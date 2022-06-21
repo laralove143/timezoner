@@ -11,6 +11,10 @@ and someone 10 hours ahead sees:
 
 ![example](example.png)
 
+setting your timezone couldn't be easier:
+
+![example](example_timezone.gif)
+
 ## features
 
 - does all the conversion automatically in chat, no commands or dms or annoying stuff like that
