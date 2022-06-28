@@ -12,6 +12,7 @@ use twilight_webhook::util::{MinimalMember, MinimalWebhook};
 
 use crate::{database, parse::token::Format, Context};
 
+/// message to send when the user hasn't set their timezone
 const TIMEZONE_DM_MESSAGE: &str = "sorry to disturb but if you use `/timezone` to set your \
 timezone, i can automatically convert all the times you mention in your message
 
