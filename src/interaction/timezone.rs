@@ -32,6 +32,11 @@ const TIMEZONE_PICKER_SUGGESTION: &str = "pick from website if you can't find yo
 const TIMEZONE_PICKER_MESSAGE: &str =
     "please select your location from the map and copy-paste it like `/timezone PASTE_HEREEE!!!`:\n\
     https://kevinnovak.github.io/Time-Zone-Picker/";
+/// the message to send when the timezone can't be found
+const TIMEZONE_NOT_FOUND_MESSAGE: &str =
+    "i couldn't find that timezone :( you can select your location from the map and copy-paste it \
+    like `/timezone PASTE_HEREEE!!!`:\n\
+    https://kevinnovak.github.io/Time-Zone-Picker/";
 
 /// the timezone option of the `timezone` command
 #[derive(Debug)]
@@ -130,7 +135,7 @@ async fn _run(ctx: &Context, user_id: Id<UserMarker>, options: Timezone) -> Resu
     let tz = if let Ok(tz) = Tz::from_str(&tz_option) {
         tz
     } else {
-        bail!("suggested timezone can't be parsed: {tz_option}");
+        return Ok(TIMEZONE_NOT_FOUND_MESSAGE);
     };
 
     database::set_timezone(ctx, user_id, tz).await?;
