@@ -26,10 +26,10 @@ use twilight_util::builder::{
 
 use crate::{database, Context};
 
-/// literally the pick from website choice
-const PICK_FROM_WEBSITE: &str = "pick from website";
+/// literally the pick from website suggestion
+const TIMEZONE_PICKER_SUGGESTION: &str = "pick from website if you can't find your timezone";
 /// the message to send when pick from website choice is selected
-const TIMEZONE_PICKER_PROMPT: &str =
+const TIMEZONE_PICKER_MESSAGE: &str =
     "please select your location from the map and copy-paste it like `/timezone PASTE_HEREEE!!!`:\n\
     https://kevinnovak.github.io/Time-Zone-Picker/";
 
@@ -123,8 +123,8 @@ async fn _run(ctx: &Context, user_id: Id<UserMarker>, options: Timezone) -> Resu
         bail!("tried to run timezone command with partial option: {options:#?}")
     };
 
-    if tz_option == PICK_FROM_WEBSITE {
-        return Ok(TIMEZONE_PICKER_PROMPT);
+    if tz_option == TIMEZONE_PICKER_SUGGESTION {
+        return Ok(TIMEZONE_PICKER_MESSAGE);
     }
 
     let tz = if let Ok(tz) = Tz::from_str(&tz_option) {
@@ -189,7 +189,7 @@ fn _run_autocomplete(ctx: &Context, options: Timezone) -> Result<Vec<String>> {
     }
 
     if suggestions.is_empty() {
-        suggestions.push(PICK_FROM_WEBSITE.to_owned());
+        suggestions.push(TIMEZONE_PICKER_SUGGESTION.to_owned());
     }
 
     Ok(suggestions)
