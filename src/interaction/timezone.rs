@@ -30,9 +30,8 @@ use crate::{database, Context};
 const PICK_FROM_WEBSITE: &str = "pick from website";
 /// the message to send when pick from website choice is selected
 const TIMEZONE_PICKER_PROMPT: &str =
-    "please select your location from the map and copy-paste it like `/timezone PASTE_HEREEE!!!`:
-     \
-     https://kevinnovak.github.io/Time-Zone-Picker/";
+    "please select your location from the map and copy-paste it like `/timezone PASTE_HEREEE!!!`:\n\
+    https://kevinnovak.github.io/Time-Zone-Picker/";
 
 /// the timezone option of the `timezone` command
 #[derive(Debug)]
