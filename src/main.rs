@@ -22,11 +22,12 @@ mod parse;
 use std::{env, path::Path, sync::Arc};
 
 use aes_gcm_siv::{aead::NewAead, Aes128GcmSiv};
-use anyhow::Result;
+use anyhow::{IntoResult, Result};
 use futures::StreamExt;
 use sqlx::SqlitePool;
 use tantivy::{Index, IndexReader};
 use twilight_cache_inmemory::{InMemoryCache, ResourceType};
+use twilight_error::ErrorHandler;
 use twilight_gateway::{Cluster, EventTypeFlags, Intents};
 use twilight_http::Client;
 use twilight_model::id::{
@@ -46,6 +47,8 @@ pub struct ContextValue {
     cache: InMemoryCache,
     /// used to impersonate message authors
     webhooks: WebhookCache,
+    /// used to handle errors
+    error_handler: ErrorHandler,
     /// used for the user's timezone information
     db: SqlitePool,
     /// used to encrypt the database
@@ -118,6 +121,25 @@ async fn main() -> Result<()> {
         .resource_types(resource_types)
         .build();
     let webhooks = WebhookCache::new();
+    let mut error_handler = ErrorHandler::new();
+    error_handler.channel(
+        http.create_private_channel(
+            http.current_user_application()
+                .exec()
+                .await?
+                .model()
+                .await?
+                .owner
+                .ok()?
+                .id,
+        )
+        .exec()
+        .await?
+        .model()
+        .await?
+        .id,
+    );
+    error_handler.file("timezoner_errors.txt".into());
 
     let mut timezones_index = Index::open_in_dir(Path::new("timezones_index"))?;
     timezones_index.set_default_multithread_executor()?;
@@ -128,6 +150,7 @@ async fn main() -> Result<()> {
         http,
         cache,
         webhooks,
+        error_handler,
         db,
         cipher,
         application_id,
