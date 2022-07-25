@@ -5,7 +5,8 @@
     clippy::blanket_clippy_restriction_lints,
     clippy::implicit_return,
     clippy::shadow_same,
-    clippy::pattern_type_mismatch
+    clippy::pattern_type_mismatch,
+    clippy::self_named_module_files
 )]
 
 /// functions to set up, update and retrieve timezone information from the
