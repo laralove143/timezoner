@@ -5,7 +5,7 @@ use chrono::NaiveTime;
 use logos::{Lexer, Logos};
 use twilight_mention::Mention;
 use twilight_model::{
-    channel::{ChannelType, Message},
+    channel::{message::MessageType, ChannelType, Message},
     guild::Permissions,
 };
 use twilight_webhook::util::{MinimalMember, MinimalWebhook};
@@ -85,7 +85,7 @@ pub mod token {
 /// the author
 #[allow(clippy::integer_arithmetic, unused_must_use)]
 pub async fn send_time(ctx: Context, message: Message) -> Result<()> {
-    if message.author.bot
+    if message_is_weird(&message)
         || ctx
             .cache
             .channel(message.channel_id)
@@ -172,6 +172,22 @@ pub async fn send_time(ctx: Context, message: Message) -> Result<()> {
         .await?;
 
     Ok(())
+}
+
+/// checks if the message can be recreated
+fn message_is_weird(message: &Message) -> bool {
+    message.activity.is_some()
+        || message.application.is_some()
+        || message.application_id.is_some()
+        || message.author.bot
+        || !message.components.is_empty()
+        || !message.embeds.is_empty()
+        || message.interaction.is_some()
+        || !matches!(message.kind, MessageType::Regular | MessageType::Reply)
+        || message.pinned
+        || !message.reactions.is_empty()
+        || !message.sticker_items.is_empty()
+        || message.webhook_id.is_some()
 }
 
 /// converts 12-hour to 24-hour format
