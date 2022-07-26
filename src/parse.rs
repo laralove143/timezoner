@@ -101,6 +101,14 @@ pub async fn send_time(ctx: Context, message: Message) -> Result<()> {
         .cache
         .channel(message.channel_id)
         .context("the channel is not cached")?;
+    let channel_id = if channel.kind.is_thread() {
+        channel
+            .parent_id
+            .context("thread channel doesn't have a parent")?
+    } else {
+        channel.id
+    };
+
     let mut timezone = None;
     let lex = Format::lexer(&message.content).spanned();
     let mut content = String::with_capacity(message.content.len() + 70);
@@ -154,7 +162,7 @@ pub async fn send_time(ctx: Context, message: Message) -> Result<()> {
 
     let webhook = ctx
         .webhooks
-        .get_infallible(&ctx.http, message.channel_id, "time sender")
+        .get_infallible(&ctx.http, channel_id, "time sender")
         .await?;
     let member = &message
         .member
