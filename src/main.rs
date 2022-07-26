@@ -35,7 +35,7 @@ use twilight_model::id::{
     marker::{ApplicationMarker, UserMarker},
     Id,
 };
-use twilight_webhook::cache::Cache as WebhookCache;
+use twilight_webhook::cache::WebhooksCache;
 
 /// arced context data for thread safety
 type Context = Arc<ContextValue>;
@@ -47,7 +47,7 @@ pub struct ContextValue {
     /// used to check permissions and channels
     cache: InMemoryCache,
     /// used to impersonate message authors
-    webhooks: WebhookCache,
+    webhooks: WebhooksCache,
     /// used to handle errors
     error_handler: ErrorHandler,
     /// used for the user's timezone information
@@ -93,7 +93,7 @@ async fn main() -> Result<()> {
     let resource_types =
         ResourceType::GUILD | ResourceType::CHANNEL | ResourceType::MEMBER | ResourceType::ROLE;
 
-    let token = env::var("TIMEZONER_BOT_TOKEN")?;
+    let token = env::var("TEST_BOT_TOKEN")?;
 
     let (cluster, mut events) = Cluster::builder(token.clone(), intents)
         .event_types(event_types)
@@ -121,7 +121,7 @@ async fn main() -> Result<()> {
     let cache = InMemoryCache::builder()
         .resource_types(resource_types)
         .build();
-    let webhooks = WebhookCache::new();
+    let webhooks = WebhooksCache::new();
     let mut error_handler = ErrorHandler::new();
     error_handler.channel(
         http.create_private_channel(

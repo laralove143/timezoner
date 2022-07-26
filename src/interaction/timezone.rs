@@ -10,10 +10,7 @@ use tantivy::{
 use twilight_model::{
     application::{
         command::{Command, CommandOptionChoice, CommandType},
-        interaction::{
-            application_command::{CommandData, CommandDataOption, CommandOptionValue},
-            application_command_autocomplete::ApplicationCommandAutocompleteDataOption,
-        },
+        interaction::application_command::{CommandData, CommandDataOption, CommandOptionValue},
     },
     channel::message::MessageFlags,
     http::interaction::InteractionResponseData,
@@ -78,31 +75,19 @@ impl TryFrom<Vec<CommandDataOption>> for Timezone {
     type Error = anyhow::Error;
 
     fn try_from(mut options: Vec<CommandDataOption>) -> Result<Self> {
+        let value = options
+            .pop()
+            .context("timezone command has no options")?
+            .value;
         Ok(Self {
-            timezone: TimezoneOption::Complete(
-                if let CommandOptionValue::String(tz) = options
-                    .pop()
-                    .context("timezone command has no options")?
-                    .value
-                {
-                    tz
-                } else {
-                    bail!("timezone command's first option is not string: {options:#?}")
-                },
-            ),
+            timezone: if let CommandOptionValue::String(complete) = value {
+                TimezoneOption::Complete(complete)
+            } else if let CommandOptionValue::Focused(partial, _) = value {
+                TimezoneOption::Partial(partial)
+            } else {
+                bail!("timezone command's first option is not string or focused: {options:#?}")
+            },
         })
-    }
-}
-
-impl From<Vec<ApplicationCommandAutocompleteDataOption>> for Timezone {
-    fn from(mut options: Vec<ApplicationCommandAutocompleteDataOption>) -> Self {
-        Self {
-            timezone: TimezoneOption::Partial(
-                options
-                    .pop()
-                    .map_or("".to_owned(), |o| o.value.unwrap_or_default()),
-            ),
-        }
     }
 }
 

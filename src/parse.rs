@@ -5,10 +5,12 @@ use chrono::NaiveTime;
 use logos::{Lexer, Logos};
 use twilight_mention::Mention;
 use twilight_model::{
-    channel::{message::MessageType, ChannelType, Message},
-    guild::Permissions,
+    channel::{message::MessageType, Message},
+    guild::{PartialMember, Permissions},
+    id::{marker::GuildMarker, Id},
+    user::User,
 };
-use twilight_webhook::util::{MinimalMember, MinimalWebhook};
+use twilight_webhook::util::ExecuteWebhookExt;
 
 use crate::{database, parse::token::Format, Context};
 
@@ -86,10 +88,6 @@ pub mod token {
 #[allow(clippy::integer_arithmetic, unused_must_use)]
 pub async fn send_time(ctx: Context, message: Message) -> Result<()> {
     if message_is_weird(&message)
-        || ctx
-            .cache
-            .channel(message.channel_id)
-            .map_or(true, |c| c.kind != ChannelType::GuildText)
         || !ctx
             .cache
             .permissions()
@@ -99,6 +97,10 @@ pub async fn send_time(ctx: Context, message: Message) -> Result<()> {
         return Ok(());
     }
 
+    let channel = ctx
+        .cache
+        .channel(message.channel_id)
+        .context("the channel is not cached")?;
     let mut timezone = None;
     let lex = Format::lexer(&message.content).spanned();
     let mut content = String::with_capacity(message.content.len() + 70);
@@ -124,9 +126,9 @@ pub async fn send_time(ctx: Context, message: Message) -> Result<()> {
                 .exec()
                 .await
             {
-                let channel = response.model().await?;
+                let dm_channel = response.model().await?;
                 ctx.http
-                    .create_message(channel.id)
+                    .create_message(dm_channel.id)
                     .content(TIMEZONE_DM_MESSAGE)?
                     .exec()
                     .await;
@@ -154,22 +156,31 @@ pub async fn send_time(ctx: Context, message: Message) -> Result<()> {
         .webhooks
         .get_infallible(&ctx.http, message.channel_id, "time sender")
         .await?;
+    let member = &message
+        .member
+        .context("message doesn't have member attached")?;
 
-    MinimalWebhook::try_from(&*webhook)?
-        .execute_as_member(
-            &ctx.http,
-            None,
-            &MinimalMember::from_partial_member(
-                &message
-                    .member
-                    .context("message doesn't have member attached")?,
-                Some(message.guild_id.context("message isn't in a guild")?),
-                &message.author,
-            ),
-        )?
-        .content(&content)?
-        .exec()
-        .await?;
+    let exec = ctx
+        .http
+        .execute_webhook(
+            webhook.id,
+            webhook
+                .token
+                .as_ref()
+                .context("webhook doesn't have token")?,
+        )
+        .in_channel(&channel)
+        .username(member.nick.as_ref().unwrap_or(&message.author.name))?
+        .content(&content)?;
+    if let Some(url) = avatar_url(
+        &message.author,
+        member,
+        message.guild_id.context("message is not in a guild")?,
+    ) {
+        exec.avatar_url(&url).exec().await?;
+    } else {
+        exec.exec().await?;
+    }
 
     Ok(())
 }
@@ -188,6 +199,31 @@ fn message_is_weird(message: &Message) -> bool {
         || !message.reactions.is_empty()
         || !message.sticker_items.is_empty()
         || message.webhook_id.is_some()
+}
+
+/// Returns the user or member's avatar URL, if they have any
+#[allow(unused_must_use)]
+fn avatar_url(user: &User, member: &PartialMember, guild_id: Id<GuildMarker>) -> Option<String> {
+    let mut url = "https://cdn.discordapp.com/".to_owned();
+
+    let avatar = if let Some(member_avatar) = member.avatar {
+        write!(url, "guilds/{guild_id}/users/{}/avatars/", user.id);
+        member_avatar
+    } else if let Some(user_avatar) = user.avatar {
+        write!(url, "avatars/{}", user.id);
+        user_avatar
+    } else {
+        return None;
+    };
+
+    write!(url, "/{avatar}");
+    if avatar.is_animated() {
+        write!(url, ".gif");
+    } else {
+        write!(url, ".png");
+    }
+
+    Some(url)
 }
 
 /// converts 12-hour to 24-hour format
