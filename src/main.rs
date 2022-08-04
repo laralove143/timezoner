@@ -22,9 +22,9 @@ mod parse;
 
 use std::{env, path::Path, sync::Arc};
 
-use aes_gcm_siv::{aead::NewAead, Aes128GcmSiv};
+use aes_gcm_siv::{Aes128GcmSiv, KeyInit};
 use anyhow::{IntoResult, Result};
-use futures::StreamExt;
+use futures_util::StreamExt;
 use sqlx::SqlitePool;
 use tantivy::{Index, IndexReader};
 use twilight_cache_inmemory::{InMemoryCache, ResourceType};

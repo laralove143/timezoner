@@ -8,36 +8,53 @@ categories = ["web-programming::http-client"]
 edition = "2021"
 license = "MIT"
 
+[dependencies.tokio]
+version = "1.17"
+features = ["macros", "rt-multi-thread"]
+
+[dependencies.futures-util]
+version = "0.3"
+default-features = false
+
+[dependencies.aes-gcm-siv]
+version = "0.11"
+features = ["std"]
+
+[dependencies.anyhow]
+git = "https://github.com/laralove143/anyhow"
+
+[dependencies.sqlx]
+version = "0.6"
+default-features = false
+features = ["runtime-tokio-rustls", "macros","sqlite"]
+
+[dependencies.twilight-gateway]
+version = "0.12"
+features = ["rustls-native-roots", "simd-json", "zlib-simd"]
+
+[dependencies.twilight-http]
+version = "0.12"
+default-features = false
+features = ["simd-json", "decompression", "rustls-native-roots", "trust-dns"]
+
+[dependencies.twilight-cache-inmemory]
+version = "0.12"
+features = ["permission-calculator"]
+
+[dependencies.twilight-util]
+version = "0.12"
+features = ["builder"]
+
 [dependencies]
-twilight-gateway = { version = "0.12", default-features = false, features = [
-    "rustls-native-roots",
-    "zlib-simd",
-] }
-twilight-http = { version = "0.12", default-features = false, features = [
-    "decompression",
-    "rustls-native-roots",
-    "trust-dns",
-] }
-twilight-model = { version = "0.12", default-features = false }
-twilight-cache-inmemory = { version = "0.12", features = ["permission-calculator"] }
-twilight-util = { version = "0.12", features = ["builder"] }
+twilight-model = "0.12"
 twilight-mention = "0.12"
 twilight-interactions = "0.12"
 twilight-webhook = "0.12"
 twilight-error = "0.12"
-sqlx = { version = "0.5", default-features = false, features = [
-    "runtime-tokio-rustls",
-    "macros",
-    "sqlite",
-] }
-aes-gcm-siv = { version = "0.10", features = ["std"] }
 rand = "0.8"
 hex = "0.4"
-tokio = { version = "1.17", features = ["macros", "rt-multi-thread"] }
-futures = { version = "0.3", default-features = false }
-anyhow = { git = "https://github.com/laralove143/anyhow" }
 dashmap = "5.2"
 logos = "0.12"
 chrono = "0.4"
 chrono-tz = "0.6"
-tantivy = "0.17"
+tantivy = "0.18"
