@@ -1,8 +1,8 @@
 [package]
-name = "timezoner-discord-bot"
+name = "timezoner"
 description = "a discord bot that makes timezone conversions really easy"
 version = "0.1.0"
-repository = "https://github.com/laralove143/timezoner-discord-bot"
+repository = "https://github.com/laralove143/timezoner"
 keywords = ["discord", "bot", "time"]
 categories = ["web-programming::http-client"]
 edition = "2021"

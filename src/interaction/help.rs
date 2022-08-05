@@ -44,14 +44,14 @@ just convert times into discord format and your discord client does the rest"))
  channel/category, if it still doesn't work, please contact me"))
         .field(EmbedFieldBuilder::new("terms of service",
 "pretty basic stuff, but here: \
-https://github.com/laralove143/timezoner-discord-bot#terms-of-service"))
+https://github.com/laralove143/timezoner#terms-of-service"))
         .field(EmbedFieldBuilder::new("i have a bug report/feature request/feedback",
                                       "please contact my developer"))
         .field(EmbedFieldBuilder::new("contact my developer",
 "join their server: https://discord.gg/6vAzfFj8xG
 friend them: <@258568289746288641>
 email them: laralove143@icloud.com
-make a github issue: https://github.com/laralove143/timezoner-discord-bot/issues/new"))
+make a github issue: https://github.com/laralove143/timezoner/issues/new"))
         .field(EmbedFieldBuilder::new("i love this bot, how can i help",
 "first of all thank you :) any feedback to improve the bot helps, you can tell about it to \
 your friends too
