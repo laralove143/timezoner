@@ -7,15 +7,15 @@ goodbye to timezone conversions!
 
 just type some time in chat and everyone magically sees it in their own timezone
 
-![example](example.gif)
+![example](examples/sent.gif)
 
 and someone 10 hours ahead sees:
 
-![example](example.png)
+![example](examples/shown.png)
 
 setting your timezone couldn't be easier:
 
-![example](example_timezone.gif)
+![example](examples/timezone.gif)
 
 *thank you to [jason](https://github.com/zudsniper) for funding the hosting!*
 
@@ -30,7 +30,7 @@ setting your timezone couldn't be easier:
 
 just set your timezone like below:
 
-![example](example_timezone.gif)
+![example](examples/timezone.gif)
 
 ## terms of service
 
