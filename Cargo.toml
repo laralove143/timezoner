@@ -8,8 +8,9 @@ license = "MIT"
 [dependencies]
 sparkle-convenience = "0.14"
 sparkle-cache-postgres = "0.14"
+twilight-gateway = "0.14"
 twilight-model = "0.14"
-twilight-util = { version = "0.14", features = ["builder"] }
+twilight-interactions = "0.14"
 tokio = { version = "1.21", features = ["rt-multi-thread", "macros"] }
 futures = "0.3"
 anyhow = "1.0"

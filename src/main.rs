@@ -29,7 +29,6 @@
     single_use_lifetimes,
     trivial_casts,
     trivial_numeric_casts,
-    unreachable_pub,
     unsafe_code,
     unsafe_op_in_unsafe_fn,
     unstable_features,
@@ -46,7 +45,10 @@ use std::{env, sync::Arc};
 
 use futures::stream::StreamExt;
 use sparkle_convenience::Bot;
+use twilight_gateway::EventTypeFlags;
 use twilight_model::gateway::Intents;
+
+mod interaction;
 
 struct Context {
     bot: Bot,
@@ -54,18 +56,21 @@ struct Context {
 
 #[tokio::main]
 async fn main() -> Result<(), anyhow::Error> {
-    let (bot, mut events) = Bot::new(
+    let (mut bot, mut events) = Bot::new(
         env::var("TIMEZONER_BOT_TOKEN")?,
         Intents::GUILDS
             | Intents::GUILD_WEBHOOKS
             | Intents::GUILD_MESSAGES
             | Intents::MESSAGE_CONTENT,
-        Some(env::var("LOGGING_CHANNEL_ID")?.parse()?),
-        Some("timezoner errors.txt".to_owned()),
+        EventTypeFlags::all(),
     )
     .await?;
+    bot.set_logging_channel(env::var("LOGGING_CHANNEL_ID")?.parse()?)
+        .await?;
+    bot.set_logging_file("timezoner_errors.txt".to_owned());
 
     let ctx = Arc::new(Context { bot });
+    ctx.set_commands().await?;
 
     while let Some((_, event)) = events.next().await {}
 
