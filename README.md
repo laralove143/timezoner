@@ -13,6 +13,12 @@ and someone 10 hours ahead sees:
 
 ![example](example.png)
 
+setting your timezone couldn't be easier:
+
+![example](example_timezone.gif)
+
+*thank you to [jason](https://github.com/zudsniper) for funding the hosting!*
+
 ## features
 
 - does all the conversion automatically, no commands or dms or annoyances
