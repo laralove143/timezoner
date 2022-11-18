@@ -1,10 +1,7 @@
 # timezoner
 
-[<img src="add_to_server_badge.png" height="32"/>]
-[<img src="join_support_server_badge.png" height="32"/>]
-
-[<img src="add_to_server_badge.png" height="32"/>]: https://discord.com/api/oauth2/authorize?client_id=909820903574106203&permissions=536880128&scope=bot%20applications.commands
-[<img src="join_support_server_badge.png" height="32"/>]: https://discord.gg/6vAzfFj8xG
+[add to your server](https://discord.com/api/oauth2/authorize?client_id=909820903574106203&permissions=536880128&scope=bot%20applications.commands)
+[get support](https://discord.gg/6vAzfFj8xG)
 
 goodbye to timezone conversions!
 
@@ -16,25 +13,18 @@ and someone 10 hours ahead sees:
 
 ![example](example.png)
 
-setting your timezone couldn't be easier:
-
-![example](example_timezone.gif)
-
 ## features
 
 - does all the conversion automatically, no commands or dms or annoyances
 - the ones reading the times don't need to do anything
 - supports all the sane formats: `1pm` `1:30 Pm` `13:30`...
 - has a `/copy` command that you can use to share times in dms etc
-- setting up your timezone couldn't be easier, scroll down for an example
 
-## contact
+## usage
 
-- i am the only person responsible for the bot, it has no team
-- discord server: <https://discord.gg/6vAzfFj8xG>
-- discord username: laralove#7186
-- email: laralove143@icloud.com
-- github issues
+just set your timezone like below:
+
+![example](example_timezone.gif)
 
 ## terms of service
 
@@ -63,10 +53,3 @@ these clauses override all other licenses:
 - you may not advertise the self-hosted bot, such as on websites such as top.gg
 - the self-hosted bot may not be in over 5 guilds
 - you must direct the feedback/support requests to me
-
-## nerdy stuff
-
-made with [rust] and [twilight] and sqlite
-
-[rust]: https://www.rust-lang.org
-[twilight]: https://github.com/twilight-rs/twilight
