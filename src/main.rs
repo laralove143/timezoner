@@ -40,28 +40,44 @@
     unused_qualifications,
     variant_size_differences
 )]
+#![allow(
+    clippy::module_name_repetitions,
+    clippy::missing_errors_doc,
+    clippy::missing_panics_doc
+)]
 
 use std::{env, sync::Arc};
 
 use futures::stream::StreamExt;
+use sparkle_cache_postgres::Cache;
 use sparkle_convenience::Bot;
 use twilight_gateway::EventTypeFlags;
-use twilight_model::gateway::Intents;
+use twilight_model::gateway::{event::Event, Intents};
 
+mod database;
 mod interaction;
 
-struct Context {
+#[derive(Debug)]
+pub struct Context {
     bot: Bot,
+    cache: Cache,
+}
+
+impl Context {
+    async fn handle_event(&self, event: Event) -> Result<(), anyhow::Error> {
+        if let Event::InteractionCreate(interaction) = event {
+            self.handle_interaction(interaction.0).await?;
+        }
+
+        Ok(())
+    }
 }
 
 #[tokio::main]
 async fn main() -> Result<(), anyhow::Error> {
     let (mut bot, mut events) = Bot::new(
         env::var("TIMEZONER_BOT_TOKEN")?,
-        Intents::GUILDS
-            | Intents::GUILD_WEBHOOKS
-            | Intents::GUILD_MESSAGES
-            | Intents::MESSAGE_CONTENT,
+        Intents::empty(),
         EventTypeFlags::all(),
     )
     .await?;
@@ -69,10 +85,21 @@ async fn main() -> Result<(), anyhow::Error> {
         .await?;
     bot.set_logging_file("timezoner_errors.txt".to_owned());
 
-    let ctx = Arc::new(Context { bot });
+    let ctx = Arc::new(Context {
+        bot,
+        cache: Cache::new(&env::var("TIMEZONER_DATABASE_URL")?).await?,
+    });
     ctx.set_commands().await?;
+    ctx.init_db().await?;
 
-    while let Some((_, event)) = events.next().await {}
+    while let Some((_, event)) = events.next().await {
+        let ctx_ref = Arc::clone(&ctx);
+        tokio::spawn(async move {
+            if let Err(err) = ctx_ref.handle_event(event).await {
+                ctx_ref.bot.log(format!("{err:?}")).await;
+            };
+        });
+    }
 
     Ok(())
 }
