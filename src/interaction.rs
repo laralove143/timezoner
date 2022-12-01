@@ -1,21 +1,14 @@
-use std::{env, str::FromStr};
+use std::env;
 
 use anyhow::anyhow;
 use sparkle_convenience::{
-    reply::Reply,
-    util::{InteractionDataExt, InteractionExt, Prettify},
-    Error, IntoError,
+    interaction::InteractionHandle, reply::Reply, util::Prettify, Error, IntoError,
 };
 use twilight_interactions::command::CreateCommand;
 use twilight_model::application::interaction::Interaction;
 
 use crate::{
-    interaction::{
-        date::DateCommandOptions,
-        timezone::{
-            TimezoneCommand, TimezoneCommandOptions, TimezoneSubmit, TimezoneSubmitButtonClick,
-        },
-    },
+    interaction::{date::DateCommandOptions, timezone::TimezoneCommandOptions},
     Context,
 };
 
@@ -31,46 +24,10 @@ pub enum UserError {
     BadTimezone,
 }
 
-impl From<UserError> for Reply {
-    fn from(err: UserError) -> Self {
-        Self::new().ephemeral().content(err.to_string())
-    }
-}
-
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-enum CommandKind {
-    Timezone,
-    TimezoneSubmitButtonClick,
-    TimezoneSubmit,
-}
-
-impl CommandKind {
-    const fn deferred(self) -> bool {
-        match self {
-            Self::TimezoneSubmit | Self::Timezone => true,
-            Self::TimezoneSubmitButtonClick => false,
-        }
-    }
-
-    const fn is_ephemeral(self) -> bool {
-        match self {
-            Self::TimezoneSubmit | Self::Timezone => true,
-            Self::TimezoneSubmitButtonClick => false,
-        }
-    }
-}
-
-impl FromStr for CommandKind {
-    type Err = anyhow::Error;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "timezone" => Ok(Self::Timezone),
-            "timezone_submit_button_click" => Ok(Self::TimezoneSubmitButtonClick),
-            "timezone_submit" => Ok(Self::TimezoneSubmit),
-            _ => Err(anyhow!("Unknown command: {s}")),
-        }
-    }
+struct InteractionContext<'ctx, 'handle> {
+    ctx: &'ctx Context,
+    handle: &'ctx mut InteractionHandle<'handle>,
+    interaction: Interaction,
 }
 
 impl Context {
@@ -93,46 +50,36 @@ impl Context {
     }
 
     pub async fn handle_interaction(&self, interaction: Interaction) -> Result<(), anyhow::Error> {
-        let command_kind: CommandKind = interaction.name().ok()?.parse()?;
-        let handle = self.bot.interaction_handle(&interaction);
-        let err_handle = handle.clone();
+        let mut handle = self.bot.interaction_handle(&interaction);
+        let ctx = InteractionContext {
+            ctx: self,
+            handle: &mut handle,
+            interaction,
+        };
 
-        if command_kind.deferred() {
-            handle.defer(command_kind.is_ephemeral()).await?;
-        }
+        let command_run_result = match ctx.handle.name.as_deref().ok()? {
+            "timezone" => ctx.handle_timezone_command().await,
+            "timezone_paste_button" => ctx.handle_timezone_paste_button_click().await,
+            "timezone_modal_submit" => ctx.handle_timezone_modal_submit().await,
+            name => Err(Error::Internal(anyhow!("Unknown command: {name}"))),
+        };
 
-        if let Err(err) = match command_kind {
-            CommandKind::Timezone => TimezoneCommand::new(handle).run().await,
-            CommandKind::TimezoneSubmitButtonClick => {
-                TimezoneSubmitButtonClick::new(handle).run().await
-            }
-            CommandKind::TimezoneSubmit => {
-                TimezoneSubmit::new(
-                    handle,
-                    self,
-                    interaction.author_id().ok()?,
-                    interaction.data.ok()?.modal().ok()?,
-                )?
-                .run()
-                .await
-            }
-        } {
-            if command_kind.deferred() {
-                let reply = match &err {
-                    Error::User(err) => (*err).into(),
-                    Error::MissingPermissions(permissions) => {
-                        Reply::new().ephemeral().content(format!(
-                            "Please give me these permissions first:\n{}",
-                            permissions.prettify()
-                        ))
-                    }
-                    Error::Internal(_) => Reply::new().ephemeral().content(
-                        "Something went wrong... The error has been reported to the developer"
-                            .to_owned(),
-                    ),
-                };
-                err_handle.reply(reply).await?;
-            }
+        if let Err(err) = command_run_result {
+            let content = match &err {
+                Error::User(err) => err.to_string(),
+                Error::MissingPermissions(permissions) => {
+                    format!(
+                        "Please give me these permissions first:\n{}",
+                        permissions.prettify()
+                    )
+                }
+                Error::Internal(_) => "Something went wrong... The error has been reported to the \
+                                       developer"
+                    .to_owned(),
+            };
+            handle
+                .reply(Reply::new().ephemeral().content(content))
+                .await?;
 
             if let Error::Internal(err) = err {
                 return Err(err);

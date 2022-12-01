@@ -13,10 +13,6 @@ and someone 10 hours ahead sees:
 
 ![example](examples/shown.png)
 
-setting your timezone couldn't be easier:
-
-![example](examples/timezone.gif)
-
 *thank you to [jason](https://github.com/zudsniper) for funding the hosting!*
 
 ## features
@@ -25,12 +21,6 @@ setting your timezone couldn't be easier:
 - the ones reading the times don't need to do anything
 - supports all the sane formats: `1pm` `1:30 Pm` `13:30`...
 - has a `/copy` command that you can use to share times in dms etc
-
-## usage
-
-just set your timezone like below:
-
-![example](examples/timezone.gif)
 
 ## terms of service
 

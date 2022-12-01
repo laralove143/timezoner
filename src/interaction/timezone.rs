@@ -1,138 +1,186 @@
-use sparkle_convenience::{interaction::InteractionHandle, reply::Reply, Error, IntoError};
-use twilight_interactions::command::{CommandModel, CreateCommand};
-use twilight_model::{
-    application::interaction::modal::ModalInteractionData,
-    channel::message::{
-        component::{ActionRow, Button, ButtonStyle, TextInput, TextInputStyle},
-        embed::{EmbedField, EmbedImage},
-        Component, Embed, ReactionType,
-    },
-    id::{marker::UserMarker, Id},
+use sparkle_convenience::{reply::Reply, util::InteractionDataExt, Error, IntoError};
+use time_tz::timezones;
+use twilight_interactions::command::CreateCommand;
+use twilight_model::channel::message::{
+    component::{ActionRow, Button, ButtonStyle, TextInput, TextInputStyle},
+    embed::{EmbedField, EmbedFooter, EmbedImage},
+    Component, Embed, ReactionType,
 };
 
-use crate::{interaction::UserError, Context};
+use crate::interaction::{InteractionContext, UserError};
 
-#[derive(CommandModel, CreateCommand)]
+const COPY_BUTTON_EXAMPLE_URL: &str =
+    "https://github.com/laralove143/timezoner/blob/rewrite/examples/copy_button?raw=true";
+const COPY_TIMEZONE_EXAMPLE_URL: &str =
+    "https://github.com/laralove143/timezoner/blob/rewrite/examples/copy_timezone?raw=true";
+const PASTE_BUTTON_EXAMPLE_URL: &str =
+    "https://github.com/laralove143/timezoner/blob/rewrite/examples/paste_button?raw=true";
+const SUBMIT_TIMEZONE_EXAMPLE_URL: &str =
+    "https://github.com/laralove143/timezoner/blob/rewrite/examples/submit_timezone?raw=true";
+
+#[derive(CreateCommand)]
 #[command(
     name = "timezone",
     desc = "Set your timezone so you can start sharing magical times"
 )]
 pub struct TimezoneCommandOptions {}
 
-pub struct TimezoneCommand<'bot> {
-    handle: InteractionHandle<'bot>,
+fn copy_button() -> Component {
+    Component::Button(Button {
+        style: ButtonStyle::Link,
+        emoji: Some(ReactionType::Unicode {
+            name: "📋".to_owned(),
+        }),
+        label: Some("Copy your timezone".to_owned()),
+        url: Some("https://kevinnovak.github.io/Time-Zone-Picker/".to_owned()),
+        disabled: false,
+        custom_id: None,
+    })
 }
 
-impl<'bot> TimezoneCommand<'bot> {
-    pub const fn new(handle: InteractionHandle<'bot>) -> Self {
-        Self { handle }
-    }
+fn paste_button() -> Component {
+    Component::Button(Button {
+        custom_id: Some("timezone_paste_button".to_owned()),
+        style: ButtonStyle::Primary,
+        emoji: Some(ReactionType::Unicode {
+            name: "✍️".to_owned(),
+        }),
+        label: Some("Click here to paste it".to_owned()),
+        disabled: false,
+        url: None,
+    })
+}
 
-    pub async fn run(self) -> Result<(), Error<UserError>> {
+fn copy_button_example_embed() -> Embed {
+    Embed {
+        title: Some("Press the `Copy your timezone` button".to_owned()),
+        color: Some(0x00d4_f1f9),
+        image: Some(EmbedImage {
+            url: COPY_BUTTON_EXAMPLE_URL.to_owned(),
+            proxy_url: None,
+            height: None,
+            width: None,
+        }),
+        fields: vec![],
+        kind: String::new(),
+        author: None,
+        description: None,
+        footer: None,
+        provider: None,
+        thumbnail: None,
+        timestamp: None,
+        url: None,
+        video: None,
+    }
+}
+
+fn copy_timezone_example_embed() -> Embed {
+    Embed {
+        title: Some("In the website that opens, press the `Copy` button".to_owned()),
+        description: Some(
+            "If the detected timezone is wrong, select where you live on the map and then press \
+             the `Copy` button"
+                .to_owned(),
+        ),
+        color: Some(0x00d4_f1f9),
+        image: Some(EmbedImage {
+            url: COPY_TIMEZONE_EXAMPLE_URL.to_owned(),
+            proxy_url: None,
+            height: None,
+            width: None,
+        }),
+        fields: vec![],
+        kind: String::new(),
+        author: None,
+        footer: None,
+        provider: None,
+        thumbnail: None,
+        timestamp: None,
+        url: None,
+        video: None,
+    }
+}
+
+fn paste_button_example_embed() -> Embed {
+    Embed {
+        title: Some(
+            "Come back to Discord and press the `Click here to paste it` button".to_owned(),
+        ),
+        color: Some(0x00d4_f1f9),
+        image: Some(EmbedImage {
+            url: PASTE_BUTTON_EXAMPLE_URL.to_owned(),
+            proxy_url: None,
+            height: None,
+            width: None,
+        }),
+        fields: vec![],
+        kind: String::new(),
+        author: None,
+        description: None,
+        footer: None,
+        provider: None,
+        thumbnail: None,
+        timestamp: None,
+        url: None,
+        video: None,
+    }
+}
+
+fn submit_timezone_example_embed() -> Embed {
+    Embed {
+        title: Some(
+            "Paste the timezone you copied to the text field and press the `Submit` button"
+                .to_owned(),
+        ),
+        color: Some(0x00d4_f1f9),
+        image: Some(EmbedImage {
+            url: SUBMIT_TIMEZONE_EXAMPLE_URL.to_owned(),
+            proxy_url: None,
+            height: None,
+            width: None,
+        }),
+        fields: vec![],
+        kind: String::new(),
+        author: None,
+        description: None,
+        footer: None,
+        provider: None,
+        thumbnail: None,
+        timestamp: None,
+        url: None,
+        video: None,
+    }
+}
+
+impl InteractionContext<'_, '_> {
+    pub async fn handle_timezone_command(self) -> Result<(), Error<UserError>> {
         self.handle
             .reply(
                 Reply::new()
                     .component(Component::ActionRow(ActionRow {
-                        components: vec![
-                            Component::Button(Button {
-                                emoji: Some(ReactionType::Unicode {
-                                    name: "📋".to_owned(),
-                                }),
-                                label: Some("Copy your timezone".to_owned()),
-                                url: Some(
-                                    "https://kevinnovak.github.io/Time-Zone-Picker/".to_owned(),
-                                ),
-                                style: ButtonStyle::Link,
-                                disabled: false,
-                                custom_id: None,
-                            }),
-                            Component::Button(Button {
-                                custom_id: Some("timezone_submit_button_click".to_owned()),
-                                emoji: Some(ReactionType::Unicode {
-                                    name: "✍️".to_owned(),
-                                }),
-                                label: Some("Paste it here".to_owned()),
-                                style: ButtonStyle::Primary,
-                                disabled: false,
-                                url: None,
-                            }),
-                        ],
+                        components: vec![copy_button(), paste_button()],
                     }))
-                    .embed(Embed {
-                        title: Some("Timezone Picking 101".to_owned()),
-                        fields: vec![
-                            EmbedField {
-                                name: ":one:".to_owned(),
-                                value: "Press the `Copy your timezone` button".to_owned(),
-                                inline: false,
-                            },
-                            EmbedField {
-                                name: ":two:".to_owned(),
-                                value: "In the website that opens, press the `Copy` button (If \
-                                        your timezone isn't detected, select it on the map and \
-                                        then press the `Copy` button)"
-                                    .to_owned(),
-                                inline: false,
-                            },
-                            EmbedField {
-                                name: ":three:".to_owned(),
-                                value: "Come back to Discord and press the `Paste it here` button"
-                                    .to_owned(),
-                                inline: false,
-                            },
-                            EmbedField {
-                                name: ":four:".to_owned(),
-                                value: "Paste the timezone you copied to the text field and press \
-                                        the `Submit` button"
-                                    .to_owned(),
-                                inline: false,
-                            },
-                        ],
-                        image: Some(EmbedImage {
-                            url: "https://github.com/laralove143/timezoner/blob/main/examples\
-                            /timezone.gif".to_owned(),
-                            proxy_url: None,
-                            height: None,
-                            width: None,
-                        }),
-                        kind: String::new(),
-                        description: None,
-                        author: None,
-                        footer: None,
-                        timestamp: None,
-                        thumbnail: None,
-                        url: None,
-                        color: None,
-                        video: None,
-                        provider: None,
-                    }),
+                    .embed(copy_button_example_embed())
+                    .embed(copy_timezone_example_embed())
+                    .embed(paste_button_example_embed())
+                    .embed(submit_timezone_example_embed()),
             )
             .await?;
 
         Ok(())
     }
-}
 
-pub struct TimezoneSubmitButtonClick<'bot> {
-    pub handle: InteractionHandle<'bot>,
-}
-
-impl<'bot> TimezoneSubmitButtonClick<'bot> {
-    pub const fn new(handle: InteractionHandle<'bot>) -> Self {
-        Self { handle }
-    }
-
-    pub async fn run(self) -> Result<(), Error<UserError>> {
+    pub async fn handle_timezone_paste_button_click(self) -> Result<(), Error<UserError>> {
         self.handle
             .modal(
-                "timezone_submit".to_owned(),
+                "timezone_modal_submit".to_owned(),
                 "Timezone Postal Service".to_owned(),
                 vec![TextInput {
                     custom_id: "timezone".to_owned(),
+                    style: TextInputStyle::Short,
                     label: "Paste your timezone here please".to_owned(),
                     placeholder: Some("America/Chicago".to_owned()),
                     required: Some(true),
-                    style: TextInputStyle::Short,
                     max_length: None,
                     min_length: None,
                     value: None,
@@ -142,45 +190,29 @@ impl<'bot> TimezoneSubmitButtonClick<'bot> {
 
         Ok(())
     }
-}
 
-pub struct TimezoneSubmit<'bot> {
-    pub handle: InteractionHandle<'bot>,
-    pub ctx: &'bot Context,
-    pub user_id: Id<UserMarker>,
-    pub timezone: String,
-}
+    pub async fn handle_timezone_modal_submit(self) -> Result<(), Error<UserError>> {
+        let user_id = self.interaction.author_id().ok()?;
+        let input = self
+            .interaction
+            .data
+            .ok()?
+            .modal()
+            .ok()?
+            .components
+            .into_iter()
+            .next()
+            .ok()?
+            .components
+            .into_iter()
+            .next()
+            .ok()?
+            .value
+            .ok()?;
 
-impl<'bot> TimezoneSubmit<'bot> {
-    pub fn new(
-        handle: InteractionHandle<'bot>,
-        ctx: &'bot Context,
-        user_id: Id<UserMarker>,
-        data: ModalInteractionData,
-    ) -> Result<Self, anyhow::Error> {
-        Ok(Self {
-            handle,
-            ctx,
-            user_id,
-            timezone: data
-                .components
-                .into_iter()
-                .next()
-                .ok()?
-                .components
-                .into_iter()
-                .next()
-                .ok()?
-                .value
-                .ok()?,
-        })
-    }
+        let tz = timezones::get_by_name(&input).ok_or(Error::User(UserError::BadTimezone))?;
 
-    pub async fn run(self) -> Result<(), Error<UserError>> {
-        let tz = time_tz::timezones::get_by_name(&self.timezone)
-            .ok_or(Error::User(UserError::BadTimezone))?;
-
-        self.ctx.insert_timezone(self.user_id, tz).await?;
+        self.ctx.insert_timezone(user_id, tz).await?;
 
         self.handle
             .reply(
