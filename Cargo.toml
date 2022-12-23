@@ -7,14 +7,16 @@ license = "MIT"
 
 [dependencies]
 sparkle-convenience = "0.14"
-sparkle-cache-postgres = "0.14"
+twilight-http = "0.14"
 twilight-gateway = "0.14"
 twilight-model = "0.14"
+twilight-standby = "0.14"
 twilight-interactions = "0.14"
-sqlx = { version = "0.6", features = ["runtime-tokio-rustls", "postgres"]}
-time = "0.3"
-time-tz = "1.0"
+chrono = { version = "0.4", default-features = false }
+chrono-tz = "0.8"
+lazy-regex = "2.3"
+rbdc-pg = "0.1"
+serde = "1.0"
 tokio = { version = "1.21", features = ["rt-multi-thread", "macros"] }
 futures = "0.3"
 anyhow = { version = "1.0", features = ["backtrace"] }
-thiserror = "1.0"

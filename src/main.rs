@@ -46,27 +46,69 @@
     clippy::missing_panics_doc
 )]
 
-use std::{env, sync::Arc};
+use std::{
+    env,
+    error::Error,
+    fmt::{Display, Formatter},
+    sync::Arc,
+};
 
+use anyhow::anyhow;
 use futures::stream::StreamExt;
-use sparkle_cache_postgres::Cache;
-use sparkle_convenience::Bot;
+use sparkle_convenience::{
+    error::{conversion::IntoError, ErrorExt, UserError},
+    prettify::Prettify,
+    reply::Reply,
+    Bot,
+};
 use twilight_gateway::EventTypeFlags;
-use twilight_model::gateway::{event::Event, Intents};
+use twilight_model::{
+    application::command::Command,
+    gateway::{event::Event, Intents},
+    id::{marker::CommandMarker, Id},
+};
+use twilight_standby::Standby;
+
+use crate::interaction::set_commands;
 
 mod database;
 mod interaction;
+mod message;
 
-#[derive(Debug)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum CustomError {
+    BadTimezone,
+    MissingTimezone(Id<CommandMarker>),
+    MessageTooLong,
+}
+
+impl Display for CustomError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        f.write_str("a user error has been handled like an internal error")
+    }
+}
+
+impl Error for CustomError {}
+
 pub struct Context {
     bot: Bot,
-    cache: Cache,
+    db: Db,
+    standby: Standby,
+    commands: Vec<Command>,
 }
 
 impl Context {
     async fn handle_event(&self, event: Event) -> Result<(), anyhow::Error> {
-        if let Event::InteractionCreate(interaction) = event {
-            self.handle_interaction(interaction.0).await?;
+        self.standby.process(&event);
+
+        match event {
+            Event::InteractionCreate(interaction) => {
+                self.handle_interaction(interaction.0).await?;
+            }
+            Event::MessageCreate(message) => {
+                self.handle_message(message.0).await?;
+            }
+            _ => {}
         }
 
         Ok(())
@@ -77,7 +119,10 @@ impl Context {
 async fn main() -> Result<(), anyhow::Error> {
     let (mut bot, mut events) = Bot::new(
         env::var("TIMEZONER_BOT_TOKEN")?,
-        Intents::empty(),
+        Intents::GUILDS
+            | Intents::GUILD_MESSAGES
+            | Intents::MESSAGE_CONTENT
+            | Intents::GUILD_MESSAGE_REACTIONS,
         EventTypeFlags::all(),
     )
     .await?;
@@ -85,12 +130,13 @@ async fn main() -> Result<(), anyhow::Error> {
         .await?;
     bot.set_logging_file("timezoner_errors.txt".to_owned());
 
+    let commands = set_commands(&bot).await?;
     let ctx = Arc::new(Context {
         bot,
-        cache: Cache::new(&env::var("TIMEZONER_DATABASE_URL")?).await?,
+        db: sled::open("timezoner.sled")?,
+        standby: Standby::new(),
+        commands,
     });
-    ctx.set_commands().await?;
-    ctx.init_db().await?;
 
     while let Some((_, event)) = events.next().await {
         let ctx_ref = Arc::clone(&ctx);
@@ -102,4 +148,40 @@ async fn main() -> Result<(), anyhow::Error> {
     }
 
     Ok(())
+}
+
+fn err_reply(err: &anyhow::Error) -> Result<Reply, anyhow::Error> {
+    let message = if let Some(user_err) = err.user() {
+        match user_err {
+            UserError::MissingPermissions(permissions) => format!(
+                "Please beg the mods to give me these permissions first:\n{}",
+                permissions.ok()?.prettify()
+            ),
+            UserError::Ignore => {
+                return Err(anyhow!("tried to handle an error that should be ignored"))
+            }
+        }
+    } else if let Some(custom_err) = err.downcast_ref::<CustomError>() {
+        match custom_err {
+            CustomError::BadTimezone => {
+                "I looked and looked but couldn't find that timezone anywhere... If you're sure \
+                 the timezone is right, please join the support server"
+            }
+            .to_owned(),
+            CustomError::MissingTimezone(timezone) => format!(
+                "Bad news, I need to know your timezone first, good news, it's really easy to \
+                 tell me, just press </timezone:{timezone}>"
+            ),
+            CustomError::MessageTooLong => "That message is too long, maybe you're using your \
+                                            super nitro powers or it's right at the edge of the \
+                                            character limit"
+                .to_owned(),
+        }
+    } else {
+        "Something went terribly wrong there... I spammed Lara with the error, I'm sure they'll \
+         look at it ASAP"
+            .to_owned()
+    };
+
+    Ok(Reply::new().ephemeral().content(message))
 }

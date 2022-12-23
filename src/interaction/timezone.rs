@@ -1,22 +1,26 @@
-use sparkle_convenience::{reply::Reply, util::InteractionDataExt, Error, IntoError};
-use time_tz::timezones;
+use chrono_tz::Tz;
+use sparkle_convenience::{
+    error::conversion::IntoError, interaction::extract::InteractionDataExt, reply::Reply,
+};
 use twilight_interactions::command::CreateCommand;
 use twilight_model::channel::message::{
     component::{ActionRow, Button, ButtonStyle, TextInput, TextInputStyle},
-    embed::{EmbedField, EmbedFooter, EmbedImage},
+    embed::EmbedImage,
     Component, Embed, ReactionType,
 };
 
-use crate::interaction::{InteractionContext, UserError};
+use crate::{interaction::InteractionContext, CustomError};
 
 const COPY_BUTTON_EXAMPLE_URL: &str =
-    "https://github.com/laralove143/timezoner/blob/rewrite/examples/copy_button?raw=true";
+    "https://github.com/laralove143/timezoner/blob/rewrite/examples/copy_button.png?raw=true";
 const COPY_TIMEZONE_EXAMPLE_URL: &str =
-    "https://github.com/laralove143/timezoner/blob/rewrite/examples/copy_timezone?raw=true";
+    "https://github.com/laralove143/timezoner/blob/rewrite/examples/copy_timezone.png?raw=true";
 const PASTE_BUTTON_EXAMPLE_URL: &str =
-    "https://github.com/laralove143/timezoner/blob/rewrite/examples/paste_button?raw=true";
+    "https://github.com/laralove143/timezoner/blob/rewrite/examples/paste_button.png?raw=true";
 const SUBMIT_TIMEZONE_EXAMPLE_URL: &str =
-    "https://github.com/laralove143/timezoner/blob/rewrite/examples/submit_timezone?raw=true";
+    "https://github.com/laralove143/timezoner/blob/rewrite/examples/submit_timezone.png?raw=true";
+
+type Timezone = ();
 
 #[derive(CreateCommand)]
 #[command(
@@ -152,8 +156,8 @@ fn submit_timezone_example_embed() -> Embed {
     }
 }
 
-impl InteractionContext<'_, '_> {
-    pub async fn handle_timezone_command(self) -> Result<(), Error<UserError>> {
+impl InteractionContext<'_> {
+    pub async fn handle_timezone_command(self) -> Result<(), anyhow::Error> {
         self.handle
             .reply(
                 Reply::new()
@@ -170,7 +174,7 @@ impl InteractionContext<'_, '_> {
         Ok(())
     }
 
-    pub async fn handle_timezone_paste_button_click(self) -> Result<(), Error<UserError>> {
+    pub async fn handle_timezone_paste_button_click(self) -> Result<(), anyhow::Error> {
         self.handle
             .modal(
                 "timezone_modal_submit".to_owned(),
@@ -191,7 +195,7 @@ impl InteractionContext<'_, '_> {
         Ok(())
     }
 
-    pub async fn handle_timezone_modal_submit(self) -> Result<(), Error<UserError>> {
+    pub async fn handle_timezone_modal_submit(self) -> Result<(), anyhow::Error> {
         let user_id = self.interaction.author_id().ok()?;
         let input = self
             .interaction
@@ -210,7 +214,7 @@ impl InteractionContext<'_, '_> {
             .value
             .ok()?;
 
-        let tz = timezones::get_by_name(&input).ok_or(Error::User(UserError::BadTimezone))?;
+        let tz = input.parse().map_err(|_| CustomError::BadTimezone)?;
 
         self.ctx.insert_timezone(user_id, tz).await?;
 

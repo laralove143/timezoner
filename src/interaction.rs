@@ -1,87 +1,82 @@
-use std::env;
+use std::{env, marker::PhantomData};
 
 use anyhow::anyhow;
 use sparkle_convenience::{
-    interaction::InteractionHandle, reply::Reply, util::Prettify, Error, IntoError,
+    error::{conversion::IntoError, ErrorExt},
+    interaction::{extract::InteractionExt, InteractionHandle},
+    Bot,
 };
 use twilight_interactions::command::CreateCommand;
-use twilight_model::application::interaction::Interaction;
+use twilight_model::{
+    application::{command::Command, interaction::Interaction},
+    id::{marker::CommandMarker, Id},
+};
 
 use crate::{
+    err_reply,
     interaction::{date::DateCommandOptions, timezone::TimezoneCommandOptions},
-    Context,
+    Context, CustomError,
 };
 
 mod date;
 mod timezone;
 
-#[derive(Clone, Copy, Debug, Eq, PartialEq, thiserror::Error)]
-pub enum UserError {
-    #[error(
-        "I couldn't find that timezone... If you're sure the timezone is right, please join the \
-         support server"
-    )]
-    BadTimezone,
-}
-
-struct InteractionContext<'ctx, 'handle> {
+struct InteractionContext<'ctx> {
     ctx: &'ctx Context,
-    handle: &'ctx mut InteractionHandle<'handle>,
+    handle: InteractionHandle<'ctx>,
     interaction: Interaction,
 }
 
+pub async fn set_commands(bot: &Bot) -> Result<Vec<Command>, anyhow::Error> {
+    let commands = &[
+        DateCommandOptions::create_command().into(),
+        TimezoneCommandOptions::create_command().into(),
+    ];
+
+    let commands_response = bot
+        .interaction_client()
+        .set_global_commands(commands)
+        .await?
+        .models()
+        .await?;
+    bot.interaction_client()
+        .set_guild_commands(env::var("TEST_GUILD_ID")?.parse()?, commands)
+        .await?;
+
+    Ok(commands_response)
+}
+
 impl Context {
-    pub async fn set_commands(&self) -> Result<(), anyhow::Error> {
-        let commands = &[
-            DateCommandOptions::create_command().into(),
-            TimezoneCommandOptions::create_command().into(),
-        ];
-
-        self.bot
-            .interaction_client()
-            .set_global_commands(commands)
-            .await?;
-        self.bot
-            .interaction_client()
-            .set_guild_commands(env::var("TEST_GUILD_ID")?.parse()?, commands)
-            .await?;
-
-        Ok(())
+    pub fn timezone_command_id(&self) -> Result<Id<CommandMarker>, anyhow::Error> {
+        self.commands
+            .iter()
+            .find_map(|command| (command.name == "timezone").then_some(command.id?))
+            .ok()
     }
 
     pub async fn handle_interaction(&self, interaction: Interaction) -> Result<(), anyhow::Error> {
-        let mut handle = self.bot.interaction_handle(&interaction);
+        let handle = self.bot.interaction_handle(&interaction);
         let ctx = InteractionContext {
             ctx: self,
-            handle: &mut handle,
+            handle: handle.clone(),
             interaction,
         };
 
-        let command_run_result = match ctx.handle.name.as_deref().ok()? {
+        let command_run_result = match ctx.interaction.name().ok()? {
             "timezone" => ctx.handle_timezone_command().await,
             "timezone_paste_button" => ctx.handle_timezone_paste_button_click().await,
             "timezone_modal_submit" => ctx.handle_timezone_modal_submit().await,
-            name => Err(Error::Internal(anyhow!("Unknown command: {name}"))),
+            name => Err(anyhow!("unknown command: {name}")),
         };
 
         if let Err(err) = command_run_result {
-            let content = match &err {
-                Error::User(err) => err.to_string(),
-                Error::MissingPermissions(permissions) => {
-                    format!(
-                        "Please give me these permissions first:\n{}",
-                        permissions.prettify()
-                    )
-                }
-                Error::Internal(_) => "Something went wrong... The error has been reported to the \
-                                       developer"
-                    .to_owned(),
-            };
-            handle
-                .reply(Reply::new().ephemeral().content(content))
-                .await?;
+            if err.ignore() {
+                return Ok(());
+            }
 
-            if let Error::Internal(err) = err {
+            handle.reply(err_reply(&err)?).await?;
+
+            if let Some(err) = err.internal::<CustomError>() {
                 return Err(err);
             }
         }
