@@ -1,4 +1,3 @@
-use chrono_tz::Tz;
 use sparkle_convenience::{
     error::conversion::IntoError, interaction::extract::InteractionDataExt, reply::Reply,
 };
@@ -19,8 +18,6 @@ const PASTE_BUTTON_EXAMPLE_URL: &str =
     "https://github.com/laralove143/timezoner/blob/rewrite/examples/paste_button.png?raw=true";
 const SUBMIT_TIMEZONE_EXAMPLE_URL: &str =
     "https://github.com/laralove143/timezoner/blob/rewrite/examples/submit_timezone.png?raw=true";
-
-type Timezone = ();
 
 #[derive(CreateCommand)]
 #[command(

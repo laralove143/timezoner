@@ -54,6 +54,7 @@ use std::{
 };
 
 use anyhow::anyhow;
+use dotenvy::dotenv;
 use futures::stream::StreamExt;
 use sparkle_convenience::{
     error::{conversion::IntoError, ErrorExt, UserError},
@@ -61,6 +62,7 @@ use sparkle_convenience::{
     reply::Reply,
     Bot,
 };
+use sqlx::PgPool;
 use twilight_gateway::EventTypeFlags;
 use twilight_model::{
     application::command::Command,
@@ -90,9 +92,10 @@ impl Display for CustomError {
 
 impl Error for CustomError {}
 
+#[derive(Debug)]
 pub struct Context {
     bot: Bot,
-    db: Db,
+    db: PgPool,
     standby: Standby,
     commands: Vec<Command>,
 }
@@ -117,6 +120,8 @@ impl Context {
 
 #[tokio::main]
 async fn main() -> Result<(), anyhow::Error> {
+    dotenv()?;
+
     let (mut bot, mut events) = Bot::new(
         env::var("TIMEZONER_BOT_TOKEN")?,
         Intents::GUILDS
@@ -130,10 +135,14 @@ async fn main() -> Result<(), anyhow::Error> {
         .await?;
     bot.set_logging_file("timezoner_errors.txt".to_owned());
 
+    let db = PgPool::connect(&env::var("DATABASE_URL")?).await?;
+    sqlx::migrate!().run(&db).await?;
+
     let commands = set_commands(&bot).await?;
+
     let ctx = Arc::new(Context {
         bot,
-        db: sled::open("timezoner.sled")?,
+        db,
         standby: Standby::new(),
         commands,
     });

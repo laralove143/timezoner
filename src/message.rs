@@ -1,8 +1,8 @@
 use std::ops::Range;
 
 use anyhow::anyhow;
-use chrono::NaiveTime;
-use lazy_regex::{regex, Regex};
+use chrono::{offset::Local, Datelike, TimeZone};
+use lazy_regex::{lazy_regex, Lazy, Regex};
 use sparkle_convenience::{
     error::{conversion::IntoError, ErrorExt},
     http::message::CreateMessageExt,
@@ -16,12 +16,15 @@ use twilight_model::{
 
 use crate::{err_reply, Context, CustomError};
 
-const REGEX_24_HOUR: &Regex = regex!(r#"\b([0-1]?[0-9]|2[0-3]):([0-5][0-9])\b"#);
-const REGEX_12_HOUR: &Regex = regex!(r#"\b(1[0-2]|0?[1-9]) ?([AaPp][Mm])\b"#);
-const REGEX_12_HOUR_WITH_MIN: &Regex = regex!(r#"\b(1[0-2]|0?[1-9]):([0-5][0-9]) ?([AaPp][Mm])\b"#);
-const REQUIRED_PERMISSIONS: Permissions =
-    Permissions::MANAGE_MESSAGES | Permissions::ADD_REACTIONS | Permissions::MANAGE_WEBHOOKS;
+static REGEX_24_HOUR: Lazy<Regex> = lazy_regex!(r#"\b([0-1]?[0-9]|2[0-3]):([0-5][0-9])\b"#);
+static REGEX_12_HOUR: Lazy<Regex> = lazy_regex!(r#"\b(1[0-2]|0?[1-9]) ?([AaPp][Mm])\b"#);
+static REGEX_12_HOUR_WITH_MIN: Lazy<Regex> =
+    lazy_regex!(r#"\b(1[0-2]|0?[1-9]):([0-5][0-9]) ?([AaPp][Mm])\b"#);
 const REACTION_EMOJI: &str = "⏰";
+
+fn required_permissions() -> Permissions {
+    Permissions::MANAGE_MESSAGES | Permissions::ADD_REACTIONS | Permissions::MANAGE_WEBHOOKS
+}
 
 impl Context {
     pub async fn handle_message(&self, message: Message) -> Result<(), anyhow::Error> {
@@ -35,7 +38,7 @@ impl Context {
                 return Ok(());
             }
 
-            err.with_permissions(REQUIRED_PERMISSIONS);
+            err.with_permissions(required_permissions());
 
             self.bot
                 .http
@@ -73,7 +76,7 @@ impl Context {
             })
             .await?;
 
-        let Some((time, range)) = parse_time(&message.content)? else {
+        let Some((hour, minute, range)) = parse_time(&message.content)? else {
             return Ok(());
         };
 
@@ -81,11 +84,18 @@ impl Context {
             return Err(CustomError::MissingTimezone(self.timezone_command_id()?).into());
         };
 
-        let datetime = tz.with_ymd_and_hms(time);
+        let now = Local::now();
 
-        message
-            .content
-            .replace_range(range, &format!("<t:{}:t>", datetime.unix_timestamp()));
+        message.content.replace_range(
+            range,
+            &format!(
+                "<t:{}:t>",
+                tz.with_ymd_and_hms(now.year(), now.month(), now.day(), hour, minute, 0)
+                    .single()
+                    .ok()?
+                    .timestamp()
+            ),
+        );
 
         self.bot
             .http
@@ -102,34 +112,31 @@ impl Context {
     }
 }
 
-fn parse_time(s: &str) -> Result<Option<(NaiveTime, Range<usize>)>, anyhow::Error> {
-    let (time, top_match) = if let Some(captures) = REGEX_12_HOUR_WITH_MIN.captures(s) {
+fn parse_time(s: &str) -> Result<Option<(u32, u32, Range<usize>)>, anyhow::Error> {
+    if let Some(captures) = REGEX_12_HOUR_WITH_MIN.captures(s) {
         let hour = captures[1].parse()?;
         let min = captures[2].parse()?;
         let am_pm = &captures[3];
-        (
-            NaiveTime::from_hms_opt(to_24_hour(hour, am_pm)?, min, 0).ok()?,
-            captures.get(0).ok()?,
-        )
+        Ok(Some((
+            to_24_hour(hour, am_pm)?,
+            min,
+            captures.get(0).ok()?.range(),
+        )))
     } else if let Some(captures) = REGEX_12_HOUR.captures(s) {
         let hour = captures[1].parse()?;
         let am_pm = &captures[2];
-        (
-            NaiveTime::from_hms_opt(to_24_hour(hour, am_pm)?, 0, 0).ok()?,
-            captures.get(0).ok()?,
-        )
+        Ok(Some((
+            to_24_hour(hour, am_pm)?,
+            0,
+            captures.get(0).ok()?.range(),
+        )))
     } else if let Some(captures) = REGEX_24_HOUR.captures(s) {
         let hour = captures[1].parse()?;
         let min = captures[2].parse()?;
-        (
-            NaiveTime::from_hms_opt(hour, min, 0).ok()?,
-            captures.get(0).ok()?,
-        )
+        Ok(Some((hour, min, captures.get(0).ok()?.range())))
     } else {
-        return Ok(None);
-    };
-
-    Ok(Some((time, top_match.range())))
+        Ok(None)
+    }
 }
 
 fn to_24_hour(hour: u32, am_pm: &str) -> Result<u32, anyhow::Error> {
