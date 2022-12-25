@@ -1,7 +1,7 @@
 # timezoner
 
-[add to your server](https://discord.com/api/oauth2/authorize?client_id=909820903574106203&permissions=536880128&scope=bot%20applications.commands)
-[get support](https://discord.gg/6vAzfFj8xG)
+- [add to your server](https://discord.com/api/oauth2/authorize?client_id=909820903574106203&permissions=536880128&scope=bot%20applications.commands)
+- [get support](https://discord.gg/6vAzfFj8xG)
 
 goodbye to timezone conversions!
 
