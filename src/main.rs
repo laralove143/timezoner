@@ -124,11 +124,10 @@ async fn main() -> Result<()> {
 
     let (mut bot, mut events) = Bot::new(
         env::var("TIMEZONER_BOT_TOKEN")?,
-        Intents::GUILDS
-            | Intents::GUILD_MESSAGES
-            | Intents::MESSAGE_CONTENT
-            | Intents::GUILD_MESSAGE_REACTIONS,
-        EventTypeFlags::all(),
+        Intents::GUILD_MESSAGES | Intents::MESSAGE_CONTENT | Intents::GUILD_MESSAGE_REACTIONS,
+        EventTypeFlags::INTERACTION_CREATE
+            | EventTypeFlags::MESSAGE_CREATE
+            | EventTypeFlags::REACTION_ADD,
     )
     .await?;
     bot.set_logging_channel(env::var("LOGGING_CHANNEL_ID")?.parse()?)
