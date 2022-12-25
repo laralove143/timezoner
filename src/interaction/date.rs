@@ -1,7 +1,15 @@
-use sparkle_convenience::interaction::InteractionHandle;
-use twilight_interactions::command::CreateCommand;
+use anyhow::Result;
+use chrono::TimeZone;
+use sparkle_convenience::{
+    error::conversion::IntoError,
+    interaction::{extract::InteractionDataExt, InteractionHandle},
+    reply::Reply,
+};
+use twilight_interactions::command::{CommandModel, CreateCommand};
 
-#[derive(CreateCommand)]
+use crate::{interaction::InteractionContext, CustomError};
+
+#[derive(CommandModel, CreateCommand)]
 #[command(
     name = "date",
     desc = "Send a date that everyone sees in their own timezone"
@@ -11,7 +19,7 @@ pub struct DateCommandOptions {
     day: i64,
     #[command(desc = "The month of the date", min_value = 0, max_value = 12)]
     month: i64,
-    #[command(desc = "the year of the date", min_value = -9999, max_value = 9999)]
+    #[command(desc = "the year of the date", min_value = -262000, max_value = 262000)]
     year: i64,
     #[command(
         desc = "The hour of the date in 24-hour format",
@@ -23,7 +31,34 @@ pub struct DateCommandOptions {
     min: i64,
 }
 
-pub struct DateCommand<'bot> {
-    handle: InteractionHandle<'bot>,
-    options: DateCommandOptions,
+impl InteractionContext<'_> {
+    pub async fn handle_date_command(self) -> Result<()> {
+        let author_id = self.interaction.author_id().ok()?;
+        let options = DateCommandOptions::from_interaction(
+            self.interaction.data.ok()?.command().ok()?.into(),
+        )?;
+
+        let Some(tz) = self.ctx.timezone(author_id).await? else {
+            return Err(CustomError::MissingTimezone(self.ctx.timezone_command_id()?).into());
+        };
+
+        self.handle
+            .reply(Reply::new().content(format!(
+            "<t:{}:F>",
+            tz.with_ymd_and_hms(
+                options.year.try_into()?,
+                options.month.try_into()?,
+                options.day.try_into()?,
+                options.hour.try_into()?,
+                options.min.try_into()?,
+                0
+            )
+            .single()
+            .ok()?
+            .timestamp()
+        )))
+            .await?;
+
+        Ok(())
+    }
 }

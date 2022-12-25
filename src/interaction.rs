@@ -66,6 +66,7 @@ impl Context {
             "timezone" => ctx.handle_timezone_command().await,
             "timezone_paste_button" => ctx.handle_timezone_paste_button_click().await,
             "timezone_modal_submit" => ctx.handle_timezone_modal_submit().await,
+            "date" => ctx.handle_date_command().await,
             name => Err(anyhow!("unknown command: {name}")),
         };
 
