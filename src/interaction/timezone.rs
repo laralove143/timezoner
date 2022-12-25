@@ -1,3 +1,4 @@
+use anyhow::Result;
 use sparkle_convenience::{
     error::conversion::IntoError, interaction::extract::InteractionDataExt, reply::Reply,
 };
@@ -154,7 +155,7 @@ fn submit_timezone_example_embed() -> Embed {
 }
 
 impl InteractionContext<'_> {
-    pub async fn handle_timezone_command(self) -> Result<(), anyhow::Error> {
+    pub async fn handle_timezone_command(self) -> Result<()> {
         self.handle
             .reply(
                 Reply::new()
@@ -171,7 +172,7 @@ impl InteractionContext<'_> {
         Ok(())
     }
 
-    pub async fn handle_timezone_paste_button_click(self) -> Result<(), anyhow::Error> {
+    pub async fn handle_timezone_paste_button_click(self) -> Result<()> {
         self.handle
             .modal(
                 "timezone_modal_submit".to_owned(),

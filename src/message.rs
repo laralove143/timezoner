@@ -1,6 +1,6 @@
 use std::ops::Range;
 
-use anyhow::anyhow;
+use anyhow::{anyhow, Result};
 use chrono::{offset::Local, Datelike, TimeZone};
 use lazy_regex::{lazy_regex, Lazy, Regex};
 use sparkle_convenience::{
@@ -27,7 +27,7 @@ fn required_permissions() -> Permissions {
 }
 
 impl Context {
-    pub async fn handle_message(&self, message: Message) -> Result<(), anyhow::Error> {
+    pub async fn handle_message(&self, message: Message) -> Result<()> {
         if message.author.bot {
             return Ok(());
         }
@@ -112,7 +112,7 @@ impl Context {
     }
 }
 
-fn parse_time(s: &str) -> Result<Option<(u32, u32, Range<usize>)>, anyhow::Error> {
+fn parse_time(s: &str) -> Result<Option<(u32, u32, Range<usize>)>> {
     if let Some(captures) = REGEX_12_HOUR_WITH_MIN.captures(s) {
         let hour = captures[1].parse()?;
         let min = captures[2].parse()?;
@@ -139,7 +139,7 @@ fn parse_time(s: &str) -> Result<Option<(u32, u32, Range<usize>)>, anyhow::Error
     }
 }
 
-fn to_24_hour(hour: u32, am_pm: &str) -> Result<u32, anyhow::Error> {
+fn to_24_hour(hour: u32, am_pm: &str) -> Result<u32> {
     Ok(match am_pm.to_ascii_lowercase().as_str() {
         "am" => {
             if hour == 12 {

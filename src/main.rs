@@ -53,7 +53,7 @@ use std::{
     sync::Arc,
 };
 
-use anyhow::anyhow;
+use anyhow::{anyhow, Result};
 use dotenvy::dotenv;
 use futures::stream::StreamExt;
 use sparkle_convenience::{
@@ -101,7 +101,7 @@ pub struct Context {
 }
 
 impl Context {
-    async fn handle_event(&self, event: Event) -> Result<(), anyhow::Error> {
+    async fn handle_event(&self, event: Event) -> Result<()> {
         self.standby.process(&event);
 
         match event {
@@ -119,7 +119,7 @@ impl Context {
 }
 
 #[tokio::main]
-async fn main() -> Result<(), anyhow::Error> {
+async fn main() -> Result<()> {
     dotenv()?;
 
     let (mut bot, mut events) = Bot::new(
@@ -159,7 +159,7 @@ async fn main() -> Result<(), anyhow::Error> {
     Ok(())
 }
 
-fn err_reply(err: &anyhow::Error) -> Result<Reply, anyhow::Error> {
+fn err_reply(err: &anyhow::Error) -> Result<Reply> {
     let message = if let Some(user_err) = err.user() {
         match user_err {
             UserError::MissingPermissions(permissions) => format!(

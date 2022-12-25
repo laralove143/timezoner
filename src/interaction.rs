@@ -1,6 +1,6 @@
 use std::env;
 
-use anyhow::anyhow;
+use anyhow::{anyhow, Result};
 use sparkle_convenience::{
     error::{conversion::IntoError, ErrorExt},
     interaction::{extract::InteractionExt, InteractionHandle},
@@ -27,7 +27,7 @@ struct InteractionContext<'ctx> {
     interaction: Interaction,
 }
 
-pub async fn set_commands(bot: &Bot) -> Result<Vec<Command>, anyhow::Error> {
+pub async fn set_commands(bot: &Bot) -> Result<Vec<Command>> {
     let commands = &[
         DateCommandOptions::create_command().into(),
         TimezoneCommandOptions::create_command().into(),
@@ -47,14 +47,14 @@ pub async fn set_commands(bot: &Bot) -> Result<Vec<Command>, anyhow::Error> {
 }
 
 impl Context {
-    pub fn timezone_command_id(&self) -> Result<Id<CommandMarker>, anyhow::Error> {
+    pub fn timezone_command_id(&self) -> Result<Id<CommandMarker>> {
         self.commands
             .iter()
             .find_map(|command| (command.name == "timezone").then_some(command.id?))
             .ok()
     }
 
-    pub async fn handle_interaction(&self, interaction: Interaction) -> Result<(), anyhow::Error> {
+    pub async fn handle_interaction(&self, interaction: Interaction) -> Result<()> {
         let handle = self.bot.interaction_handle(&interaction);
         let ctx = InteractionContext {
             ctx: self,

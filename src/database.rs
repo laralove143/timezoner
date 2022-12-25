@@ -34,11 +34,7 @@ impl Decode<Result<Tz>> for String {
 }
 
 impl Context {
-    pub async fn insert_timezone(
-        &self,
-        user_id: Id<UserMarker>,
-        timezone: Tz,
-    ) -> Result<(), anyhow::Error> {
+    pub async fn insert_timezone(&self, user_id: Id<UserMarker>, timezone: Tz) -> Result<()> {
         query!(
             "INSERT INTO timezones (user_id, timezone) VALUES ($1, $2) ON CONFLICT (user_id) DO \
              UPDATE SET timezone = $2",
@@ -51,7 +47,7 @@ impl Context {
         Ok(())
     }
 
-    pub async fn timezone(&self, user_id: Id<UserMarker>) -> Result<Option<Tz>, anyhow::Error> {
+    pub async fn timezone(&self, user_id: Id<UserMarker>) -> Result<Option<Tz>> {
         match query_scalar!(
             "SELECT timezone FROM timezones WHERE user_id = $1",
             user_id.encode()
