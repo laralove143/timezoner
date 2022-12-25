@@ -178,7 +178,7 @@ fn err_reply(err: &anyhow::Error) -> Result<Reply> {
             .to_owned(),
             CustomError::MissingTimezone(timezone) => format!(
                 "Bad news, I need to know your timezone first, good news, it's really easy to \
-                 tell me, just press </timezone:{timezone}>"
+                 tell me, just press </timezone:{timezone}> and smash that send button"
             ),
             CustomError::MessageTooLong => "That message is too long, maybe you're using your \
                                             super nitro powers or it's right at the edge of the \
