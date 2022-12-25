@@ -55,7 +55,11 @@ impl Context {
         Ok(())
     }
 
-    async fn handle_time_message(&self, mut message: Message) -> Result<(), anyhow::Error> {
+    async fn handle_time_message(&self, mut message: Message) -> Result<()> {
+        let Some((hour, minute, range)) = parse_time(&message.content)? else {
+            return Ok(());
+        };
+
         self.bot
             .http
             .create_reaction(
@@ -75,10 +79,6 @@ impl Context {
                     } == reaction.emoji
             })
             .await?;
-
-        let Some((hour, minute, range)) = parse_time(&message.content)? else {
-            return Ok(());
-        };
 
         let Some(tz) = self.timezone(message.author.id).await? else {
             return Err(CustomError::MissingTimezone(self.timezone_command_id()?).into());
