@@ -14,10 +14,13 @@ use twilight_model::{
 
 use crate::{
     err_reply,
-    interaction::{date::DateCommandOptions, timezone::TimezoneCommandOptions},
+    interaction::{
+        copy::CopyCommandOptions, date::DateCommandOptions, timezone::TimezoneCommandOptions,
+    },
     Context, CustomError,
 };
 
+mod copy;
 mod date;
 mod timezone;
 
@@ -29,8 +32,9 @@ struct InteractionContext<'ctx> {
 
 pub async fn set_commands(bot: &Bot) -> Result<Vec<Command>> {
     let commands = &[
-        DateCommandOptions::create_command().into(),
         TimezoneCommandOptions::create_command().into(),
+        DateCommandOptions::create_command().into(),
+        CopyCommandOptions::create_command().into(),
     ];
 
     let commands_response = bot
@@ -67,6 +71,7 @@ impl Context {
             "timezone_paste_button" => ctx.handle_timezone_paste_button_click().await,
             "timezone_modal_submit" => ctx.handle_timezone_modal_submit().await,
             "date" => ctx.handle_date_command().await,
+            "copy" => ctx.handle_copy_command().await,
             name => Err(anyhow!("unknown command: {name}")),
         };
 
