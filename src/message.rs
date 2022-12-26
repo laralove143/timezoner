@@ -20,11 +20,10 @@ static REGEX_24_HOUR: Lazy<Regex> = lazy_regex!(r#"\b([0-1]?[0-9]|2[0-3]):([0-5]
 static REGEX_12_HOUR: Lazy<Regex> = lazy_regex!(r#"\b(1[0-2]|0?[1-9]) ?([AaPp][Mm])\b"#);
 static REGEX_12_HOUR_WITH_MIN: Lazy<Regex> =
     lazy_regex!(r#"\b(1[0-2]|0?[1-9]):([0-5][0-9]) ?([AaPp][Mm])\b"#);
+const REQUIRED_PERMISSIONS: Permissions = Permissions::MANAGE_MESSAGES
+    .union(Permissions::ADD_REACTIONS)
+    .union(Permissions::MANAGE_WEBHOOKS);
 const REACTION_EMOJI: &str = "⏰";
-
-fn required_permissions() -> Permissions {
-    Permissions::MANAGE_MESSAGES | Permissions::ADD_REACTIONS | Permissions::MANAGE_WEBHOOKS
-}
 
 impl Context {
     pub async fn handle_message(&self, message: Message) -> Result<()> {
@@ -38,7 +37,7 @@ impl Context {
                 return Ok(());
             }
 
-            err.with_permissions(required_permissions());
+            err.with_permissions(REQUIRED_PERMISSIONS);
 
             self.bot
                 .http
