@@ -124,7 +124,7 @@ async fn main() -> Result<()> {
     dotenv()?;
 
     let (mut bot, mut events) = Bot::new(
-        env::var("TIMEZONER_BOT_TOKEN")?,
+        env::var("BOT_TOKEN")?,
         Intents::GUILD_MESSAGES | Intents::MESSAGE_CONTENT | Intents::GUILD_MESSAGE_REACTIONS,
         EventTypeFlags::INTERACTION_CREATE
             | EventTypeFlags::MESSAGE_CREATE
@@ -133,7 +133,7 @@ async fn main() -> Result<()> {
     .await?;
     bot.set_logging_channel(env::var("LOGGING_CHANNEL_ID")?.parse()?)
         .await?;
-    bot.set_logging_file("timezoner_errors.txt".to_owned());
+    bot.set_logging_file("log.txt".to_owned());
 
     let db = PgPool::connect(&env::var("DATABASE_URL")?).await?;
     sqlx::migrate!().run(&db).await?;
