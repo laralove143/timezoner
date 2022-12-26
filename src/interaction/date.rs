@@ -1,13 +1,10 @@
 use anyhow::Result;
-use chrono::TimeZone;
 use sparkle_convenience::{
-    error::conversion::IntoError,
-    interaction::{extract::InteractionDataExt, InteractionHandle},
-    reply::Reply,
+    error::conversion::IntoError, interaction::extract::InteractionDataExt, reply::Reply,
 };
 use twilight_interactions::command::{CommandModel, CreateCommand};
 
-use crate::{interaction::InteractionContext, CustomError};
+use crate::interaction::InteractionContext;
 
 #[derive(CommandModel, CreateCommand)]
 #[command(
@@ -38,25 +35,20 @@ impl InteractionContext<'_> {
             self.interaction.data.ok()?.command().ok()?.into(),
         )?;
 
-        let Some(tz) = self.ctx.timezone(author_id).await? else {
-            return Err(CustomError::MissingTimezone(self.ctx.timezone_command_id()?).into());
-        };
-
         self.handle
             .reply(Reply::new().content(format!(
-            "<t:{}:F>",
-            tz.with_ymd_and_hms(
-                options.year.try_into()?,
-                options.month.try_into()?,
-                options.day.try_into()?,
-                options.hour.try_into()?,
-                options.min.try_into()?,
-                0
-            )
-            .single()
-            .ok()?
-            .timestamp()
-        )))
+                "<t:{}:F>",
+                self.ctx
+                    .user_timestamp(
+                        author_id,
+                        options.year.try_into()?,
+                        options.month.try_into()?,
+                        options.day.try_into()?,
+                        options.hour.try_into()?,
+                        options.min.try_into()?
+                    )
+                    .await?
+            )))
             .await?;
 
         Ok(())

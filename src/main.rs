@@ -76,6 +76,7 @@ use crate::interaction::set_commands;
 mod database;
 mod interaction;
 mod message;
+mod time;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum CustomError {
