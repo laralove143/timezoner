@@ -13,7 +13,8 @@ use twilight_model::{
 
 use crate::{err_reply, time::parse_time, Context, CustomError};
 
-const REQUIRED_PERMISSIONS: Permissions = Permissions::MANAGE_MESSAGES
+const REQUIRED_PERMISSIONS: Permissions = Permissions::SEND_MESSAGES
+    .union(Permissions::MANAGE_MESSAGES)
     .union(Permissions::ADD_REACTIONS)
     .union(Permissions::MANAGE_WEBHOOKS);
 const REACTION_EMOJI: &str = "⏰";
