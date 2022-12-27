@@ -14,7 +14,7 @@ use crate::{
 #[derive(CreateCommand)]
 #[command(
     name = "help",
-    desc = "Get info about the bot and learn why it might not be working"
+    desc = "Get info about the bot or learn why it might not be working"
 )]
 pub struct HelpCommandOptions {}
 
@@ -28,7 +28,9 @@ fn help_embed(command_ids: CommandIds) -> Embed {
                 inline: false,
             },
             EmbedField {
-                name: "Get support".to_owned(),
+                name: "Get support/Give feedback/Get updates/Meet Lara (the dev)/Join please \
+                       :pleading_face:"
+                    .to_owned(),
                 value: SUPPORT_SERVER_INVITE.to_owned(),
                 inline: false,
             },
@@ -75,27 +77,28 @@ fn missing_permissions_embed(application_name: &str, missing_permissions: Permis
         title: Some("Permissions error detected, call tech support!".to_owned()),
         fields: vec![
             EmbedField {
-                name: "How to fix??".to_owned(),
-                value: format!(
-                    "Go to **Server Settings -> Roles -> {application_name} -> Permissions** and \
-                     turn on those permissions I listed, if they're already given, read below and \
-                     have fun"
-                ),
-                inline: false,
-            },
-            EmbedField {
-                name: "How to fix (extreme edition)".to_owned(),
-                value: format!(
-                    "Right click the channel you're in right now, click **Edit Channel -> \
-                     Permissions -> Advanced Permissions -> Tiny little + button**, type \
-                     {application_name} and select the text or user, finally put all those \
-                     permissions I listed to a nice looking green tick"
-                ),
-                inline: false,
-            },
-            EmbedField {
                 name: "Missing permissions".to_owned(),
                 value: missing_permissions.prettify(),
+                inline: false,
+            },
+            EmbedField {
+                name: "How to fix??".to_owned(),
+                value: format!(
+                    "**1.** Go to **Server Settings -> Roles -> {application_name} -> \
+                     Permissions**\n**2.** Turn on those permissions I listed\n**Oops.** If \
+                     they're already given, read below and have fun\n"
+                ),
+                inline: false,
+            },
+            EmbedField {
+                name: "How to fix?? (extreme edition)".to_owned(),
+                value: format!(
+                    "**1.** Right click the channel you're in right now\n**2.** Click **Edit \
+                     Channel -> Permissions -> Advanced Permissions -> Tiny little + \
+                     button**\n**3.** Type **{application_name}** and select the role or \
+                     user\n**4.** Finally put all those permissions I listed into a nice looking \
+                     green tick"
+                ),
                 inline: false,
             },
         ],
