@@ -159,13 +159,14 @@ impl InteractionContext<'_> {
         self.handle
             .reply(
                 Reply::new()
-                    .component(Component::ActionRow(ActionRow {
-                        components: vec![copy_button(), paste_button()],
-                    }))
+                    .ephemeral()
                     .embed(copy_button_example_embed())
                     .embed(copy_timezone_example_embed())
                     .embed(paste_button_example_embed())
-                    .embed(submit_timezone_example_embed()),
+                    .embed(submit_timezone_example_embed())
+                    .component(Component::ActionRow(ActionRow {
+                        components: vec![copy_button(), paste_button()],
+                    })),
             )
             .await?;
 
