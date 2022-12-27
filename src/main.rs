@@ -82,7 +82,7 @@ mod message;
 mod time;
 
 const ACCENT_COLOR: u32 = 0x00d4_f1f9;
-const LOGGING_CHANNEL_ID: Id<ChannelMarker> = Id::new(903_367_565_349_384_202);
+const LOGGING_CHANNEL_ID: Id<ChannelMarker> = Id::new(1_002_953_459_890_397_287);
 const TEST_GUILD_ID: Id<GuildMarker> = Id::new(903_367_565_349_384_202);
 const BOT_INVITE: &str = "https://discord.com/api/oauth2/authorize?\
     client_id=909820903574106203&permissions=536882240&scope=bot%20applications.commands";
