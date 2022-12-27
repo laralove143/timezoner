@@ -13,13 +13,15 @@ use twilight_model::{
 use crate::{
     err_reply,
     interaction::{
-        copy::CopyCommandOptions, date::DateCommandOptions, timezone::TimezoneCommandOptions,
+        copy::CopyCommandOptions, date::DateCommandOptions, help::HelpCommandOptions,
+        timezone::TimezoneCommandOptions,
     },
     Context, CustomError, TEST_GUILD_ID,
 };
 
 mod copy;
 mod date;
+mod help;
 mod timezone;
 
 #[derive(Clone, Copy, Debug)]
@@ -58,6 +60,7 @@ pub async fn set_commands(bot: &Bot) -> Result<CommandIds> {
         TimezoneCommandOptions::create_command().into(),
         DateCommandOptions::create_command().into(),
         CopyCommandOptions::create_command().into(),
+        HelpCommandOptions::create_command().into(),
     ];
 
     let commands_response = bot
@@ -88,6 +91,7 @@ impl Context {
             "timezone_modal_submit" => ctx.handle_timezone_modal_submit().await,
             "date" => ctx.handle_date_command().await,
             "copy" => ctx.handle_copy_command().await,
+            "help" => ctx.handle_help_command().await,
             name => Err(anyhow!("unknown command: {name}")),
         };
 
