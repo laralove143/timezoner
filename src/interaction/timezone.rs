@@ -12,13 +12,13 @@ use twilight_model::channel::message::{
 use crate::{interaction::InteractionContext, CustomError};
 
 const COPY_BUTTON_EXAMPLE_URL: &str =
-    "https://github.com/laralove143/timezoner/blob/rewrite/examples/copy_button.png?raw=true";
+    "https://github.com/laralove143/timezoner/blob/main/examples/copy_button.png?raw=true";
 const COPY_TIMEZONE_EXAMPLE_URL: &str =
-    "https://github.com/laralove143/timezoner/blob/rewrite/examples/copy_timezone.png?raw=true";
+    "https://github.com/laralove143/timezoner/blob/main/examples/copy_timezone.png?raw=true";
 const PASTE_BUTTON_EXAMPLE_URL: &str =
-    "https://github.com/laralove143/timezoner/blob/rewrite/examples/paste_button.png?raw=true";
+    "https://github.com/laralove143/timezoner/blob/main/examples/paste_button.png?raw=true";
 const SUBMIT_TIMEZONE_EXAMPLE_URL: &str =
-    "https://github.com/laralove143/timezoner/blob/rewrite/examples/submit_timezone.png?raw=true";
+    "https://github.com/laralove143/timezoner/blob/main/examples/submit_timezone.png?raw=true";
 
 #[derive(CreateCommand)]
 #[command(
