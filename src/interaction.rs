@@ -1,5 +1,3 @@
-use std::env;
-
 use anyhow::{anyhow, Result};
 use sparkle_convenience::{
     error::{conversion::IntoError, ErrorExt},
@@ -17,7 +15,7 @@ use crate::{
     interaction::{
         copy::CopyCommandOptions, date::DateCommandOptions, timezone::TimezoneCommandOptions,
     },
-    Context, CustomError,
+    Context, CustomError, TEST_GUILD_ID,
 };
 
 mod copy;
@@ -44,7 +42,7 @@ pub async fn set_commands(bot: &Bot) -> Result<Vec<Command>> {
         .models()
         .await?;
     bot.interaction_client()
-        .set_guild_commands(env::var("TEST_GUILD_ID")?.parse()?, commands)
+        .set_guild_commands(TEST_GUILD_ID, commands)
         .await?;
 
     Ok(commands_response)

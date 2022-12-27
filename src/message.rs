@@ -8,15 +8,10 @@ use twilight_http::request::channel::reaction::RequestReactionType;
 use twilight_model::{
     channel::{message::ReactionType, Message},
     gateway::payload::incoming::ReactionAdd,
-    guild::Permissions,
 };
 
-use crate::{err_reply, time::parse_time, Context, CustomError};
+use crate::{err_reply, time::parse_time, Context, CustomError, REQUIRED_PERMISSIONS};
 
-const REQUIRED_PERMISSIONS: Permissions = Permissions::SEND_MESSAGES
-    .union(Permissions::MANAGE_MESSAGES)
-    .union(Permissions::ADD_REACTIONS)
-    .union(Permissions::MANAGE_WEBHOOKS);
 const REACTION_EMOJI: &str = "⏰";
 
 impl Context {

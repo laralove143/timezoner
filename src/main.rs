@@ -67,7 +67,11 @@ use twilight_gateway::EventTypeFlags;
 use twilight_model::{
     application::command::Command,
     gateway::{event::Event, Intents},
-    id::{marker::CommandMarker, Id},
+    guild::Permissions,
+    id::{
+        marker::{ChannelMarker, CommandMarker, GuildMarker},
+        Id,
+    },
 };
 use twilight_standby::Standby;
 
@@ -77,6 +81,18 @@ mod database;
 mod interaction;
 mod message;
 mod time;
+
+const ACCENT_COLOR: u32 = 0x00d4_f1f9;
+const LOGGING_CHANNEL_ID: Id<ChannelMarker> = Id::new(903_367_565_349_384_202);
+const TEST_GUILD_ID: Id<GuildMarker> = Id::new(903_367_565_349_384_202);
+const BOT_INVITE: &str = "https://discord.com/api/oauth2/authorize?\
+    client_id=909820903574106203&permissions=536882240&scope=bot%20applications.commands";
+const SUPPORT_SERVER_INVITE: &str = "https://discord.gg/6vAzfFj8xG";
+const REQUIRED_PERMISSIONS: Permissions = Permissions::MANAGE_WEBHOOKS
+    .union(Permissions::VIEW_CHANNEL)
+    .union(Permissions::SEND_MESSAGES)
+    .union(Permissions::MANAGE_MESSAGES)
+    .union(Permissions::ADD_REACTIONS);
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum CustomError {
@@ -131,8 +147,7 @@ async fn main() -> Result<()> {
             | EventTypeFlags::REACTION_ADD,
     )
     .await?;
-    bot.set_logging_channel(env::var("LOGGING_CHANNEL_ID")?.parse()?)
-        .await?;
+    bot.set_logging_channel(LOGGING_CHANNEL_ID).await?;
     bot.set_logging_file("log.txt".to_owned());
 
     let db = PgPool::connect(&env::var("DATABASE_URL")?).await?;

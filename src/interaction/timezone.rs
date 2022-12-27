@@ -9,7 +9,7 @@ use twilight_model::channel::message::{
     Component, Embed, ReactionType,
 };
 
-use crate::{interaction::InteractionContext, CustomError};
+use crate::{interaction::InteractionContext, CustomError, ACCENT_COLOR};
 
 const COPY_BUTTON_EXAMPLE_URL: &str =
     "https://github.com/laralove143/timezoner/blob/main/examples/copy_button.png?raw=true";
@@ -56,7 +56,7 @@ fn paste_button() -> Component {
 fn copy_button_example_embed() -> Embed {
     Embed {
         title: Some("Press the `Copy your timezone` button".to_owned()),
-        color: Some(0x00d4_f1f9),
+        color: Some(ACCENT_COLOR),
         image: Some(EmbedImage {
             url: COPY_BUTTON_EXAMPLE_URL.to_owned(),
             proxy_url: None,
@@ -84,7 +84,7 @@ fn copy_timezone_example_embed() -> Embed {
              the `Copy` button"
                 .to_owned(),
         ),
-        color: Some(0x00d4_f1f9),
+        color: Some(ACCENT_COLOR),
         image: Some(EmbedImage {
             url: COPY_TIMEZONE_EXAMPLE_URL.to_owned(),
             proxy_url: None,
@@ -108,7 +108,7 @@ fn paste_button_example_embed() -> Embed {
         title: Some(
             "Come back to Discord and press the `Click here to paste it` button".to_owned(),
         ),
-        color: Some(0x00d4_f1f9),
+        color: Some(ACCENT_COLOR),
         image: Some(EmbedImage {
             url: PASTE_BUTTON_EXAMPLE_URL.to_owned(),
             proxy_url: None,
@@ -134,7 +134,7 @@ fn submit_timezone_example_embed() -> Embed {
             "Paste the timezone you copied to the text field and press the `Submit` button"
                 .to_owned(),
         ),
-        color: Some(0x00d4_f1f9),
+        color: Some(ACCENT_COLOR),
         image: Some(EmbedImage {
             url: SUBMIT_TIMEZONE_EXAMPLE_URL.to_owned(),
             proxy_url: None,
