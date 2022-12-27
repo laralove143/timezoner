@@ -22,13 +22,38 @@ mod copy;
 mod date;
 mod timezone;
 
+#[derive(Clone, Copy, Debug)]
+pub struct CommandIds {
+    pub timezone: Id<CommandMarker>,
+    pub date: Id<CommandMarker>,
+    pub copy: Id<CommandMarker>,
+}
+
+impl CommandIds {
+    fn new(commands: &[Command]) -> Result<Self> {
+        Ok(Self {
+            timezone: Self::command_id("timezone", commands)?,
+            date: Self::command_id("date", commands)?,
+            copy: Self::command_id("copy", commands)?,
+        })
+    }
+
+    fn command_id(command_name: &str, commands: &[Command]) -> Result<Id<CommandMarker>> {
+        commands
+            .iter()
+            .find_map(|command| (command.name == command_name).then_some(command.id?))
+            .ok()
+    }
+}
+
+#[derive(Debug)]
 struct InteractionContext<'ctx> {
     ctx: &'ctx Context,
     handle: InteractionHandle<'ctx>,
     interaction: Interaction,
 }
 
-pub async fn set_commands(bot: &Bot) -> Result<Vec<Command>> {
+pub async fn set_commands(bot: &Bot) -> Result<CommandIds> {
     let commands = &[
         TimezoneCommandOptions::create_command().into(),
         DateCommandOptions::create_command().into(),
@@ -45,17 +70,10 @@ pub async fn set_commands(bot: &Bot) -> Result<Vec<Command>> {
         .set_guild_commands(TEST_GUILD_ID, commands)
         .await?;
 
-    Ok(commands_response)
+    CommandIds::new(&commands_response)
 }
 
 impl Context {
-    pub fn timezone_command_id(&self) -> Result<Id<CommandMarker>> {
-        self.commands
-            .iter()
-            .find_map(|command| (command.name == "timezone").then_some(command.id?))
-            .ok()
-    }
-
     pub async fn handle_interaction(&self, interaction: Interaction) -> Result<()> {
         let handle = self.bot.interaction_handle(&interaction);
         let ctx = InteractionContext {

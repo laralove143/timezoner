@@ -24,7 +24,7 @@ impl Context {
         min: u32,
     ) -> Result<i64> {
         let Some(tz) = self.timezone(user_id).await? else {
-            return Err(CustomError::MissingTimezone(self.timezone_command_id()?).into());
+            return Err(CustomError::MissingTimezone(self.command_ids.timezone).into());
         };
 
         Ok(tz

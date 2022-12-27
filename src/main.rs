@@ -65,7 +65,6 @@ use sparkle_convenience::{
 use sqlx::PgPool;
 use twilight_gateway::EventTypeFlags;
 use twilight_model::{
-    application::command::Command,
     gateway::{event::Event, Intents},
     guild::Permissions,
     id::{
@@ -75,7 +74,7 @@ use twilight_model::{
 };
 use twilight_standby::Standby;
 
-use crate::interaction::set_commands;
+use crate::interaction::{set_commands, CommandIds};
 
 mod database;
 mod interaction;
@@ -114,7 +113,7 @@ pub struct Context {
     bot: Bot,
     db: PgPool,
     standby: Standby,
-    commands: Vec<Command>,
+    command_ids: CommandIds,
 }
 
 impl Context {
@@ -153,13 +152,13 @@ async fn main() -> Result<()> {
     let db = PgPool::connect(&env::var("DATABASE_URL")?).await?;
     sqlx::migrate!().run(&db).await?;
 
-    let commands = set_commands(&bot).await?;
+    let command_ids = set_commands(&bot).await?;
 
     let ctx = Arc::new(Context {
         bot,
         db,
         standby: Standby::new(),
-        commands,
+        command_ids,
     });
 
     while let Some((_, event)) = events.next().await {
