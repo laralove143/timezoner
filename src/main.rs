@@ -9,7 +9,6 @@
     rustdoc::invalid_html_tags,
     rustdoc::invalid_rust_codeblocks,
     rustdoc::bare_urls,
-    warnings,
     absolute_paths_not_starting_with_crate,
     elided_lifetimes_in_paths,
     explicit_outlives_requirements,
@@ -40,11 +39,7 @@
     unused_qualifications,
     variant_size_differences
 )]
-#![allow(
-    clippy::module_name_repetitions,
-    clippy::missing_errors_doc,
-    clippy::missing_panics_doc
-)]
+#![allow(clippy::missing_errors_doc, clippy::missing_panics_doc)]
 
 use std::{
     env,

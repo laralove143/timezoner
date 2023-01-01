@@ -16,7 +16,7 @@ use crate::{
     name = "help",
     desc = "Get info about the bot or learn why it might not be working"
 )]
-pub struct HelpCommandOptions {}
+pub struct CommandOptions {}
 
 fn help_embed(command_ids: CommandIds) -> Embed {
     Embed {

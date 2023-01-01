@@ -11,7 +11,7 @@ use crate::interaction::InteractionContext;
     name = "copy",
     desc = "Send a date that you can copy on desktop (on mobile just copy the message)"
 )]
-pub struct CopyCommandOptions {
+pub struct CommandOptions {
     #[command(desc = "The day of the date", min_value = 0, max_value = 31)]
     day: i64,
     #[command(desc = "The month of the date", min_value = 0, max_value = 12)]
@@ -31,9 +31,8 @@ pub struct CopyCommandOptions {
 impl InteractionContext<'_> {
     pub async fn handle_copy_command(self) -> Result<()> {
         let author_id = self.interaction.author_id().ok()?;
-        let options = CopyCommandOptions::from_interaction(
-            self.interaction.data.ok()?.command().ok()?.into(),
-        )?;
+        let options =
+            CommandOptions::from_interaction(self.interaction.data.ok()?.command().ok()?.into())?;
 
         self.handle
             .reply(Reply::new().content(format!(

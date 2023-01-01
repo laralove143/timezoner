@@ -10,7 +10,7 @@ use twilight_model::{
     gateway::payload::incoming::ReactionAdd,
 };
 
-use crate::{err_reply, time::parse_time, Context, CustomError, REQUIRED_PERMISSIONS};
+use crate::{err_reply, time::parse, Context, CustomError, REQUIRED_PERMISSIONS};
 
 const REACTION_EMOJI: &str = "⏰";
 
@@ -44,7 +44,7 @@ impl Context {
     }
 
     async fn handle_time_message(&self, mut message: Message) -> Result<()> {
-        let Some((hour, min, range)) = parse_time(&message.content)? else {
+        let Some((hour, min, range)) = parse(&message.content)? else {
             return Ok(());
         };
 

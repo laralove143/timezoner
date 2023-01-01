@@ -35,7 +35,7 @@ impl Context {
     }
 }
 
-pub fn parse_time(s: &str) -> Result<Option<(u32, u32, Range<usize>)>> {
+pub fn parse(s: &str) -> Result<Option<(u32, u32, Range<usize>)>> {
     if let Some(captures) = REGEX_12_HOUR_WITH_MIN.captures(s) {
         let hour = captures[1].parse()?;
         let min = captures[2].parse()?;

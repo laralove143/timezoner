@@ -10,14 +10,7 @@ use twilight_model::{
     id::{marker::CommandMarker, Id},
 };
 
-use crate::{
-    err_reply,
-    interaction::{
-        copy::CopyCommandOptions, date::DateCommandOptions, help::HelpCommandOptions,
-        timezone::TimezoneCommandOptions,
-    },
-    Context, CustomError, TEST_GUILD_ID,
-};
+use crate::{err_reply, Context, CustomError, TEST_GUILD_ID};
 
 mod copy;
 mod date;
@@ -57,10 +50,10 @@ struct InteractionContext<'ctx> {
 
 pub async fn set_commands(bot: &Bot) -> Result<CommandIds> {
     let commands = &[
-        TimezoneCommandOptions::create_command().into(),
-        DateCommandOptions::create_command().into(),
-        CopyCommandOptions::create_command().into(),
-        HelpCommandOptions::create_command().into(),
+        timezone::CommandOptions::create_command().into(),
+        date::CommandOptions::create_command().into(),
+        copy::CommandOptions::create_command().into(),
+        help::CommandOptions::create_command().into(),
     ];
 
     let commands_response = bot

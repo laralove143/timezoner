@@ -25,7 +25,7 @@ const SUBMIT_TIMEZONE_EXAMPLE_URL: &str =
     name = "timezone",
     desc = "Set your timezone so you can start sharing magical times"
 )]
-pub struct TimezoneCommandOptions {}
+pub struct CommandOptions {}
 
 fn copy_button() -> Component {
     Component::Button(Button {
