@@ -1,5 +1,7 @@
+use std::fmt::Write;
+
 use anyhow::Result;
-use chrono::{offset::Local, Datelike};
+use chrono::{offset::Local, Datelike, TimeZone};
 use sparkle_convenience::{
     error::{conversion::IntoError, ErrorExt},
     http::message::CreateMessageExt,
@@ -10,7 +12,7 @@ use twilight_model::{
     gateway::payload::incoming::ReactionAdd,
 };
 
-use crate::{err_reply, time::parse, Context, CustomError, REQUIRED_PERMISSIONS};
+use crate::{err_reply, time::ParsedTime, Context, CustomError, REQUIRED_PERMISSIONS};
 
 const REACTION_EMOJI: &str = "⏰";
 
@@ -44,9 +46,10 @@ impl Context {
     }
 
     async fn handle_time_message(&self, mut message: Message) -> Result<()> {
-        let Some((hour, min, range)) = parse(&message.content)? else {
+        let parsed_times = ParsedTime::all_from_text(&message.content)?;
+        if parsed_times.is_empty() {
             return Ok(());
-        };
+        }
 
         self.bot
             .http
@@ -69,22 +72,26 @@ impl Context {
             .await?;
 
         let now = Local::now();
+        let Some(tz) = self.timezone(message.author.id).await? else {
+            return Err(CustomError::MissingTimezone(self.command_ids.timezone).into());
+        };
 
-        message.content.replace_range(
-            range,
-            &format!(
-                "<t:{}:t>",
-                self.user_timestamp(
-                    message.author.id,
-                    now.year(),
-                    now.month(),
-                    now.day(),
-                    hour,
-                    min
-                )
-                .await?
-            ),
-        );
+        let mut content = String::new();
+        let mut push_start = 0;
+        for time in parsed_times {
+            write!(
+                content,
+                "{}<t:{}:t>",
+                message.content.get(push_start..time.range.start).ok()?,
+                tz.with_ymd_and_hms(now.year(), now.month(), now.day(), time.hour, time.min, 0)
+                    .single()
+                    .ok()?
+                    .timestamp()
+            )?;
+            push_start = time.range.end;
+        }
+        content.push_str(message.content.get(push_start..).ok()?);
+        message.content = content;
 
         self.bot
             .http

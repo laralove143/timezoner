@@ -2,7 +2,7 @@ use std::ops::Range;
 
 use anyhow::{anyhow, Result};
 use chrono::TimeZone;
-use lazy_regex::{lazy_regex, Lazy, Regex};
+use lazy_regex::{lazy_regex, Captures, Lazy, Regex};
 use sparkle_convenience::error::conversion::IntoError;
 use twilight_model::id::{marker::UserMarker, Id};
 
@@ -12,6 +12,85 @@ static REGEX_24_HOUR: Lazy<Regex> = lazy_regex!(r#"\b([0-1]?[0-9]|2[0-3]):([0-5]
 static REGEX_12_HOUR: Lazy<Regex> = lazy_regex!(r#"\b(1[0-2]|0?[1-9]) ?([AaPp][Mm])\b"#);
 static REGEX_12_HOUR_WITH_MIN: Lazy<Regex> =
     lazy_regex!(r#"\b(1[0-2]|0?[1-9]):([0-5][0-9]) ?([AaPp][Mm])\b"#);
+
+#[allow(clippy::module_name_repetitions)]
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ParsedTime {
+    pub hour: u32,
+    pub min: u32,
+    pub range: Range<usize>,
+}
+
+impl ParsedTime {
+    pub fn all_from_text(s: &str) -> Result<Vec<Self>> {
+        let parsed_12_hour_with_min = Self::all_from_12_hour_with_min(s)?;
+        if !parsed_12_hour_with_min.is_empty() {
+            return Ok(parsed_12_hour_with_min);
+        }
+
+        let parsed_12_hour = Self::all_from_12_hour(s)?;
+        if !parsed_12_hour.is_empty() {
+            return Ok(parsed_12_hour);
+        }
+
+        let parsed_24_hour = Self::all_from_24_hour(s)?;
+        if !parsed_24_hour.is_empty() {
+            return Ok(parsed_24_hour);
+        }
+
+        Ok(vec![])
+    }
+
+    fn all_from_12_hour_with_min(s: &str) -> Result<Vec<Self>> {
+        REGEX_12_HOUR_WITH_MIN
+            .captures_iter(s)
+            .map(|captures| {
+                let hour = captures[1].parse()?;
+                let min = captures[2].parse()?;
+                let am_pm = &captures[3];
+                Ok(Self {
+                    hour: to_24_hour(hour, am_pm)?,
+                    min,
+                    range: Self::range(&captures)?,
+                })
+            })
+            .collect()
+    }
+
+    fn all_from_12_hour(s: &str) -> Result<Vec<Self>> {
+        REGEX_12_HOUR
+            .captures_iter(s)
+            .map(|captures| {
+                let hour = captures[1].parse()?;
+                let am_pm = &captures[2];
+                Ok(Self {
+                    hour: to_24_hour(hour, am_pm)?,
+                    min: 0,
+                    range: Self::range(&captures)?,
+                })
+            })
+            .collect()
+    }
+
+    fn all_from_24_hour(s: &str) -> Result<Vec<Self>> {
+        REGEX_24_HOUR
+            .captures_iter(s)
+            .map(|captures| {
+                let hour = captures[1].parse()?;
+                let min = captures[2].parse()?;
+                Ok(Self {
+                    hour,
+                    min,
+                    range: Self::range(&captures)?,
+                })
+            })
+            .collect()
+    }
+
+    fn range(captures: &Captures<'_>) -> Result<Range<usize>> {
+        Ok(captures.get(0).ok()?.range())
+    }
+}
 
 impl Context {
     pub async fn user_timestamp(
@@ -32,33 +111,6 @@ impl Context {
             .single()
             .ok()?
             .timestamp())
-    }
-}
-
-pub fn parse(s: &str) -> Result<Option<(u32, u32, Range<usize>)>> {
-    if let Some(captures) = REGEX_12_HOUR_WITH_MIN.captures(s) {
-        let hour = captures[1].parse()?;
-        let min = captures[2].parse()?;
-        let am_pm = &captures[3];
-        Ok(Some((
-            to_24_hour(hour, am_pm)?,
-            min,
-            captures.get(0).ok()?.range(),
-        )))
-    } else if let Some(captures) = REGEX_12_HOUR.captures(s) {
-        let hour = captures[1].parse()?;
-        let am_pm = &captures[2];
-        Ok(Some((
-            to_24_hour(hour, am_pm)?,
-            0,
-            captures.get(0).ok()?.range(),
-        )))
-    } else if let Some(captures) = REGEX_24_HOUR.captures(s) {
-        let hour = captures[1].parse()?;
-        let min = captures[2].parse()?;
-        Ok(Some((hour, min, captures.get(0).ok()?.range())))
-    } else {
-        Ok(None)
     }
 }
 
