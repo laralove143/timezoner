@@ -1,6 +1,6 @@
 # Timezoner
 
-- [Add to your server](https://discord.com/api/oauth2/authorize?client_id=704060600673894493&permissions=536947776&scope=bot%20applications.commands)
+- [Add to your server](https://discord.com/api/oauth2/authorize?client_id=909820903574106203&permissions=536947776&scope=bot%20applications.commands)
 - [Get support](https://discord.gg/6vAzfFj8xG)
 
 Goodbye to timezone conversions! Just type some time in chat, hit that reaction and everyone magically sees it in their
