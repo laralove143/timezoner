@@ -12,7 +12,7 @@ use twilight_model::{
     gateway::payload::incoming::ReactionAdd,
 };
 
-use crate::{err_reply, time::ParsedTime, Context, CustomError, REQUIRED_PERMISSIONS};
+use crate::{log, time::ParsedTime, Context, CustomError, HandleExitResult, REQUIRED_PERMISSIONS};
 
 const REACTION_EMOJI: &str = "⏰";
 
@@ -23,24 +23,28 @@ impl Context {
         }
         let channel_id = message.channel_id;
 
-        if let Err(mut err) = self.handle_time_message(message).await {
-            if err.ignore() {
-                return Ok(());
-            }
-
+        let message_handle_result = self.handle_time_message(message).await.map_err(|mut err| {
             err.with_permissions(REQUIRED_PERMISSIONS);
+            err
+        });
 
-            self.bot
+        if let Some((reply, internal_err)) = message_handle_result.handle() {
+            if let Some((_, Some(err))) = self
+                .bot
                 .http
                 .create_message(channel_id)
-                .with_reply(&err_reply(&err)?)?
+                .with_reply(&reply)?
                 .execute_ignore_permissions()
-                .await?;
-
-            if let Some(err) = err.internal::<CustomError>() {
-                return Err(err);
+                .await
+                .handle()
+            {
+                log(&self.bot, &err).await;
             }
-        };
+
+            if let Some(err) = internal_err {
+                log(&self.bot, &err).await;
+            }
+        }
 
         Ok(())
     }

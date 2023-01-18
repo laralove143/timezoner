@@ -1,6 +1,6 @@
 use anyhow::{anyhow, Result};
 use sparkle_convenience::{
-    error::{conversion::IntoError, ErrorExt},
+    error::conversion::IntoError,
     interaction::{extract::InteractionExt, InteractionHandle},
     Bot,
 };
@@ -10,7 +10,7 @@ use twilight_model::{
     id::{marker::CommandMarker, Id},
 };
 
-use crate::{err_reply, Context, CustomError, TEST_GUILD_ID};
+use crate::{log, Context, HandleExitResult, TEST_GUILD_ID};
 
 mod copy;
 mod date;
@@ -88,15 +88,13 @@ impl Context {
             name => Err(anyhow!("unknown command: {name}")),
         };
 
-        if let Err(err) = command_run_result {
-            if err.ignore() {
-                return Ok(());
+        if let Some((reply, internal_err)) = command_run_result.handle() {
+            if let Some((_, Some(err))) = handle.reply(reply).await.handle() {
+                log(&self.bot, &err).await;
             }
 
-            handle.reply(err_reply(&err)?).await?;
-
-            if let Some(err) = err.internal::<CustomError>() {
-                return Err(err);
+            if let Some(err) = internal_err {
+                log(&self.bot, &err).await;
             }
         }
 

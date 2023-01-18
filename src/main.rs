@@ -89,6 +89,28 @@ const REQUIRED_PERMISSIONS: Permissions = Permissions::MANAGE_WEBHOOKS
     .union(Permissions::READ_MESSAGE_HISTORY)
     .union(Permissions::ADD_REACTIONS);
 
+trait HandleExitResult<E> {
+    fn handle(self) -> Option<(Reply, Option<E>)>;
+}
+
+impl<T> HandleExitResult<anyhow::Error> for Result<T> {
+    fn handle(self) -> Option<(Reply, Option<anyhow::Error>)> {
+        match self {
+            Ok(_) => None,
+            Err(err) if err.ignore() => None,
+            Err(err) => {
+                let reply = err_reply(&err).unwrap();
+
+                if let Some(err) = err.internal::<CustomError>() {
+                    Some((reply, Some(err)))
+                } else {
+                    Some((reply, None))
+                }
+            }
+        }
+    }
+}
+
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum CustomError {
     BadTimezone,
@@ -167,6 +189,10 @@ async fn main() -> Result<()> {
     }
 
     Ok(())
+}
+
+async fn log(bot: &Bot, err: &anyhow::Error) {
+    bot.log(format!("{err:?}")).await;
 }
 
 fn err_reply(err: &anyhow::Error) -> Result<Reply> {
