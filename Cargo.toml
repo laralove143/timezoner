@@ -1,6 +1,6 @@
 [package]
 name = "timezoner"
-description = "a discord bot that makes timezone conversions really easy"
+description = "a discord bot to send times/dates that everyone sees in their own timezone"
 version = "0.1.0"
 edition = "2021"
 license = "MIT"

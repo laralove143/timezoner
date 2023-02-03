@@ -199,7 +199,7 @@ fn err_reply(err: &anyhow::Error) -> Result<Reply> {
     let message = if let Some(user_err) = err.user() {
         match user_err {
             UserError::MissingPermissions(permissions) => format!(
-                "Please beg the mods to give me these permissions first:\n{}",
+                "please beg the mods to give me these permissions first:\n{}",
                 permissions.ok()?.prettify()
             ),
             UserError::Ignore => {
@@ -209,22 +209,22 @@ fn err_reply(err: &anyhow::Error) -> Result<Reply> {
     } else if let Some(custom_err) = err.downcast_ref::<CustomError>() {
         match custom_err {
             CustomError::BadTimezone => {
-                "I looked and looked but couldn't find that timezone anywhere... If you're sure \
-                 the timezone is right, please join the support server"
+                "i looked and looked but couldnt find that timezone anywhere... if you're sure the \
+                 timezone is right, please join the support server"
             }
             .to_owned(),
             CustomError::MissingTimezone(timezone) => format!(
-                "Bad news, I need to know your timezone first, good news, it's really easy to \
-                 tell me, just press </timezone:{timezone}> and smash that send or enter button"
+                "bad news, i need to know your timezone first, good news, its really easy to tell \
+                 me, just press </timezone:{timezone}> and smash that send or enter button"
             ),
-            CustomError::MessageTooLong => "That message is too long, maybe you're using your \
-                                            super nitro powers or it's right at the edge of the \
+            CustomError::MessageTooLong => "that message is too long, maybe you're using your \
+                                            super nitro powers or its right at the edge of the \
                                             character limit"
                 .to_owned(),
         }
     } else {
-        "Something went terribly wrong there... I spammed Lara with the error, I'm sure they'll \
-         look at it ASAP"
+        "something went terribly wrong there... i spammed Lara with the error, im sure they'll \
+         look at it asap"
             .to_owned()
     };
 

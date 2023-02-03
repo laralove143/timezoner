@@ -23,7 +23,7 @@ const SUBMIT_TIMEZONE_EXAMPLE_URL: &str =
 #[derive(CreateCommand)]
 #[command(
     name = "timezone",
-    desc = "Set your timezone so you can start sharing magical times"
+    desc = "set your timezone so you can start sharing magical times"
 )]
 pub struct CommandOptions {}
 
@@ -33,7 +33,7 @@ fn copy_button() -> Component {
         emoji: Some(ReactionType::Unicode {
             name: "📋".to_owned(),
         }),
-        label: Some("Copy your timezone".to_owned()),
+        label: Some("copy your timezone".to_owned()),
         url: Some("https://kevinnovak.github.io/Time-Zone-Picker/".to_owned()),
         disabled: false,
         custom_id: None,
@@ -47,7 +47,7 @@ fn paste_button() -> Component {
         emoji: Some(ReactionType::Unicode {
             name: "✍️".to_owned(),
         }),
-        label: Some("Click here to paste it".to_owned()),
+        label: Some("paste it".to_owned()),
         disabled: false,
         url: None,
     })
@@ -55,7 +55,7 @@ fn paste_button() -> Component {
 
 fn copy_button_example_embed() -> Embed {
     Embed {
-        title: Some("Press the `Copy your timezone` button".to_owned()),
+        title: Some("press the `copy your timezone` button".to_owned()),
         color: Some(ACCENT_COLOR),
         image: Some(EmbedImage {
             url: COPY_BUTTON_EXAMPLE_URL.to_owned(),
@@ -78,10 +78,10 @@ fn copy_button_example_embed() -> Embed {
 
 fn copy_timezone_example_embed() -> Embed {
     Embed {
-        title: Some("In the website that opens, press the `Copy` button".to_owned()),
+        title: Some("in the website that opens, press the `copy` button".to_owned()),
         description: Some(
-            "If the detected timezone is wrong, select where you live on the map and then press \
-             the `Copy` button"
+            "if the detected timezone is wrong, select where you live on the map and then press \
+             the `copy` button"
                 .to_owned(),
         ),
         color: Some(ACCENT_COLOR),
@@ -106,7 +106,7 @@ fn copy_timezone_example_embed() -> Embed {
 fn paste_button_example_embed() -> Embed {
     Embed {
         title: Some(
-            "Come back to Discord and press the `Click here to paste it` button".to_owned(),
+            "come back to discord and press the `paste it` button".to_owned(),
         ),
         color: Some(ACCENT_COLOR),
         image: Some(EmbedImage {
@@ -131,7 +131,7 @@ fn paste_button_example_embed() -> Embed {
 fn submit_timezone_example_embed() -> Embed {
     Embed {
         title: Some(
-            "Paste the timezone you copied to the text field and press the `Submit` button"
+            "paste the timezone you copied to the text field and press the `submit` button"
                 .to_owned(),
         ),
         color: Some(ACCENT_COLOR),
@@ -177,11 +177,11 @@ impl InteractionContext<'_> {
         self.handle
             .modal(
                 "timezone_modal_submit".to_owned(),
-                "Timezone Postal Service".to_owned(),
+                "timezone postal service".to_owned(),
                 vec![TextInput {
                     custom_id: "timezone".to_owned(),
                     style: TextInputStyle::Short,
-                    label: "Paste your timezone here please".to_owned(),
+                    label: "paste your timezone here please".to_owned(),
                     placeholder: Some("America/Chicago".to_owned()),
                     required: Some(true),
                     max_length: None,
@@ -221,7 +221,7 @@ impl InteractionContext<'_> {
             .reply(
                 Reply::new()
                     .ephemeral()
-                    .content("Done! Now you can use me to show magical times".to_owned()),
+                    .content("done! now you can use me to show magical times".to_owned()),
             )
             .await?;
 
