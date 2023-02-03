@@ -43,7 +43,6 @@
 
 use std::{
     env,
-    error::Error,
     fmt::{Display, Formatter},
     sync::Arc,
 };
@@ -111,20 +110,24 @@ impl<T> HandleExitResult<anyhow::Error> for Result<T> {
     }
 }
 
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, thiserror::Error)]
 pub enum CustomError {
+    #[error(
+        "i looked and looked but couldnt find that timezone anywhere... if you're sure the \
+         timezone is right, please join the support server"
+    )]
     BadTimezone,
+    #[error(
+        "bad news, i need to know your timezone first, good news, its really easy to tell me, \
+         just press </timezone:{0}> and smash that send or enter button"
+    )]
     MissingTimezone(Id<CommandMarker>),
+    #[error(
+        "that message is too long, maybe you're using your super nitro powers or its right at the \
+         edge of the character limit"
+    )]
     MessageTooLong,
 }
-
-impl Display for CustomError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        f.write_str("a user error has been handled like an internal error")
-    }
-}
-
-impl Error for CustomError {}
 
 #[derive(Debug)]
 pub struct Context {
@@ -207,21 +210,7 @@ fn err_reply(err: &anyhow::Error) -> Result<Reply> {
             }
         }
     } else if let Some(custom_err) = err.downcast_ref::<CustomError>() {
-        match custom_err {
-            CustomError::BadTimezone => {
-                "i looked and looked but couldnt find that timezone anywhere... if you're sure the \
-                 timezone is right, please join the support server"
-            }
-            .to_owned(),
-            CustomError::MissingTimezone(timezone) => format!(
-                "bad news, i need to know your timezone first, good news, its really easy to tell \
-                 me, just press </timezone:{timezone}> and smash that send or enter button"
-            ),
-            CustomError::MessageTooLong => "that message is too long, maybe you're using your \
-                                            super nitro powers or its right at the edge of the \
-                                            character limit"
-                .to_owned(),
-        }
+        custom_err.to_string()
     } else {
         "something went terribly wrong there... i spammed Lara with the error, im sure they'll \
          look at it asap"

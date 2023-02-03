@@ -1654,6 +1654,7 @@ dependencies = [
  "lazy-regex",
  "sparkle-convenience",
  "sqlx",
+ "thiserror",
  "tokio",
  "twilight-gateway",
  "twilight-http",
