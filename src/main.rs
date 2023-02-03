@@ -41,13 +41,9 @@
 )]
 #![allow(clippy::missing_errors_doc, clippy::missing_panics_doc)]
 
-use std::{
-    env,
-    fmt::{Display, Formatter},
-    sync::Arc,
-};
+use std::{env, sync::Arc};
 
-use anyhow::{anyhow, Result};
+use anyhow::Result;
 use dotenvy::dotenv;
 use futures::stream::StreamExt;
 use sparkle_convenience::{
@@ -108,6 +104,18 @@ impl<T> HandleExitResult<anyhow::Error> for Result<T> {
             }
         }
     }
+}
+
+#[derive(Clone, Debug, Eq, PartialEq, thiserror::Error)]
+pub enum Error {
+    #[error("{0}")]
+    TimezoneParseError(String),
+    #[error("unknown command: {0}")]
+    UnknownCommand(String),
+    #[error("tried to handle an error that should be ignored")]
+    IgnoreErrorHandled,
+    #[error("time doesn't end in am or pm")]
+    Hour12InvalidSuffix,
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq, thiserror::Error)]
@@ -205,9 +213,7 @@ fn err_reply(err: &anyhow::Error) -> Result<Reply> {
                 "please beg the mods to give me these permissions first:\n{}",
                 permissions.ok()?.prettify()
             ),
-            UserError::Ignore => {
-                return Err(anyhow!("tried to handle an error that should be ignored"))
-            }
+            UserError::Ignore => return Err(Error::IgnoreErrorHandled.into()),
         }
     } else if let Some(custom_err) = err.downcast_ref::<CustomError>() {
         custom_err.to_string()

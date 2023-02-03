@@ -1,4 +1,4 @@
-use anyhow::{anyhow, Result};
+use anyhow::Result;
 use sparkle_convenience::{
     error::conversion::IntoError,
     interaction::{extract::InteractionExt, InteractionHandle},
@@ -10,7 +10,7 @@ use twilight_model::{
     id::{marker::CommandMarker, Id},
 };
 
-use crate::{log, Context, HandleExitResult, TEST_GUILD_ID};
+use crate::{log, Context, Error, HandleExitResult, TEST_GUILD_ID};
 
 mod copy;
 mod date;
@@ -85,7 +85,7 @@ impl Context {
             date::CommandOptions::NAME => ctx.handle_date_command().await,
             copy::CommandOptions::NAME => ctx.handle_copy_command().await,
             help::CommandOptions::NAME => ctx.handle_help_command().await,
-            name => Err(anyhow!("unknown command: {name}")),
+            name => Err(Error::UnknownCommand(name.to_owned()).into()),
         };
 
         if let Some((reply, internal_err)) = command_run_result.handle() {

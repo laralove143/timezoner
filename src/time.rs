@@ -1,12 +1,12 @@
 use std::ops::Range;
 
-use anyhow::{anyhow, Result};
+use anyhow::Result;
 use chrono::TimeZone;
 use lazy_regex::{lazy_regex, Captures, Lazy, Regex};
 use sparkle_convenience::error::conversion::IntoError;
 use twilight_model::id::{marker::UserMarker, Id};
 
-use crate::{Context, CustomError};
+use crate::{Context, CustomError, Error};
 
 static REGEX_24_HOUR: Lazy<Regex> = lazy_regex!(r#"\b([0-1]?[0-9]|2[0-3]):([0-5][0-9])\b"#);
 static REGEX_12_HOUR: Lazy<Regex> = lazy_regex!(r#"\b(1[0-2]|0?[1-9]) ?([AaPp][Mm])\b"#);
@@ -130,6 +130,6 @@ fn to_24_hour(hour: u32, am_pm: &str) -> Result<u32> {
                 hour + 12
             }
         }
-        _ => return Err(anyhow!("time doesn't end in am or pm")),
+        _ => return Err(Error::Hour12InvalidSuffix.into()),
     })
 }

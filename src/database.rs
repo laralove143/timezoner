@@ -1,9 +1,9 @@
-use anyhow::{anyhow, Result};
-use chrono_tz::{ParseError, Tz};
+use anyhow::Result;
+use chrono_tz::Tz;
 use sqlx::{query, query_scalar, Postgres};
 use twilight_model::id::{marker::UserMarker, Id};
 
-use crate::Context;
+use crate::{Context, Error};
 
 trait Encode<'a, T: sqlx::Encode<'a, Postgres>> {
     fn encode(&self) -> T;
@@ -29,7 +29,7 @@ trait Decode<T> {
 impl Decode<Result<Tz>> for String {
     #[allow(clippy::use_self)]
     fn decode(&self) -> Result<Tz> {
-        self.parse().map_err(|err: ParseError| anyhow!(err))
+        Ok(self.parse().map_err(Error::TimezoneParseError)?)
     }
 }
 
