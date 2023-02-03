@@ -12,8 +12,6 @@ And someone 10 hours ahead sees:
 
 ![example](examples/shown.png)
 
-*Thank you to [Jason](https://github.com/zudsniper) for funding the hosting!*
-
 ## Features
 
 - Does all the conversion automatically in chat, no commands or DMs or annoying stuff like that
@@ -21,6 +19,10 @@ And someone 10 hours ahead sees:
 - Supports all the sane formats: `1pm` `1:30 Pm` `13:30`...
 - Has a `/date` command that lets you share dates too
 - Has a `/copy` command that you can use to share times in DMs etc
+
+## Sponsors
+
+- [Jason](https://github.com/zudsniper): Thank you for funding the hosting!
 
 ## Terms of service
 
