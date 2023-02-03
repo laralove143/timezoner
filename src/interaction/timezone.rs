@@ -20,6 +20,14 @@ const PASTE_BUTTON_EXAMPLE_URL: &str =
 const SUBMIT_TIMEZONE_EXAMPLE_URL: &str =
     "https://github.com/laralove143/timezoner/blob/main/examples/submit_timezone.png?raw=true";
 
+const TIMEZONE_PICKER_URL: &str = "https://kevinnovak.github.io/Time-Zone-Picker/";
+
+const COPY_BUTTON_LABEL: &str = "copy your timezone";
+const PASTE_BUTTON_LABEL: &str = "paste it";
+
+pub const PASTE_BUTTON_CUSTOM_ID: &str = "timezone_paste_button";
+pub const MODAL_SUBMIT_ID: &str = "timezone_modal_submit";
+
 #[derive(CreateCommand)]
 #[command(
     name = "timezone",
@@ -33,8 +41,8 @@ fn copy_button() -> Component {
         emoji: Some(ReactionType::Unicode {
             name: "📋".to_owned(),
         }),
-        label: Some("copy your timezone".to_owned()),
-        url: Some("https://kevinnovak.github.io/Time-Zone-Picker/".to_owned()),
+        label: Some(COPY_BUTTON_LABEL.to_owned()),
+        url: Some(TIMEZONE_PICKER_URL.to_owned()),
         disabled: false,
         custom_id: None,
     })
@@ -42,12 +50,12 @@ fn copy_button() -> Component {
 
 fn paste_button() -> Component {
     Component::Button(Button {
-        custom_id: Some("timezone_paste_button".to_owned()),
+        custom_id: Some(PASTE_BUTTON_CUSTOM_ID.to_owned()),
         style: ButtonStyle::Primary,
         emoji: Some(ReactionType::Unicode {
             name: "✍️".to_owned(),
         }),
-        label: Some("paste it".to_owned()),
+        label: Some(PASTE_BUTTON_LABEL.to_owned()),
         disabled: false,
         url: None,
     })
@@ -55,7 +63,7 @@ fn paste_button() -> Component {
 
 fn copy_button_example_embed() -> Embed {
     Embed {
-        title: Some("press the `copy your timezone` button".to_owned()),
+        title: Some(format!("press the `{COPY_BUTTON_LABEL}` button")),
         color: Some(ACCENT_COLOR),
         image: Some(EmbedImage {
             url: COPY_BUTTON_EXAMPLE_URL.to_owned(),
@@ -105,9 +113,9 @@ fn copy_timezone_example_embed() -> Embed {
 
 fn paste_button_example_embed() -> Embed {
     Embed {
-        title: Some(
-            "come back to discord and press the `paste it` button".to_owned(),
-        ),
+        title: Some(format!(
+            "come back to discord and press the `{PASTE_BUTTON_LABEL}` button"
+        )),
         color: Some(ACCENT_COLOR),
         image: Some(EmbedImage {
             url: PASTE_BUTTON_EXAMPLE_URL.to_owned(),
@@ -176,7 +184,7 @@ impl InteractionContext<'_> {
     pub async fn handle_timezone_paste_button_click(self) -> Result<()> {
         self.handle
             .modal(
-                "timezone_modal_submit".to_owned(),
+                MODAL_SUBMIT_ID.to_owned(),
                 "timezone postal service".to_owned(),
                 vec![TextInput {
                     custom_id: "timezone".to_owned(),

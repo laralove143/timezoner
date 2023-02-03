@@ -27,9 +27,9 @@ pub struct CommandIds {
 impl CommandIds {
     fn new(commands: &[Command]) -> Result<Self> {
         Ok(Self {
-            timezone: Self::command_id("timezone", commands)?,
-            date: Self::command_id("date", commands)?,
-            copy: Self::command_id("copy", commands)?,
+            timezone: Self::command_id(timezone::CommandOptions::NAME, commands)?,
+            date: Self::command_id(date::CommandOptions::NAME, commands)?,
+            copy: Self::command_id(copy::CommandOptions::NAME, commands)?,
         })
     }
 
@@ -79,12 +79,12 @@ impl Context {
         };
 
         let command_run_result = match ctx.interaction.name().ok()? {
-            "timezone" => ctx.handle_timezone_command().await,
-            "timezone_paste_button" => ctx.handle_timezone_paste_button_click().await,
-            "timezone_modal_submit" => ctx.handle_timezone_modal_submit().await,
-            "date" => ctx.handle_date_command().await,
-            "copy" => ctx.handle_copy_command().await,
-            "help" => ctx.handle_help_command().await,
+            timezone::CommandOptions::NAME => ctx.handle_timezone_command().await,
+            timezone::PASTE_BUTTON_CUSTOM_ID => ctx.handle_timezone_paste_button_click().await,
+            timezone::MODAL_SUBMIT_ID => ctx.handle_timezone_modal_submit().await,
+            date::CommandOptions::NAME => ctx.handle_date_command().await,
+            copy::CommandOptions::NAME => ctx.handle_copy_command().await,
+            help::CommandOptions::NAME => ctx.handle_help_command().await,
             name => Err(anyhow!("unknown command: {name}")),
         };
 
