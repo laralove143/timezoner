@@ -68,10 +68,9 @@ impl Context {
 
         self.standby
             .wait_for_reaction(message.id, move |reaction: &ReactionAdd| {
-                reaction.user_id == message.author.id
-                    && ReactionType::Unicode {
-                        name: REACTION_EMOJI.to_owned(),
-                    } == reaction.emoji
+                ReactionType::Unicode {
+                    name: REACTION_EMOJI.to_owned(),
+                } == reaction.emoji
             })
             .await?;
 
