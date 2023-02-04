@@ -18,7 +18,7 @@ and someone 8 hours behind sees:
 - the ones reading the times don't need to do anything
 - supports all the sane formats: `1pm` `1:30 Pm` `13:30`...
 - has a `/date` command that lets you share dates too
-- has a `/copy` command that you can use to share times in DMs etc
+- has a `/copy` command that you can use to share times in dms etc
 
 ## sponsors
 
