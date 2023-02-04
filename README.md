@@ -8,13 +8,13 @@ own timezone
 
 ![example](examples/sent.gif)
 
-and someone 10 hours ahead sees:
+and someone 8 hours behind sees:
 
 ![example](examples/shown.png)
 
 ## features
 
-- does all the conversion automatically in chat, no commands or DMs or annoying stuff like that
+- does all the conversion in chat, no commands or dms or annoying stuff like that
 - the ones reading the times don't need to do anything
 - supports all the sane formats: `1pm` `1:30 Pm` `13:30`...
 - has a `/date` command that lets you share dates too
