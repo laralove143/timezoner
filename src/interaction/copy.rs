@@ -24,7 +24,7 @@ impl InteractionContext<'_> {
 
         self.handle
             .reply(Reply::new().content(format!(
-                "`<t:{}:F>`",
+                "`{}`",
                 self.ctx.user_timestamp(author_id, options).await?
             )))
             .await?;

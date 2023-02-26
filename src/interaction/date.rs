@@ -2,15 +2,27 @@ use anyhow::Result;
 use sparkle_convenience::{
     error::IntoError, interaction::extract::InteractionDataExt, reply::Reply,
 };
-use twilight_interactions::command::{CommandModel, CreateCommand};
+use twilight_interactions::command::{CommandModel, CommandOption, CreateCommand, CreateOption};
 
 use crate::interaction::InteractionContext;
 
-// #[derive(CreateOption, CommandModel)]
-// enum Style {
-//     #[option(name = "Short Time: 16:20", value = 60)]
-//     ShortTime,
-// }
+#[derive(CommandOption, CreateOption)]
+pub enum Style {
+    #[option(name = "4:20 PM", value = "t")]
+    ShortTime,
+    #[option(name = "4:20:30 PM", value = "T")]
+    LongTime,
+    #[option(name = "20/04/2021", value = "d")]
+    ShortDate,
+    #[option(name = "20 April 2021", value = "D")]
+    LongDate,
+    #[option(name = "20 April 2021 4:20 PM", value = "f")]
+    ShortDateTime,
+    #[option(name = "Tuesday, 20 April 2021 4:20 PM", value = "F")]
+    LongDateTime,
+    #[option(name = "in an hour", value = "R")]
+    Relative,
+}
 
 #[derive(CommandModel, CreateCommand)]
 #[command(
@@ -34,6 +46,8 @@ pub struct Command {
     pub minute: i64,
     #[command(desc = "the second of the date", min_value = 0, max_value = 59)]
     pub second: i64,
+    #[command(desc = "the style of the date, by default like Tuesday, 20 April 2021 4:20 PM")]
+    pub style: Option<Style>,
 }
 
 impl InteractionContext<'_> {
@@ -43,10 +57,7 @@ impl InteractionContext<'_> {
             Command::from_interaction(self.interaction.data.ok()?.command().ok()?.into())?;
 
         self.handle
-            .reply(Reply::new().content(format!(
-                "<t:{}:F>",
-                self.ctx.user_timestamp(author_id, options).await?
-            )))
+            .reply(Reply::new().content(self.ctx.user_timestamp(author_id, options).await?))
             .await?;
 
         Ok(())
