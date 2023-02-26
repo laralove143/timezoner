@@ -11,7 +11,7 @@ use crate::interaction::InteractionContext;
     name = "date",
     desc = "send a date that everyone sees in their own timezone"
 )]
-pub struct CommandOptions {
+pub struct Command {
     #[command(desc = "the day of the date", min_value = 0, max_value = 31)]
     day: i64,
     #[command(desc = "the month of the date", min_value = 0, max_value = 12)]
@@ -32,7 +32,7 @@ impl InteractionContext<'_> {
     pub async fn handle_date_command(self) -> Result<()> {
         let author_id = self.interaction.author_id().ok()?;
         let options =
-            CommandOptions::from_interaction(self.interaction.data.ok()?.command().ok()?.into())?;
+            Command::from_interaction(self.interaction.data.ok()?.command().ok()?.into())?;
 
         self.handle
             .reply(Reply::new().content(format!(

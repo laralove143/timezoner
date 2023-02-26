@@ -33,7 +33,7 @@ pub const MODAL_SUBMIT_ID: &str = "timezone_modal_submit";
     name = "timezone",
     desc = "set your timezone so you can start sharing magical times"
 )]
-pub struct CommandOptions {}
+pub struct Command {}
 
 fn copy_button() -> Component {
     Component::Button(Button {
