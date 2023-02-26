@@ -24,6 +24,34 @@ pub enum Style {
     Relative,
 }
 
+#[derive(CommandOption, CreateOption)]
+pub enum Month {
+    #[option(name = "january", value = 1)]
+    January,
+    #[option(name = "february", value = 2)]
+    February,
+    #[option(name = "march", value = 3)]
+    March,
+    #[option(name = "april", value = 4)]
+    April,
+    #[option(name = "may", value = 5)]
+    May,
+    #[option(name = "june", value = 6)]
+    June,
+    #[option(name = "july", value = 7)]
+    July,
+    #[option(name = "august", value = 8)]
+    August,
+    #[option(name = "september", value = 9)]
+    September,
+    #[option(name = "october", value = 10)]
+    October,
+    #[option(name = "november", value = 11)]
+    November,
+    #[option(name = "december", value = 12)]
+    December,
+}
+
 #[derive(CommandModel, CreateCommand)]
 #[command(
     name = "date",
@@ -33,7 +61,7 @@ pub struct Command {
     #[command(desc = "the day of the date", min_value = 0, max_value = 31)]
     pub day: i64,
     #[command(desc = "the month of the date", min_value = 0, max_value = 12)]
-    pub month: i64,
+    pub month: Month,
     #[command(desc = "the year of the date", min_value = -262000, max_value = 262000)]
     pub year: i64,
     #[command(

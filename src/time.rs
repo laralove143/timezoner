@@ -109,7 +109,7 @@ impl Context {
             "<t:{}:{}>",
             tz.with_ymd_and_hms(
                 date.year.try_into()?,
-                date.month.try_into()?,
+                date.month.value().try_into()?,
                 date.day.try_into()?,
                 date.hour.try_into()?,
                 date.minute.try_into()?,
