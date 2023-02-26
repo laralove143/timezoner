@@ -39,7 +39,7 @@ const TEST_GUILD_ID: Id<GuildMarker> = Id::new(903_367_565_349_384_202);
 
 const BOT_INVITE: &str = "https://discord.com/api/oauth2/authorize?\
 client_id=909820903574106203&permissions=536947776&scope=bot%20applications.commands";
-const SUPPORT_SERVER_INVITE: &str = "https://discord.gg/6vAzfFj8xG";
+const SUPPORT_SERVER_INVITE: &str = "https://discord.gg/KUMdnjcE97";
 
 const REQUIRED_PERMISSIONS: Permissions = Permissions::MANAGE_WEBHOOKS
     .union(Permissions::VIEW_CHANNEL)
