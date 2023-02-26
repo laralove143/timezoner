@@ -109,7 +109,7 @@ impl Context {
                 date.day.try_into()?,
                 date.hour.try_into()?,
                 date.min.try_into()?,
-                0,
+                date.sec.try_into()?,
             )
             .single()
             .ok_or(CustomError::BadDate)?
