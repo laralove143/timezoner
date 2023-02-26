@@ -48,9 +48,10 @@ impl Context {
         if timeout(Duration::from_secs(60 * 5), async {
             self.standby
                 .wait_for_reaction(message.id, move |reaction: &ReactionAdd| {
-                    ReactionType::Unicode {
-                        name: REACTION_EMOJI.to_owned(),
-                    } == reaction.emoji
+                    reaction.user_id == message.author.id
+                        && ReactionType::Unicode {
+                            name: REACTION_EMOJI.to_owned(),
+                        } == reaction.emoji
                 })
                 .await
         })
