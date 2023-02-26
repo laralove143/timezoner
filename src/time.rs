@@ -1,7 +1,7 @@
 use std::ops::Range;
 
 use anyhow::Result;
-use chrono::TimeZone;
+use chrono::{Datelike, TimeZone, Timelike, Utc};
 use lazy_regex::{lazy_regex, Captures, Lazy, Regex};
 use sparkle_convenience::error::IntoError;
 use twilight_model::id::{marker::UserMarker, Id};
@@ -105,15 +105,21 @@ impl Context {
             return Err(CustomError::MissingTimezone(self.command_ids.timezone).into());
         };
 
+        let now = Utc::now().with_timezone(&tz);
         Ok(format!(
             "<t:{}:{}>",
             tz.with_ymd_and_hms(
-                date.year.try_into()?,
-                date.month.value().try_into()?,
-                date.day.try_into()?,
-                date.hour.try_into()?,
-                date.minute.try_into()?,
-                date.second.try_into()?,
+                date.year
+                    .map_or_else(|| Ok(now.year()), TryInto::try_into)?,
+                date.month
+                    .map_or_else(|| Ok(now.month()), |month| month.value().try_into())?,
+                date.day.map_or_else(|| Ok(now.day()), TryInto::try_into)?,
+                date.hour
+                    .map_or_else(|| Ok(now.hour()), TryInto::try_into)?,
+                date.minute
+                    .map_or_else(|| Ok(now.minute()), TryInto::try_into)?,
+                date.second
+                    .map_or_else(|| Ok(now.second()), TryInto::try_into)?,
             )
             .single()
             .ok_or(CustomError::BadDate)?
