@@ -108,8 +108,8 @@ impl Context {
                 date.month.try_into()?,
                 date.day.try_into()?,
                 date.hour.try_into()?,
-                date.min.try_into()?,
-                date.sec.try_into()?,
+                date.minute.try_into()?,
+                date.second.try_into()?,
             )
             .single()
             .ok_or(CustomError::BadDate)?

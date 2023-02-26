@@ -6,6 +6,12 @@ use twilight_interactions::command::{CommandModel, CreateCommand};
 
 use crate::interaction::InteractionContext;
 
+// #[derive(CreateOption, CommandModel)]
+// enum Style {
+//     #[option(name = "Short Time: 16:20", value = 60)]
+//     ShortTime,
+// }
+
 #[derive(CommandModel, CreateCommand)]
 #[command(
     name = "date",
@@ -25,9 +31,9 @@ pub struct Command {
     )]
     pub hour: i64,
     #[command(desc = "the minute of the date", min_value = 0, max_value = 59)]
-    pub min: i64,
+    pub minute: i64,
     #[command(desc = "the second of the date", min_value = 0, max_value = 59)]
-    pub sec: i64,
+    pub second: i64,
 }
 
 impl InteractionContext<'_> {
