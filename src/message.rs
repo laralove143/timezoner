@@ -1,52 +1,33 @@
-use std::fmt::Write;
+use std::{fmt::Write, time::Duration};
 
 use anyhow::Result;
 use chrono::{offset::Local, Datelike, TimeZone};
-use sparkle_convenience::{
-    error::{conversion::IntoError, ErrorExt},
-    http::message::CreateMessageExt,
-};
+use sparkle_convenience::error::IntoError;
+use tokio::time::timeout;
 use twilight_http::request::channel::reaction::RequestReactionType;
 use twilight_model::{
     channel::{message::ReactionType, Message},
     gateway::payload::incoming::ReactionAdd,
 };
 
-use crate::{log, time::ParsedTime, Context, CustomError, HandleExitResult, REQUIRED_PERMISSIONS};
+use crate::{err_reply, time::ParsedTime, Context, CustomError};
 
 const REACTION_EMOJI: &str = "⏰";
 
 impl Context {
-    pub async fn handle_message(&self, message: Message) -> Result<()> {
+    pub async fn handle_message(&self, message: Message) {
         if message.author.bot {
-            return Ok(());
+            return;
         }
         let channel_id = message.channel_id;
 
-        let message_handle_result = self.handle_time_message(message).await.map_err(|mut err| {
-            err.with_permissions(REQUIRED_PERMISSIONS);
-            err
-        });
+        let message_handle_result = self.handle_time_message(message).await;
 
-        if let Some((reply, internal_err)) = message_handle_result.handle() {
-            if let Some((_, Some(err))) = self
-                .bot
-                .http
-                .create_message(channel_id)
-                .with_reply(&reply)?
-                .execute_ignore_permissions()
-                .await
-                .handle()
-            {
-                log(&self.bot, &err).await;
-            }
-
-            if let Some(err) = internal_err {
-                log(&self.bot, &err).await;
-            }
+        if let Err(err) = message_handle_result {
+            self.bot
+                .handle_error::<CustomError>(channel_id, err_reply(&err), err)
+                .await;
         }
-
-        Ok(())
     }
 
     async fn handle_time_message(&self, mut message: Message) -> Result<()> {

@@ -6,12 +6,12 @@ edition = "2021"
 license = "MIT"
 
 [dependencies]
-sparkle-convenience = "0.14"
-twilight-http = "0.14"
-twilight-gateway = "0.14"
-twilight-model = "0.14"
-twilight-standby = "0.14"
-twilight-interactions = "0.14"
+sparkle-convenience = "0.15"
+twilight-http = "0.15"
+twilight-gateway = "0.15"
+twilight-model = "0.15"
+twilight-standby = "0.15"
+twilight-interactions = "0.15"
 chrono = { version = "0.4", default-features = false, features = ["clock"] }
 chrono-tz = "0.8"
 lazy-regex = "2.3"

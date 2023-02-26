@@ -1,6 +1,6 @@
 use anyhow::Result;
 use sparkle_convenience::{
-    error::conversion::IntoError,
+    error::IntoError,
     interaction::{extract::InteractionExt, InteractionHandle},
     Bot,
 };
@@ -10,7 +10,7 @@ use twilight_model::{
     id::{marker::CommandMarker, Id},
 };
 
-use crate::{log, Context, Error, HandleExitResult, TEST_GUILD_ID};
+use crate::{err_reply, Context, CustomError, Error, TEST_GUILD_ID};
 
 mod copy;
 mod date;
@@ -48,6 +48,20 @@ struct InteractionContext<'ctx> {
     interaction: Interaction,
 }
 
+impl<'ctx> InteractionContext<'ctx> {
+    async fn handle(self) -> Result<()> {
+        match self.interaction.name().ok()? {
+            timezone::CommandOptions::NAME => self.handle_timezone_command().await,
+            timezone::PASTE_BUTTON_CUSTOM_ID => self.handle_timezone_paste_button_click().await,
+            timezone::MODAL_SUBMIT_ID => self.handle_timezone_modal_submit().await,
+            date::CommandOptions::NAME => self.handle_date_command().await,
+            copy::CommandOptions::NAME => self.handle_copy_command().await,
+            help::CommandOptions::NAME => self.handle_help_command().await,
+            name => Err(Error::UnknownCommand(name.to_owned()).into()),
+        }
+    }
+}
+
 pub async fn set_commands(bot: &Bot) -> Result<CommandIds> {
     let commands = &[
         timezone::CommandOptions::create_command().into(),
@@ -70,7 +84,7 @@ pub async fn set_commands(bot: &Bot) -> Result<CommandIds> {
 }
 
 impl Context {
-    pub async fn handle_interaction(&self, interaction: Interaction) -> Result<()> {
+    pub async fn handle_interaction(&self, interaction: Interaction) {
         let handle = self.bot.interaction_handle(&interaction);
         let ctx = InteractionContext {
             ctx: self,
@@ -78,26 +92,10 @@ impl Context {
             interaction,
         };
 
-        let command_run_result = match ctx.interaction.name().ok()? {
-            timezone::CommandOptions::NAME => ctx.handle_timezone_command().await,
-            timezone::PASTE_BUTTON_CUSTOM_ID => ctx.handle_timezone_paste_button_click().await,
-            timezone::MODAL_SUBMIT_ID => ctx.handle_timezone_modal_submit().await,
-            date::CommandOptions::NAME => ctx.handle_date_command().await,
-            copy::CommandOptions::NAME => ctx.handle_copy_command().await,
-            help::CommandOptions::NAME => ctx.handle_help_command().await,
-            name => Err(Error::UnknownCommand(name.to_owned()).into()),
-        };
-
-        if let Some((reply, internal_err)) = command_run_result.handle() {
-            if let Some((_, Some(err))) = handle.reply(reply).await.handle() {
-                log(&self.bot, &err).await;
-            }
-
-            if let Some(err) = internal_err {
-                log(&self.bot, &err).await;
-            }
+        if let Err(err) = ctx.handle().await {
+            handle
+                .handle_error::<CustomError>(err_reply(&err), err)
+                .await;
         }
-
-        Ok(())
     }
 }

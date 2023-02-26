@@ -3,7 +3,7 @@ use std::ops::Range;
 use anyhow::Result;
 use chrono::TimeZone;
 use lazy_regex::{lazy_regex, Captures, Lazy, Regex};
-use sparkle_convenience::error::conversion::IntoError;
+use sparkle_convenience::error::IntoError;
 use twilight_model::id::{marker::UserMarker, Id};
 
 use crate::{Context, CustomError, Error};

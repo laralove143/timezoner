@@ -1,6 +1,6 @@
 use anyhow::Result;
 use sparkle_convenience::{
-    error::conversion::IntoError, interaction::extract::InteractionDataExt, reply::Reply,
+    error::IntoError, interaction::extract::InteractionDataExt, reply::Reply,
 };
 use twilight_interactions::command::{CommandModel, CreateCommand};
 
