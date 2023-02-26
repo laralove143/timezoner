@@ -75,6 +75,8 @@ pub enum CustomError {
          edge of the character limit"
     )]
     MessageTooLong,
+    #[error("that's not a valid date, please give me a valid date, thank you")]
+    BadDate,
 }
 
 #[derive(Debug)]

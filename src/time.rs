@@ -109,7 +109,7 @@ impl Context {
         Ok(tz
             .with_ymd_and_hms(year, month, day, hour, min, 0)
             .single()
-            .ok()?
+            .ok_or(CustomError::BadDate)?
             .timestamp())
     }
 }
