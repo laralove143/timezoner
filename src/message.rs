@@ -36,24 +36,37 @@ impl Context {
             return Ok(());
         }
 
+        let request_reaction_type = RequestReactionType::Unicode {
+            name: REACTION_EMOJI,
+        };
+
         self.bot
             .http
-            .create_reaction(
-                message.channel_id,
-                message.id,
-                &RequestReactionType::Unicode {
-                    name: REACTION_EMOJI,
-                },
-            )
+            .create_reaction(message.channel_id, message.id, &request_reaction_type)
             .await?;
 
-        self.standby
-            .wait_for_reaction(message.id, move |reaction: &ReactionAdd| {
-                ReactionType::Unicode {
-                    name: REACTION_EMOJI.to_owned(),
-                } == reaction.emoji
-            })
-            .await?;
+        if timeout(Duration::from_secs(60 * 5), async {
+            self.standby
+                .wait_for_reaction(message.id, move |reaction: &ReactionAdd| {
+                    ReactionType::Unicode {
+                        name: REACTION_EMOJI.to_owned(),
+                    } == reaction.emoji
+                })
+                .await
+        })
+        .await
+        .is_err()
+        {
+            self.bot
+                .http
+                .delete_reaction(
+                    message.channel_id,
+                    message.id,
+                    &request_reaction_type,
+                    self.bot.user.id,
+                )
+                .await?;
+        }
 
         let now = Local::now();
         let Some(tz) = self.timezone(message.author.id).await? else {
