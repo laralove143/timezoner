@@ -6,7 +6,7 @@ use lazy_regex::{lazy_regex, Captures, Lazy, Regex};
 use sparkle_convenience::error::IntoError;
 use twilight_model::id::{marker::UserMarker, Id};
 
-use crate::{Context, CustomError, Error};
+use crate::{interaction::date, Context, CustomError, Error};
 
 static REGEX_24_HOUR: Lazy<Regex> = lazy_regex!(r#"\b([0-1]?[0-9]|2[0-3]):([0-5][0-9])\b"#);
 static REGEX_12_HOUR: Lazy<Regex> = lazy_regex!(r#"\b(1[0-2]|0?[1-9]) ?([AaPp][Mm])\b"#);
@@ -96,18 +96,21 @@ impl Context {
     pub async fn user_timestamp(
         &self,
         user_id: Id<UserMarker>,
-        year: i32,
-        month: u32,
-        day: u32,
-        hour: u32,
-        min: u32,
+        date: date::Command,
     ) -> Result<i64> {
         let Some(tz) = self.timezone(user_id).await? else {
             return Err(CustomError::MissingTimezone(self.command_ids.timezone).into());
         };
 
         Ok(tz
-            .with_ymd_and_hms(year, month, day, hour, min, 0)
+            .with_ymd_and_hms(
+                date.year.try_into()?,
+                date.month.try_into()?,
+                date.day.try_into()?,
+                date.hour.try_into()?,
+                date.min.try_into()?,
+                0,
+            )
             .single()
             .ok_or(CustomError::BadDate)?
             .timestamp())

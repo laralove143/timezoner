@@ -13,7 +13,7 @@ use twilight_model::{
 use crate::{err_reply, Context, CustomError, Error, TEST_GUILD_ID};
 
 mod copy;
-mod date;
+pub mod date;
 mod help;
 mod timezone;
 
@@ -29,7 +29,7 @@ impl CommandIds {
         Ok(Self {
             timezone: Self::command_id(timezone::Command::NAME, commands)?,
             date: Self::command_id(date::Command::NAME, commands)?,
-            copy: Self::command_id(copy::Command::NAME, commands)?,
+            copy: Self::command_id(copy::NAME, commands)?,
         })
     }
 
@@ -55,7 +55,7 @@ impl<'ctx> InteractionContext<'ctx> {
             timezone::PASTE_BUTTON_CUSTOM_ID => self.handle_timezone_paste_button_click().await,
             timezone::MODAL_SUBMIT_ID => self.handle_timezone_modal_submit().await,
             date::Command::NAME => self.handle_date_command().await,
-            copy::Command::NAME => self.handle_copy_command().await,
+            copy::NAME => self.handle_copy_command().await,
             help::Command::NAME => self.handle_help_command().await,
             name => Err(Error::UnknownCommand(name.to_owned()).into()),
         }
@@ -66,7 +66,7 @@ pub async fn set_commands(bot: &Bot) -> Result<CommandIds> {
     let commands = &[
         timezone::Command::create_command().into(),
         date::Command::create_command().into(),
-        copy::Command::create_command().into(),
+        copy::command().into(),
         help::Command::create_command().into(),
     ];
 

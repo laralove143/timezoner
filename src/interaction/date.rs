@@ -13,19 +13,19 @@ use crate::interaction::InteractionContext;
 )]
 pub struct Command {
     #[command(desc = "the day of the date", min_value = 0, max_value = 31)]
-    day: i64,
+    pub day: i64,
     #[command(desc = "the month of the date", min_value = 0, max_value = 12)]
-    month: i64,
+    pub month: i64,
     #[command(desc = "the year of the date", min_value = -262000, max_value = 262000)]
-    year: i64,
+    pub year: i64,
     #[command(
         desc = "the hour of the date in 24 hour format",
         min_value = 0,
         max_value = 23
     )]
-    hour: i64,
+    pub hour: i64,
     #[command(desc = "the minute of the date", min_value = 0, max_value = 59)]
-    min: i64,
+    pub min: i64,
 }
 
 impl InteractionContext<'_> {
@@ -37,16 +37,7 @@ impl InteractionContext<'_> {
         self.handle
             .reply(Reply::new().content(format!(
                 "<t:{}:F>",
-                self.ctx
-                    .user_timestamp(
-                        author_id,
-                        options.year.try_into()?,
-                        options.month.try_into()?,
-                        options.day.try_into()?,
-                        options.hour.try_into()?,
-                        options.min.try_into()?
-                    )
-                    .await?
+                self.ctx.user_timestamp(author_id, options).await?
             )))
             .await?;
 
