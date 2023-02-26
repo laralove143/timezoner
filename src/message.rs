@@ -67,6 +67,7 @@ impl Context {
                     self.bot.user.id,
                 )
                 .await?;
+            return Ok(());
         }
 
         let now = Local::now();
