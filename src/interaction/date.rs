@@ -58,11 +58,23 @@ pub enum Month {
     desc = "send a date that everyone sees in their own timezone"
 )]
 pub struct Command {
-    #[command(desc = "the day of the date, today by default", min_value = 0, max_value = 31)]
+    #[command(
+        desc = "the day of the date, today by default",
+        min_value = 0,
+        max_value = 31
+    )]
     pub day: Option<i64>,
-    #[command(desc = "the month of the date, this month by default", min_value = 0, max_value = 12)]
+    #[command(
+        desc = "the month of the date, this month by default",
+        min_value = 0,
+        max_value = 12
+    )]
     pub month: Option<Month>,
-    #[command(desc = "the year of the date, this year by default", min_value = -262000, max_value = 262000)]
+    #[command(
+        desc = "the year of the date, this year by default",
+        min_value = -262000,
+        max_value = 262000
+    )]
     pub year: Option<i64>,
     #[command(
         desc = "the hour of the date in 24 hour format, current hour by default",
@@ -70,9 +82,17 @@ pub struct Command {
         max_value = 23
     )]
     pub hour: Option<i64>,
-    #[command(desc = "the minute of the date, current minute by default", min_value = 0, max_value = 59)]
+    #[command(
+        desc = "the minute of the date, current minute by default",
+        min_value = 0,
+        max_value = 59
+    )]
     pub minute: Option<i64>,
-    #[command(desc = "the second of the date, current second by default", min_value = 0, max_value = 59)]
+    #[command(
+        desc = "the second of the date, current second by default",
+        min_value = 0,
+        max_value = 59
+    )]
     pub second: Option<i64>,
     #[command(desc = "the style of the date, by default like Tuesday, 20 April 2021 4:20 PM")]
     pub style: Option<Style>,
