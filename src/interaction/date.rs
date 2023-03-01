@@ -52,7 +52,7 @@ pub enum Month {
     December,
 }
 
-#[derive(CommandModel, CreateCommand)]
+#[derive(Default, CommandModel, CreateCommand)]
 #[command(
     name = "date",
     desc = "send a date that everyone sees in their own timezone"

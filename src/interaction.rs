@@ -13,6 +13,7 @@ use twilight_model::{
 use crate::{err_reply, Context, CustomError, Error, TEST_GUILD_ID};
 
 mod copy;
+mod current_time;
 pub mod date;
 mod help;
 mod timezone;
@@ -56,6 +57,7 @@ impl<'ctx> InteractionContext<'ctx> {
             timezone::MODAL_SUBMIT_ID => self.handle_timezone_modal_submit().await,
             date::Command::NAME => self.handle_date_command().await,
             copy::NAME => self.handle_copy_command().await,
+            current_time::NAME => self.handle_current_time_command().await,
             help::Command::NAME => self.handle_help_command().await,
             name => Err(Error::UnknownCommand(name.to_owned()).into()),
         }
@@ -67,6 +69,7 @@ pub async fn set_commands(bot: &Bot) -> Result<CommandIds> {
         timezone::Command::create_command().into(),
         date::Command::create_command().into(),
         copy::command().into(),
+        current_time::command(),
         help::Command::create_command().into(),
     ];
 

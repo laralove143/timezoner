@@ -71,6 +71,10 @@ pub enum CustomError {
     )]
     MissingTimezone(Id<CommandMarker>),
     #[error(
+        "that user hasn't set their timezone yet, beg them to use the </timezone:{0}> command"
+    )]
+    OtherUserMissingTimezone(Id<CommandMarker>),
+    #[error(
         "that message is too long, maybe you're using your super nitro powers or its right at the \
          edge of the character limit"
     )]
