@@ -139,19 +139,24 @@ impl Context {
         };
         let webhook_token = webhook.token.ok()?;
 
+        let username = message
+            .member
+            .as_ref()
+            .and_then(|member| member.nick.as_ref())
+            .map_or(message.author.name, |nick| {
+                if nick.len() == 1 {
+                    format!("{nick}{REACTION_EMOJI}")
+                } else {
+                    nick.clone()
+                }
+            });
         let mut execute_webhook = self
             .bot
             .http
             .execute_webhook(webhook.id, &webhook_token)
             .content(&message.content)
             .map_err(|_| CustomError::MessageTooLong)?
-            .username(
-                message
-                    .member
-                    .as_ref()
-                    .and_then(|member| member.nick.as_ref())
-                    .unwrap_or(&message.author.name),
-            )?;
+            .username(&username)?;
 
         if let Some(thread_id) = thread_id {
             execute_webhook = execute_webhook.thread_id(thread_id);
