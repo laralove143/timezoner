@@ -61,25 +61,28 @@ pub enum Error {
 #[derive(Clone, Copy, Debug, Eq, PartialEq, thiserror::Error)]
 pub enum CustomError {
     #[error(
-        "i looked and looked but couldnt find that timezone anywhere... if you're sure the \
-         timezone is right, please join the support server"
+        "i looked and looked but couldn't find that timezone anywhere :pensive:
+        if you're sure the timezone is right, please join the support server here:
+        {SUPPORT_SERVER_INVITE}"
     )]
     BadTimezone,
     #[error(
-        "bad news, i need to know your timezone first, good news, its really easy to tell me, \
-         just press </timezone:{0}> and smash that send or enter button"
+        "bad news, i need to know your timezone first :scream:
+        good news, its really easy to tell me :relieved:
+        just press </timezone:{0}> and smash that send or enter button"
     )]
     MissingTimezone(Id<CommandMarker>),
     #[error(
-        "that user hasn't set their timezone yet, beg them to use the </timezone:{0}> command"
+        "that user hasn't set their timezone yet :rolling_eyes:
+        but they can do that using the </timezone:{0}> command"
     )]
     OtherUserMissingTimezone(Id<CommandMarker>),
     #[error(
-        "that message is too long, maybe you're using your super nitro powers or its right at the \
-         edge of the character limit"
+        "that message is too long :sob:
+        maybe you're using your super nitro powers or its right at the edge of the character limit"
     )]
     MessageTooLong,
-    #[error("that's not a valid date, please give me a valid date, thank you")]
+    #[error("that's not a valid date :rage:")]
     BadDate,
 }
 

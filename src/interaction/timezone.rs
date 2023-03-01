@@ -63,7 +63,7 @@ fn paste_button() -> Component {
 
 fn copy_button_example_embed() -> Embed {
     Embed {
-        title: Some(format!("press the `{COPY_BUTTON_LABEL}` button")),
+        title: Some(format!(":one: press the `{COPY_BUTTON_LABEL}` button")),
         color: Some(ACCENT_COLOR),
         image: Some(EmbedImage {
             url: COPY_BUTTON_EXAMPLE_URL.to_owned(),
@@ -86,7 +86,7 @@ fn copy_button_example_embed() -> Embed {
 
 fn copy_timezone_example_embed() -> Embed {
     Embed {
-        title: Some("in the website that opens, press the `copy` button".to_owned()),
+        title: Some(":two: in the website that opens, press the `copy` button".to_owned()),
         description: Some(
             "if the detected timezone is wrong, select where you live on the map and then press \
              the `copy` button"
@@ -114,7 +114,7 @@ fn copy_timezone_example_embed() -> Embed {
 fn paste_button_example_embed() -> Embed {
     Embed {
         title: Some(format!(
-            "come back to discord and press the `{PASTE_BUTTON_LABEL}` button"
+            ":three: come back to discord and press the `{PASTE_BUTTON_LABEL}` button"
         )),
         color: Some(ACCENT_COLOR),
         image: Some(EmbedImage {
@@ -139,7 +139,7 @@ fn paste_button_example_embed() -> Embed {
 fn submit_timezone_example_embed() -> Embed {
     Embed {
         title: Some(
-            "paste the timezone you copied to the text field and press the `submit` button"
+            ":four: paste the timezone you copied to the text field and press the `submit` button"
                 .to_owned(),
         ),
         color: Some(ACCENT_COLOR),
@@ -226,11 +226,9 @@ impl InteractionContext<'_> {
         self.ctx.insert_timezone(user_id, tz).await?;
 
         self.handle
-            .reply(
-                Reply::new()
-                    .ephemeral()
-                    .content("done! now you can use me to show magical times".to_owned()),
-            )
+            .reply(Reply::new().ephemeral().content(
+                "done! now you can use me to show magical times :partying_face:".to_owned(),
+            ))
             .await?;
 
         Ok(())
