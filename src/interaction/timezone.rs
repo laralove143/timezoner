@@ -8,6 +8,7 @@ use twilight_model::channel::message::{
     embed::EmbedImage,
     Component, Embed, ReactionType,
 };
+use twilight_util::builder::embed::{EmbedBuilder, ImageSource};
 
 use crate::{interaction::InteractionContext, CustomError, ACCENT_COLOR};
 
@@ -62,26 +63,11 @@ fn paste_button() -> Component {
 }
 
 fn copy_button_example_embed() -> Embed {
-    Embed {
-        title: Some(format!(":one: press the `{COPY_BUTTON_LABEL}` button")),
-        color: Some(ACCENT_COLOR),
-        image: Some(EmbedImage {
-            url: COPY_BUTTON_EXAMPLE_URL.to_owned(),
-            proxy_url: None,
-            height: None,
-            width: None,
-        }),
-        fields: vec![],
-        kind: String::new(),
-        author: None,
-        description: None,
-        footer: None,
-        provider: None,
-        thumbnail: None,
-        timestamp: None,
-        url: None,
-        video: None,
-    }
+    EmbedBuilder::new()
+        .title(format!(":one: press the `{COPY_BUTTON_LABEL}` button"))
+        .color(ACCENT_COLOR)
+        .image(ImageSource::url(COPY_BUTTON_EXAMPLE_URL).unwrap())
+        .build()
 }
 
 fn copy_timezone_example_embed() -> Embed {

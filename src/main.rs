@@ -59,26 +59,27 @@ pub enum Error {
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq, thiserror::Error)]
+#[rustfmt::skip]
 pub enum CustomError {
     #[error(
-        "i looked and looked but couldn't find that timezone anywhere :pensive:
-        if you're sure the timezone is right, please join the support server here:
+        "i looked and looked but couldn't find that timezone anywhere :pensive:\n\
+        if you're sure the timezone is right, please join the support server here:\n\
         {SUPPORT_SERVER_INVITE}"
     )]
     BadTimezone,
     #[error(
-        "bad news, i need to know your timezone first :scream:
-        good news, its really easy to tell me :relieved:
+        "bad news, i need to know your timezone first :scream:\n\
+        good news, its really easy to tell me :relieved:\n\
         just press </timezone:{0}> and smash that send or enter button"
     )]
     MissingTimezone(Id<CommandMarker>),
     #[error(
-        "that user hasn't set their timezone yet :rolling_eyes:
+        "that user hasn't set their timezone yet :rolling_eyes:\n\
         but they can do that using the </timezone:{0}> command"
     )]
     OtherUserMissingTimezone(Id<CommandMarker>),
     #[error(
-        "that message is too long :sob:
+        "that message is too long :sob:\n\
         maybe you're using your super nitro powers or its right at the edge of the character limit"
     )]
     MessageTooLong,
@@ -163,6 +164,10 @@ async fn main() -> Result<()> {
 }
 
 fn err_reply(err: &anyhow::Error) -> Reply {
+    #[rustfmt::skip]
+    const INTERNAL_ERROR_MESSAGE: &str = "something went terribly wrong there :facepalm:\n\
+    i spammed lara (the dev) with the error, im sure they'll look at it asap";
+
     let message = if let Some(UserError::MissingPermissions(permissions)) = err.user() {
         format!(
             "please beg the mods to give me these permissions first:\n{}",
@@ -171,9 +176,7 @@ fn err_reply(err: &anyhow::Error) -> Reply {
     } else if let Some(custom_err) = err.downcast_ref::<CustomError>() {
         custom_err.to_string()
     } else {
-        "something went terribly wrong there... i spammed lara (the dev) with the error, im sure \
-         they'll look at it asap"
-            .to_owned()
+        INTERNAL_ERROR_MESSAGE.to_owned()
     };
 
     Reply::new().ephemeral().content(message)
