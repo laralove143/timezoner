@@ -52,6 +52,36 @@ all you have to do is use the `/timezone` command to set your timezone, it takes
 
 ![example](examples/timezone.gif)
 
+## something not working? let's see
+
+### bot doesn't react to a message
+
+- make sure the person that sent the message hasn't blocked the bot
+- run the `/help` command in the channel where this is happening
+- it'll probably warn you about missing permissions, if not, [join the support server]
+
+### missing permissions
+
+- if you unticked any permissions when adding the bot, kick the bot and invite it again without unticking any permissions, it actually needs them!
+- remove the bot from channel or category permissions
+  - **on desktop:**
+    1. right click on a channel or category
+    2. click _edit channel/category_
+    3. click _permissions_
+    4. click _advanced permissions_ if its closed
+    5. select _timezoner_ or any roles the bot has
+    6. scroll all the way down and click _remove ..._ or change all the _X_ to _/_
+  - **on mobile:**
+    1. hold down on a channel or category
+    2. tap _edit channel/category_
+    3. tap _channel/category permissions_
+    4. tap _advanced view_ if its not where you are
+    5. tap _edit_ then _-_ on any roles the bot has or tap the role and change all the _X_ to _/_
+
+### something else? how could this happen
+
+please [join the support server] and tell me
+
 ## let's get in touch
 
 have a feature idea? noticed a bug? need help with something? or just wanna meet me?
