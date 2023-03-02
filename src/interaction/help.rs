@@ -13,7 +13,8 @@ pub struct Command {}
 
 fn help_reply() -> Reply {
     Reply::new().content(format!(
-        "my dev worked a lot for my page :pleading_face: so please check that out:\n{README_LINK}"
+        "please check my page out for a list of features with gifs, info on contact, \
+         troubleshooting, sponsors and how to sponsor me :pleading_face:\n{README_LINK}"
     ))
 }
 
