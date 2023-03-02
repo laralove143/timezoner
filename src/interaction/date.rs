@@ -4,9 +4,9 @@ use sparkle_convenience::{
 };
 use twilight_interactions::command::{CommandModel, CommandOption, CreateCommand, CreateOption};
 
-use crate::interaction::InteractionContext;
+use crate::{interaction::InteractionContext, time::format};
 
-#[derive(CommandOption, CreateOption)]
+#[derive(Clone, Copy, CommandOption, CreateOption)]
 pub enum Style {
     #[option(name = "4:20 PM", value = "t")]
     ShortTime,
@@ -24,7 +24,7 @@ pub enum Style {
     Relative,
 }
 
-#[derive(CommandOption, CreateOption)]
+#[derive(Clone, Copy, CommandOption, CreateOption)]
 pub enum Month {
     #[option(name = "january", value = 1)]
     January,
@@ -52,7 +52,7 @@ pub enum Month {
     December,
 }
 
-#[derive(Default, CommandModel, CreateCommand)]
+#[derive(Clone, Copy, Default, CommandModel, CreateCommand)]
 #[command(
     name = "date",
     desc = "send a date that everyone sees in their own timezone"
@@ -104,8 +104,9 @@ impl InteractionContext<'_> {
         let options =
             Command::from_interaction(self.interaction.data.ok()?.command().ok()?.into())?;
 
+        let time = self.ctx.user_time(author_id, options).await?;
         self.handle
-            .reply(Reply::new().content(self.ctx.user_timestamp(author_id, options).await?))
+            .reply(Reply::new().content(format(time, options.style)))
             .await?;
 
         Ok(())

@@ -4,7 +4,10 @@ use sparkle_convenience::{
 };
 use twilight_interactions::command::{ApplicationCommandData, CommandModel, CreateCommand};
 
-use crate::interaction::{date, InteractionContext};
+use crate::{
+    interaction::{date, InteractionContext},
+    time::format,
+};
 
 pub const NAME: &str = "copy";
 
@@ -22,11 +25,9 @@ impl InteractionContext<'_> {
         let options =
             date::Command::from_interaction(self.interaction.data.ok()?.command().ok()?.into())?;
 
+        let time = self.ctx.user_time(author_id, options).await?;
         self.handle
-            .reply(Reply::new().content(format!(
-                "`{}`",
-                self.ctx.user_timestamp(author_id, options).await?
-            )))
+            .reply(Reply::new().content(format!("`{}`", format(time, options.style))))
             .await?;
 
         Ok(())

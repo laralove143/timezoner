@@ -24,7 +24,7 @@ impl InteractionContext<'_> {
             .reply(
                 Reply::new().ephemeral().content(
                     self.ctx
-                        .user_timestamp(user_id.cast(), date::Command::default())
+                        .user_time(user_id.cast(), date::Command::default())
                         .await
                         .map_err(|err| {
                             if let Some(CustomError::MissingTimezone(command_id)) =
@@ -34,7 +34,9 @@ impl InteractionContext<'_> {
                             } else {
                                 err
                             }
-                        })?,
+                        })?
+                        .format("%A, %B %-d, %-Y %-I:%M %p")
+                        .to_string(),
                 ),
             )
             .await?;

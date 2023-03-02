@@ -1,7 +1,8 @@
 use std::ops::Range;
 
 use anyhow::Result;
-use chrono::{Datelike, TimeZone, Timelike, Utc};
+use chrono::{DateTime, Datelike, TimeZone, Timelike, Utc};
+use chrono_tz::Tz;
 use lazy_regex::{lazy_regex, Captures, Lazy, Regex};
 use sparkle_convenience::error::IntoError;
 use twilight_model::id::{marker::UserMarker, Id};
@@ -96,19 +97,18 @@ impl ParsedTime {
 }
 
 impl Context {
-    pub async fn user_timestamp(
+    pub async fn user_time(
         &self,
         user_id: Id<UserMarker>,
         date: date::Command,
-    ) -> Result<String> {
+    ) -> Result<DateTime<Tz>> {
         let Some(tz) = self.timezone(user_id).await? else {
             return Err(CustomError::MissingTimezone(self.command_ids.timezone).into());
         };
 
         let now = Utc::now().with_timezone(&tz);
-        Ok(format!(
-            "<t:{}:{}>",
-            tz.with_ymd_and_hms(
+        Ok(tz
+            .with_ymd_and_hms(
                 date.year
                     .map_or_else(|| Ok(now.year()), TryInto::try_into)?,
                 date.month
@@ -122,11 +122,16 @@ impl Context {
                     .map_or_else(|| Ok(now.second()), TryInto::try_into)?,
             )
             .single()
-            .ok_or(CustomError::BadDate)?
-            .timestamp(),
-            date.style.unwrap_or(Style::LongDateTime).value()
-        ))
+            .ok_or(CustomError::BadDate)?)
     }
+}
+
+pub fn format(time: DateTime<Tz>, style: Option<Style>) -> String {
+    format!(
+        "<t:{}:{}>",
+        time.timestamp(),
+        style.unwrap_or(Style::LongDateTime).value()
+    )
 }
 
 fn to_24_hour(hour: u32, am_pm: &str) -> Result<u32> {
