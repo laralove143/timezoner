@@ -58,6 +58,10 @@ have a feature idea? noticed a bug? need help with something? or just wanna meet
 
 [join the support server][SUPPORT_SERVER_INVITE]
 
+## check out my other bots
+
+- [interchannel message mover](https://github.com/laralove143/interchannel-message-mover): a discord bot to move messages between channels
+
 ## sponsors
 
 - [jason](https://github.com/zudsniper): thank you for funding the hosting!
