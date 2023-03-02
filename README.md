@@ -42,6 +42,14 @@ wanna know if your friend is asleep for example? now you can in just a second
 
 ![example](examples/get_current_time.gif)
 
+## getting started
+
+all you have to do is use the `/timezone` command to set your timezone, it takes just a few seconds
+
+- only the people that are sharing times need to do this, people seeing the times don't need to do anything!
+
+![example](examples/timezone.gif)
+
 ## sponsors
 
 - [jason](https://github.com/zudsniper): thank you for funding the hosting!
