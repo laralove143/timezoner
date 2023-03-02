@@ -3,8 +3,16 @@
 - [add to your server](https://discord.com/api/oauth2/authorize?client_id=909820903574106203&permissions=536947776&scope=bot%20applications.commands)
 - [get support](https://discord.gg/KUMdnjcE97)
 
-goodbye to timezone conversions! just type some time in chat, hit that reaction and everyone magically sees it in their
-own timezone
+goodbye to timezone conversions! a discord bot that converts times so that everyone sees it in their own timezone
+
+## features
+
+### convert a time in a message
+
+when there's a time in a message, the bot will add a reaction to it, just hit that reaction and everyone magically sees the time in their own timezone!
+
+- only the person that sent the message needs to set their timezone, the ones reading the time don't even need to do anything
+- supports basically all the time formats
 
 ![example](examples/sent.gif)
 
@@ -12,13 +20,17 @@ and someone 8 hours behind sees:
 
 ![example](examples/shown.png)
 
-## features
+### share a date
 
-- does all the conversion in chat, no commands or dms or annoying stuff like that
-- the ones reading the times don't need to do anything
-- supports all the sane formats: `1pm` `1:30 Pm` `13:30`...
-- has a `/date` command that lets you share dates too
-- has a `/copy` command that you can use to share times in dms etc
+there's a `/date` command that lets you share dates too
+
+![example](examples/date.gif)
+
+### share a date in dms
+
+you can use the `/copy` command to share dates in dms or other servers
+
+![example](examples/copy.gif)
 
 ## sponsors
 
