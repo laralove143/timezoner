@@ -22,7 +22,7 @@ impl InteractionContext<'_> {
 
         self.handle
             .reply(
-                Reply::new().content(
+                Reply::new().ephemeral().content(
                     self.ctx
                         .user_timestamp(user_id.cast(), date::Command::default())
                         .await
