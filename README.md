@@ -22,13 +22,17 @@ and someone 8 hours behind sees:
 
 ### share a date
 
-there's a `/date` command that lets you share dates too
+wanna include a date? the `/date` command is in your command
+
+- you can style it too, showing just the date for example
 
 ![example](examples/date.gif)
 
 ### share a date in dms
 
-you can use the `/copy` command to share dates in dms or other servers
+you can even share a date in dms or other servers, just use the `/copy` command
+
+- consider asking the mods to add the bot to the other server though :)
 
 ![example](examples/copy.gif)
 
