@@ -61,6 +61,7 @@ have a feature idea? noticed a bug? need help with something? or just wanna meet
 ## sponsors
 
 - [jason](https://github.com/zudsniper): thank you for funding the hosting!
+- wanna see your name here? [support me with whatever amount you wish :)](https://github.com/sponsors/laralove143)
 
 ## terms of service
 
