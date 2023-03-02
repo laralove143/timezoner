@@ -36,6 +36,12 @@ you can even share a date in dms or other servers, just use the `/copy` command
 
 ![example](examples/copy.gif)
 
+### learn what time it is for someone
+
+wanna know if your friend is asleep for example? now you can in just a second
+
+![example](examples/get_current_time.gif)
+
 ## sponsors
 
 - [jason](https://github.com/zudsniper): thank you for funding the hosting!
