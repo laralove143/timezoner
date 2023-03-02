@@ -40,7 +40,7 @@ you can even share a date in dms or other servers, just use the `/copy` command
 
 ### learn what time it is for someone
 
-wanna know if your friend is asleep for example? now you can in just a second
+wanna know if your friend is asleep for example? now you can with just right clicking/tapping on a user then pressing _apps_ and then _get current time for user_
 
 ![example](examples/get_current_time.gif)
 
