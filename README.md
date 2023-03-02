@@ -1,9 +1,9 @@
-[SUPPORT_SERVER_INVITE]: https://discord.gg/KUMdnjcE97
+[join the support server]: https://discord.gg/KUMdnjcE97
 
 # timezoner
 
 - [add to your server](https://discord.com/api/oauth2/authorize?client_id=909820903574106203&permissions=536947776&scope=bot%20applications.commands)
-- [get support][SUPPORT_SERVER_INVITE]
+- [join the support server]
 
 goodbye to timezone conversions! a discord bot that converts times so that everyone sees it in their own timezone
 
@@ -56,7 +56,7 @@ all you have to do is use the `/timezone` command to set your timezone, it takes
 
 have a feature idea? noticed a bug? need help with something? or just wanna meet me?
 
-[join the support server][SUPPORT_SERVER_INVITE]
+[join the support server]
 
 ## check out my other bots
 
