@@ -78,13 +78,18 @@ all you have to do is use the `/timezone` command to set your timezone, it takes
     4. tap _advanced view_ if its not where you are
     5. tap _edit_ then _-_ on any roles the bot has or tap the role and change all the _X_ to _/_
 
-### something else? how could this happen
+### something else? how could this happen??
 
 please [join the support server] and tell me
 
 ## let's get in touch
 
-have a feature idea? noticed a bug? need help with something? or just wanna meet me?
+- get announcements for updates
+- help shape the future of the bots by answering my feedback questions
+- peek into the future of the bots aka upcoming features
+- tell your feature ideas or bug reports
+- get help if you're having trouble with something
+- or just have a chat
 
 [join the support server]
 
