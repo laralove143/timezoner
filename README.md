@@ -1,8 +1,8 @@
-[join the support server]: https://discord.gg/KUMdnjcE97
+[join the server]: https://discord.gg/KUMdnjcE97
 
 # timezoner
 
-[![](https://custom-icon-badges.demolab.com/badge/add_to_your_server-invite-5865F2?logo=discord&logoColor=ffffff)](https://discord.com/api/oauth2/authorize?client_id=909820903574106203&permissions=536947776&scope=bot%20applications.commands) [![](https://custom-icon-badges.demolab.com/discord/903367565349384202?color=5865F2&logo=question&label=join%20the%20support%20server)](https://discord.gg/KUMdnjcE97)
+[![](https://custom-icon-badges.demolab.com/badge/add_to_your_server-invite-5865F2?logo=discord&logoColor=ffffff)](https://discord.com/api/oauth2/authorize?client_id=909820903574106203&permissions=536947776&scope=bot%20applications.commands) [![](https://custom-icon-badges.demolab.com/discord/903367565349384202?color=5865F2&logo=comment-discussion&label=join%20the%20server)](https://discord.gg/KUMdnjcE97) ![](https://img.shields.io/badge/dynamic/json?url=https://jsonblob.com/api/jsonBlob/1081686538592731136&label=%20&query=$.server_count&prefix=used%20in%20&suffix=%20servers&color=555555)
 
 goodbye to timezone conversions! a discord bot that converts times so that everyone sees it in their own timezone
 
@@ -57,7 +57,7 @@ all you have to do is use the `/timezone` command to set your timezone, it takes
 
 - make sure the person that sent the message hasn't blocked the bot
 - run the `/help` command in the channel where this is happening
-- it'll probably warn you about missing permissions, if not, [join the support server]
+- it'll probably warn you about missing permissions, if not, [join the server]
 
 ### missing permissions
 
@@ -79,7 +79,7 @@ all you have to do is use the `/timezone` command to set your timezone, it takes
 
 ### something else? how could this happen??
 
-please [join the support server] and tell me
+please [join the server] and tell me
 
 ## let's get in touch
 
@@ -90,7 +90,7 @@ please [join the support server] and tell me
 - get help if you're having trouble with something
 - or just have a chat
 
-[join the support server]
+[join the server]
 
 ## check out my other bots
 
