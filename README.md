@@ -10,9 +10,11 @@ goodbye to timezone conversions! a discord bot that converts times so that every
 
 ### convert a time in a message
 
-when there's a time in a message, the bot will add a reaction to it, just hit that reaction and everyone magically sees the time in their own timezone!
+when there's a time in a message, the bot will add a reaction to it, just hit that reaction and everyone magically sees
+the time in their own timezone!
 
-- only the person that sent the message needs to set their timezone, the ones reading the time don't even need to do anything
+- only the person that sent the message needs to set their timezone, the ones reading the time don't even need to do
+  anything
 - supports basically all the time formats
 
 ![example](examples/sent.gif)
@@ -39,7 +41,8 @@ you can even share a date in dms or other servers, just use the `/copy` command
 
 ### learn what time it is for someone
 
-wanna know if your friend is asleep for example? now you can with just right clicking/tapping on a user then pressing _apps_ and then _get current time for user_
+wanna know if your friend is asleep for example? now you can with just right clicking/tapping on a user then pressing
+_apps_ and then _get current time for user_
 
 ![example](examples/get_current_time.gif)
 
@@ -61,21 +64,22 @@ all you have to do is use the `/timezone` command to set your timezone, it takes
 
 ### missing permissions
 
-- if you unticked any permissions when adding the bot, kick the bot and invite it again without unticking any permissions, it actually needs them!
+- if you unticked any permissions when adding the bot, kick the bot and invite it again without unticking any
+  permissions, it actually needs them!
 - remove the bot from channel or category permissions
-  - **on desktop:**
-    1. right click on a channel or category
-    2. click _edit channel/category_
-    3. click _permissions_
-    4. click _advanced permissions_ if its closed
-    5. select _timezoner_ or any roles the bot has
-    6. scroll all the way down and click _remove ..._ or change all the _X_ to _/_
-  - **on mobile:**
-    1. hold down on a channel or category
-    2. tap _edit channel/category_
-    3. tap _channel/category permissions_
-    4. tap _advanced view_ if its not where you are
-    5. tap _edit_ then _-_ on any roles the bot has or tap the role and change all the _X_ to _/_
+    - **on desktop:**
+        1. right click on a channel or category
+        2. click _edit channel/category_
+        3. click _permissions_
+        4. click _advanced permissions_ if its closed
+        5. select _timezoner_ or any roles the bot has
+        6. scroll all the way down and click _remove ..._ or change all the _X_ to _/_
+    - **on mobile:**
+        1. hold down on a channel or category
+        2. tap _edit channel/category_
+        3. tap _channel/category permissions_
+        4. tap _advanced view_ if its not where you are
+        5. tap _edit_ then _-_ on any roles the bot has or tap the role and change all the _X_ to _/_
 
 ### something else? how could this happen??
 
@@ -94,7 +98,8 @@ please [join the server] and tell me
 
 ## check out my other bots
 
-- [interchannel message mover](https://github.com/laralove143/interchannel-message-mover): a discord bot to move messages between channels
+- [interchannel message mover](https://github.com/laralove143/interchannel-message-mover): a discord bot to move
+  messages between channels
 
 ## sponsors
 
