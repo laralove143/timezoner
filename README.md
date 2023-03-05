@@ -2,7 +2,7 @@
 
 # timezoner
 
-[![](https://custom-icon-badges.demolab.com/badge/add_to_your_server-invite-5865F2?logo=discord&logoColor=ffffff)](https://discord.com/api/oauth2/authorize?client_id=909820903574106203&permissions=536947776&scope=bot%20applications.commands) [![](https://custom-icon-badges.demolab.com/discord/903367565349384202?color=5865F2&logo=comment-discussion&label=join%20the%20server)](https://discord.gg/KUMdnjcE97) ![](https://custom-icon-badges.demolab.com/badge/dynamic/json?url=https://jsonblob.com/api/jsonBlob/1081686538592731136&logo=graph&label=%20&query=$.server_count&prefix=used%20in%20&suffix=%20servers&color=555555)
+[![](https://custom-icon-badges.demolab.com/badge/add_to_your_server-invite-5865F2?logo=discord&logoColor=ffffff)](https://discord.com/api/oauth2/authorize?client_id=909820903574106203&permissions=536947776&scope=bot%20applications.commands) [![](https://custom-icon-badges.demolab.com/discord/903367565349384202?color=5865F2&logo=comment-discussion&label=join%20the%20server)](https://discord.gg/KUMdnjcE97) ![](https://custom-icon-badges.demolab.com/badge/dynamic/json?url=https://jsonblob.com/api/jsonBlob/1081686538592731136&color=555555&logo=graph&label=%20&prefix=used%20in%20&query=$.guild_count&suffix=%20servers)
 
 goodbye to timezone conversions! a discord bot that converts times so that everyone sees it in their own timezone
 
