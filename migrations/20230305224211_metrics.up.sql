@@ -6,6 +6,7 @@ CREATE TABLE usage
     timestamp TIMESTAMP(0) WITH TIME ZONE NOT NULL DEFAULT now(),
     kind      usage_kind                  NOT NULL
 );
+CREATE INDEX usage_idx ON usage (kind);
 
 CREATE TABLE guild_count
 (

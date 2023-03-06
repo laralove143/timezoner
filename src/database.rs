@@ -70,9 +70,14 @@ impl Context {
     }
 
     pub async fn usage_count(&self) -> Result<i64> {
-        query_scalar!("SELECT count(*) FROM usage")
-            .fetch_one(&self.db)
-            .await?
-            .ok()
+        query_scalar!(
+            "
+            SELECT count(*)
+            FROM usage
+            WHERE kind IN ('TimeConvert', 'Date', 'Copy', 'CurrentTime')"
+        )
+        .fetch_one(&self.db)
+        .await?
+        .ok()
     }
 }
