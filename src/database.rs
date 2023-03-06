@@ -37,6 +37,7 @@ impl Decode<Result<Tz>> for String {
 }
 
 #[derive(sqlx::Type)]
+#[sqlx(type_name = "usage_kind")]
 pub enum UsageKind {
     TimeDetect,
     TimeConvert,
