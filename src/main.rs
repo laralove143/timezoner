@@ -1,7 +1,7 @@
 #![warn(clippy::nursery, clippy::pedantic)]
 #![allow(clippy::missing_errors_doc, clippy::missing_panics_doc)]
 
-use std::{env, sync::Arc};
+use std::{env, sync::Arc, time::Duration};
 
 use anyhow::Result;
 use dotenvy::dotenv;
@@ -25,11 +25,15 @@ use twilight_model::{
 };
 use twilight_standby::Standby;
 
-use crate::interaction::{set_commands, CommandIds};
+use crate::{
+    interaction::{set_commands, CommandIds},
+    metrics::{JsonStorageClient, Metrics},
+};
 
 mod database;
 mod interaction;
 mod message;
+mod metrics;
 mod time;
 
 const ACCENT_COLOR: u32 = 0x00d4_f1f9;
@@ -55,6 +59,8 @@ pub enum Error {
     UnknownCommand(String),
     #[error("time doesn't end in am or pm")]
     Hour12InvalidSuffix,
+    #[error("metrics weren't updated: put: {put:?}, got: {get:?}")]
+    MetricsUpdateFail { get: Metrics, put: Metrics },
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq, thiserror::Error)]
@@ -90,6 +96,7 @@ pub enum CustomError {
 pub struct Context {
     bot: Bot,
     db: PgPool,
+    json_storage: JsonStorageClient,
     standby: Standby,
     command_ids: CommandIds,
 }
@@ -130,17 +137,33 @@ async fn main() -> Result<()> {
     let ctx = Arc::new(Context {
         bot,
         db,
+        json_storage: JsonStorageClient {
+            http: reqwest::Client::new(),
+            api_key: env::var("JSONSTORAGE_API_KEY")?,
+            url: env::var("METRICS_URL")?,
+        },
         standby: Standby::new(),
         command_ids,
     });
 
+    let mut metrics_update_interval = tokio::time::interval(Duration::from_secs(60 * 60));
+    let ctx_metrics_ref = Arc::clone(&ctx);
+    tokio::spawn(async move {
+        loop {
+            metrics_update_interval.tick().await;
+            if let Err(err) = ctx_metrics_ref.update_metrics().await {
+                ctx_metrics_ref.bot.log(err).await;
+            }
+        }
+    });
+
     let mut events = ShardEventStream::new(shards.iter_mut());
     while let Some((_, event_res)) = events.next().await {
-        let ctx_ref = Arc::clone(&ctx);
+        let ctx_event_ref = Arc::clone(&ctx);
         match event_res {
             Ok(event) => {
                 tokio::spawn(async move {
-                    ctx_ref.handle_event(event).await;
+                    ctx_event_ref.handle_event(event).await;
                 });
             }
             Err(err)
@@ -149,7 +172,7 @@ async fn main() -> Result<()> {
                     ReceiveMessageErrorType::Deserializing { .. } | ReceiveMessageErrorType::Io
                 ) =>
             {
-                ctx_ref.bot.log(&err).await;
+                ctx_event_ref.bot.log(&err).await;
 
                 if err.is_fatal() {
                     break;
