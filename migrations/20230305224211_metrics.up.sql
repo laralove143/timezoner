@@ -1,4 +1,4 @@
-CREATE TYPE usage_kind AS ENUM ('TimeDetect', 'TimeConvert', 'Help', 'Timezone', 'Date', 'Copy', 'CurrentTime');
+CREATE TYPE usage_kind AS ENUM ('TimeDetect', 'TimeConvert', 'Help', 'TimezoneCalled', 'TimezoneSet', 'Date', 'Copy', 'CurrentTime');
 
 CREATE TABLE usage
 (
