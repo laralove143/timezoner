@@ -31,9 +31,9 @@ wanna include a date? the `/date` command is in your command
 
 ![example](examples/date.gif)
 
-### share a date in dms
+### share a date ANYwhere
 
-you can even share a date in dms or other servers, just use the `/copy` command
+you can share a date in dms, other servers, even put it in your bio! just use the `/copy` command
 
 - consider asking the mods to add the bot to the other server though :)
 
