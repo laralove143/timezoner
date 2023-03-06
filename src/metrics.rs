@@ -2,6 +2,10 @@ use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use sparkle_convenience::error::IntoError;
+use twilight_model::gateway::{
+    payload::outgoing::UpdatePresence,
+    presence::{ActivityType, MinimalActivity, Status},
+};
 
 use crate::{Context, Error};
 
@@ -35,13 +39,13 @@ impl Context {
             .as_u64()
             .ok()?;
 
-        let put_metrics = Metrics { guild_count };
+        let metrics = Metrics { guild_count };
 
         self.json_storage
             .http
             .put(&self.json_storage.url)
             .query(&[("apiKey", &self.json_storage.api_key)])
-            .json(&put_metrics)
+            .json(&metrics)
             .send()
             .await?;
 
@@ -54,12 +58,27 @@ impl Context {
             .json::<Metrics>()
             .await?;
 
-        if get_metrics != put_metrics {
+        if get_metrics != metrics {
             return Err(Error::MetricsUpdateFail {
                 get: get_metrics,
-                put: put_metrics,
+                put: metrics,
             }
             .into());
+        }
+
+        let presence = UpdatePresence::new(
+            vec![MinimalActivity {
+                kind: ActivityType::Playing,
+                name: format!("in {} servers", metrics.guild_count),
+                url: None,
+            }
+            .into()],
+            false,
+            None,
+            Status::Online,
+        )?;
+        for shard in &self.shards {
+            shard.command(&presence)?;
         }
 
         Ok(())

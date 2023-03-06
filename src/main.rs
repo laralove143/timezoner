@@ -14,7 +14,9 @@ use sparkle_convenience::{
     Bot,
 };
 use sqlx::PgPool;
-use twilight_gateway::{error::ReceiveMessageErrorType, stream::ShardEventStream, EventTypeFlags};
+use twilight_gateway::{
+    error::ReceiveMessageErrorType, stream::ShardEventStream, EventTypeFlags, MessageSender, Shard,
+};
 use twilight_model::{
     gateway::{event::Event, Intents},
     guild::Permissions,
@@ -95,6 +97,7 @@ pub enum CustomError {
 #[derive(Debug)]
 pub struct Context {
     bot: Bot,
+    shards: Vec<MessageSender>,
     db: PgPool,
     json_storage: JsonStorageClient,
     standby: Standby,
@@ -136,6 +139,7 @@ async fn main() -> Result<()> {
 
     let ctx = Arc::new(Context {
         bot,
+        shards: shards.iter().map(Shard::sender).collect(),
         db,
         json_storage: JsonStorageClient {
             http: reqwest::Client::new(),
