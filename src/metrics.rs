@@ -13,7 +13,8 @@ const APPLICATION_INFO_URL: &str = "https://discord.com/api/v10/applications/@me
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Metrics {
-    guild_count: u64,
+    guild_count: i32,
+    usage_count: i64,
 }
 
 #[derive(Debug)]
@@ -36,10 +37,17 @@ impl Context {
             .await?
             .get("approximate_guild_count")
             .ok()?
-            .as_u64()
-            .ok()?;
+            .as_i64()
+            .ok()?
+            .try_into()?;
+        self.insert_guild_count(guild_count).await?;
 
-        let metrics = Metrics { guild_count };
+        let usage_count = self.usage_count().await?;
+
+        let metrics = Metrics {
+            guild_count,
+            usage_count,
+        };
 
         self.json_storage
             .http
@@ -57,7 +65,6 @@ impl Context {
             .await?
             .json::<Metrics>()
             .await?;
-
         if get_metrics != metrics {
             return Err(Error::MetricsUpdateFail {
                 get: get_metrics,
@@ -69,7 +76,10 @@ impl Context {
         let presence = UpdatePresence::new(
             vec![MinimalActivity {
                 kind: ActivityType::Playing,
-                name: format!("in {} servers", metrics.guild_count),
+                name: format!(
+                    "converted {} times in {} servers",
+                    metrics.usage_count, metrics.guild_count
+                ),
                 url: None,
             }
             .into()],

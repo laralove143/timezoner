@@ -1,5 +1,6 @@
 use anyhow::Result;
 use chrono_tz::Tz;
+use sparkle_convenience::error::IntoError;
 use sqlx::{query, query_scalar, Postgres};
 use twilight_model::id::{marker::UserMarker, Id};
 
@@ -58,5 +59,20 @@ impl Context {
             Some(timezone) => Ok(Some(timezone.decode()?)),
             None => Ok(None),
         }
+    }
+
+    pub async fn insert_guild_count(&self, count: i32) -> Result<()> {
+        query!("INSERT INTO guild_count (count) VALUES ($1)", count)
+            .execute(&self.db)
+            .await?;
+
+        Ok(())
+    }
+
+    pub async fn usage_count(&self) -> Result<i64> {
+        query_scalar!("SELECT count(*) FROM usage")
+            .fetch_one(&self.db)
+            .await?
+            .ok()
     }
 }
