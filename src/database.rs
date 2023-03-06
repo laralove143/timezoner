@@ -1,3 +1,5 @@
+#![allow(clippy::use_self)]
+
 use anyhow::Result;
 use chrono_tz::Tz;
 use sparkle_convenience::error::IntoError;
@@ -34,6 +36,18 @@ impl Decode<Result<Tz>> for String {
     }
 }
 
+#[derive(sqlx::Type)]
+pub enum UsageKind {
+    TimeDetect,
+    TimeConvert,
+    Help,
+    TimezoneCalled,
+    TimezoneSet,
+    Date,
+    Copy,
+    CurrentTime,
+}
+
 impl Context {
     pub async fn insert_timezone(&self, user_id: Id<UserMarker>, timezone: Tz) -> Result<()> {
         query!(
@@ -63,6 +77,14 @@ impl Context {
 
     pub async fn insert_guild_count(&self, count: i32) -> Result<()> {
         query!("INSERT INTO guild_count (count) VALUES ($1)", count)
+            .execute(&self.db)
+            .await?;
+
+        Ok(())
+    }
+
+    pub async fn insert_usage(&self, kind: UsageKind) -> Result<()> {
+        query!("INSERT INTO usage (kind) VALUES ($1)", kind as _)
             .execute(&self.db)
             .await?;
 

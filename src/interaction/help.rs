@@ -2,7 +2,9 @@ use anyhow::Result;
 use sparkle_convenience::reply::Reply;
 use twilight_interactions::command::CreateCommand;
 
-use crate::{interaction::InteractionContext, README_LINK, REQUIRED_PERMISSIONS};
+use crate::{
+    database::UsageKind, interaction::InteractionContext, README_LINK, REQUIRED_PERMISSIONS,
+};
 
 #[derive(CreateCommand)]
 #[command(
@@ -39,6 +41,7 @@ impl InteractionContext<'_> {
 
         self.handle.reply(help_reply()).await?;
 
+        self.ctx.insert_usage(UsageKind::Help).await?;
         Ok(())
     }
 }

@@ -10,7 +10,7 @@ use twilight_model::channel::message::{
 };
 use twilight_util::builder::embed::{EmbedBuilder, ImageSource};
 
-use crate::{interaction::InteractionContext, CustomError, ACCENT_COLOR};
+use crate::{database::UsageKind, interaction::InteractionContext, CustomError, ACCENT_COLOR};
 
 const COPY_BUTTON_EXAMPLE_URL: &str =
     "https://github.com/laralove143/timezoner/blob/main/examples/copy_button.png?raw=true";
@@ -164,6 +164,7 @@ impl InteractionContext<'_> {
             )
             .await?;
 
+        self.ctx.insert_usage(UsageKind::TimezoneCalled).await?;
         Ok(())
     }
 
@@ -217,6 +218,7 @@ impl InteractionContext<'_> {
             ))
             .await?;
 
+        self.ctx.insert_usage(UsageKind::TimezoneSet).await?;
         Ok(())
     }
 }

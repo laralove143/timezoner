@@ -5,6 +5,7 @@ use sparkle_convenience::{
 use twilight_interactions::command::{ApplicationCommandData, CommandModel, CreateCommand};
 
 use crate::{
+    database::UsageKind,
     interaction::{date, InteractionContext},
     time::format,
 };
@@ -30,6 +31,7 @@ impl InteractionContext<'_> {
             .reply(Reply::new().content(format!("`{}`", format(time, options.style))))
             .await?;
 
+        self.ctx.insert_usage(UsageKind::Copy).await?;
         Ok(())
     }
 }

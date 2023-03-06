@@ -10,7 +10,7 @@ use twilight_model::{
     gateway::payload::incoming::ReactionAdd,
 };
 
-use crate::{err_reply, time::ParsedTime, Context, CustomError};
+use crate::{database::UsageKind, err_reply, time::ParsedTime, Context, CustomError};
 
 const REACTION_EMOJI: &str = "⏰";
 
@@ -35,6 +35,7 @@ impl Context {
         if parsed_times.is_empty() {
             return Ok(());
         }
+        self.insert_usage(UsageKind::TimeDetect).await?;
 
         let request_reaction_type = RequestReactionType::Unicode {
             name: REACTION_EMOJI,
@@ -99,6 +100,7 @@ impl Context {
 
         self.execute_webhook_as_member(message).await?;
 
+        self.insert_usage(UsageKind::TimeConvert).await?;
         Ok(())
     }
 

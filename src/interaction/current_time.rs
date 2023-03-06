@@ -6,6 +6,7 @@ use twilight_model::application::command::{Command, CommandType};
 use twilight_util::builder::command::CommandBuilder;
 
 use crate::{
+    database::UsageKind,
     interaction::{date, InteractionContext},
     CustomError,
 };
@@ -41,6 +42,7 @@ impl InteractionContext<'_> {
             )
             .await?;
 
+        self.ctx.insert_usage(UsageKind::CurrentTime).await?;
         Ok(())
     }
 }
