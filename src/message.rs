@@ -4,7 +4,7 @@ use anyhow::Result;
 use chrono::{offset::Local, Datelike, TimeZone};
 use sparkle_convenience::error::IntoError;
 use tokio::time::timeout;
-use twilight_http::request::channel::reaction::RequestReactionType;
+use twilight_http::{request::channel::reaction::RequestReactionType, Response};
 use twilight_model::{
     channel::{message::ReactionType, Message},
     gateway::payload::incoming::ReactionAdd,
@@ -24,10 +24,30 @@ impl Context {
         let message_handle_result = self.handle_time_message(message).await;
 
         if let Err(err) = message_handle_result {
-            self.bot
+            let maybe_err_response = self
+                .bot
                 .handle_error::<CustomError>(channel_id, err_reply(&err), err)
                 .await;
+
+            if let Some(err_response) = maybe_err_response {
+                if let Err(delete_err) = self.delete_err_response(err_response).await {
+                    self.bot.log(delete_err).await;
+                }
+            }
         }
+    }
+
+    async fn delete_err_response(&self, response: Response<Message>) -> Result<()> {
+        let message = response.model().await?;
+
+        tokio::time::sleep(Duration::from_secs(60 * 5)).await;
+
+        self.bot
+            .http
+            .delete_message(message.channel_id, message.id)
+            .await?;
+
+        Ok(())
     }
 
     async fn handle_time_message(&self, mut message: Message) -> Result<()> {
