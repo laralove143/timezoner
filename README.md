@@ -118,6 +118,7 @@ please [join the server] and tell me
 
 - your timezone is only used to convert times to timestamps
 - only your currently selected timezone is saved, no history is kept
+- unidentifiable, anonymous usage data is collected and used for advertisement and analytics
 - no other data, including message content, is saved anywhere
 
 ### disclaimers
