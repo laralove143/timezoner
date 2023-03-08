@@ -23,7 +23,7 @@ fn help_reply() -> Reply {
 fn missing_permissions_reply() -> Reply {
     Reply::new().content(format!(
         "permissions error detected :scream: don't worry though! just click below for a \
-         fix:\n{README_LINK}#missing-permissions"
+         fix:\n{README_LINK}"
     ))
 }
 

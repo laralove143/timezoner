@@ -43,7 +43,7 @@ const ACCENT_COLOR: u32 = 0x00d4_f1f9;
 const LOGGING_CHANNEL_ID: Id<ChannelMarker> = Id::new(1_002_953_459_890_397_287);
 const TEST_GUILD_ID: Id<GuildMarker> = Id::new(903_367_565_349_384_202);
 
-const README_LINK: &str = "https://github.com/laralove143/timezoner/blob/main/README.md";
+const README_LINK: &str = "https://github.com/laralove143/timezoner/blob/main/README.md#timezoner";
 const SUPPORT_SERVER_INVITE: &str = "https://discord.gg/KUMdnjcE97";
 
 const REQUIRED_PERMISSIONS: Permissions = Permissions::MANAGE_WEBHOOKS
