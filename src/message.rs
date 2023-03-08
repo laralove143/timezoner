@@ -2,7 +2,7 @@ use std::{fmt::Write, time::Duration};
 
 use anyhow::Result;
 use chrono::{offset::Local, Datelike, TimeZone};
-use sparkle_convenience::error::IntoError;
+use sparkle_convenience::error::{ErrorExt, IntoError};
 use tokio::time::timeout;
 use twilight_http::{request::channel::reaction::RequestReactionType, Response};
 use twilight_model::{
@@ -30,7 +30,11 @@ impl Context {
                 .await;
 
             if let Some(err_response) = maybe_err_response {
-                if let Err(delete_err) = self.delete_err_response(err_response).await {
+                if let Err(Some(delete_err)) = self
+                    .delete_err_response(err_response)
+                    .await
+                    .map_err(ErrorExt::internal::<CustomError>)
+                {
                     self.bot.log(delete_err).await;
                 }
             }
