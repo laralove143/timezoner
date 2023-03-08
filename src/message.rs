@@ -4,7 +4,10 @@ use anyhow::Result;
 use chrono::{offset::Local, Datelike, TimeZone};
 use sparkle_convenience::error::{ErrorExt, IntoError};
 use tokio::time::timeout;
-use twilight_http::{request::channel::reaction::RequestReactionType, Response};
+use twilight_http::{
+    request::channel::{reaction::RequestReactionType, webhook::ExecuteWebhook},
+    Response,
+};
 use twilight_model::{
     channel::{message::ReactionType, Message},
     gateway::payload::incoming::ReactionAdd,
@@ -117,18 +120,23 @@ impl Context {
         content.push_str(message.content.get(push_start..).ok()?);
         message.content = content;
 
+        let message_channel_id = message.channel_id;
+        let message_id = message.id;
+
+        let exec_webhook = self.execute_webhook_as_member(message).await?;
+
         self.bot
             .http
-            .delete_message(message.channel_id, message.id)
+            .delete_message(message_channel_id, message_id)
             .await?;
 
-        self.execute_webhook_as_member(message).await?;
+        exec_webhook.await?;
 
         self.insert_usage(UsageKind::TimeConvert).await?;
         Ok(())
     }
 
-    async fn execute_webhook_as_member(&self, message: Message) -> Result<()> {
+    async fn execute_webhook_as_member(&self, message: Message) -> Result<ExecuteWebhook> {
         let mut channel_id = message.channel_id;
         let mut thread_id = None;
         let channel = self
@@ -208,11 +216,9 @@ impl Context {
                 })
             })
         {
-            execute_webhook.avatar_url(&avatar_url).await?;
+            Ok(execute_webhook.avatar_url(&avatar_url))
         } else {
-            execute_webhook.await?;
+            Ok(execute_webhook)
         }
-
-        Ok(())
     }
 }
