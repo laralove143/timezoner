@@ -1,11 +1,12 @@
-use std::{fmt::Write, time::Duration};
+use std::{fmt::Write, future::IntoFuture, time::Duration};
 
 use anyhow::Result;
 use chrono::{offset::Local, Datelike, TimeZone};
 use sparkle_convenience::error::{ErrorExt, IntoError};
 use tokio::time::timeout;
 use twilight_http::{
-    request::channel::{reaction::RequestReactionType, webhook::ExecuteWebhook},
+    request::channel::reaction::RequestReactionType,
+    response::{marker::EmptyBody, ResponseFuture},
     Response,
 };
 use twilight_model::{
@@ -136,7 +137,10 @@ impl Context {
         Ok(())
     }
 
-    async fn execute_webhook_as_member(&self, message: Message) -> Result<ExecuteWebhook> {
+    async fn execute_webhook_as_member(
+        &self,
+        message: Message,
+    ) -> Result<ResponseFuture<EmptyBody>> {
         let mut channel_id = message.channel_id;
         let mut thread_id = None;
         let channel = self
@@ -216,9 +220,9 @@ impl Context {
                 })
             })
         {
-            Ok(execute_webhook.avatar_url(&avatar_url))
+            Ok(execute_webhook.avatar_url(&avatar_url).into_future())
         } else {
-            Ok(execute_webhook)
+            Ok(execute_webhook.into_future())
         }
     }
 }
