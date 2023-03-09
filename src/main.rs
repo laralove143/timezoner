@@ -132,7 +132,6 @@ async fn main() -> Result<()> {
     bot.set_logging_file("log.txt".to_owned());
 
     let db = PgPool::connect(&env::var("DATABASE_URL")?).await?;
-    sqlx::migrate!().run(&db).await?;
 
     let command_ids = set_commands(&bot).await?;
 
@@ -212,5 +211,10 @@ fn err_reply(err: &anyhow::Error) -> Reply {
         INTERNAL_ERROR_MESSAGE.to_owned()
     };
 
-    Reply::new().ephemeral().content(message)
+    Reply::new().ephemeral().embed(
+        embed()
+            .title(":x: catastrophic failure")
+            .description(message)
+            .build(),
+    )
 }
