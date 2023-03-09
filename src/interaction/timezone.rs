@@ -19,6 +19,8 @@ const PASTE_BUTTON_EXAMPLE_URL: &str =
     "https://github.com/laralove143/timezoner/blob/main/examples/paste_button.png?raw=true";
 const SUBMIT_TIMEZONE_EXAMPLE_URL: &str =
     "https://github.com/laralove143/timezoner/blob/main/examples/submit_timezone.png?raw=true";
+const TIMEZONE_GIF_EXAMPLE_URL: &str =
+    "https://github.com/laralove143/timezoner/blob/main/examples/timezone.gif?raw=true";
 
 const TIMEZONE_PICKER_URL: &str = "https://kevinnovak.github.io/Time-Zone-Picker/";
 
@@ -101,6 +103,14 @@ fn submit_timezone_example_embed() -> Embed {
         .build()
 }
 
+fn timezone_example_gif_embed() -> Embed {
+    embed()
+        .title(":frame_photo:")
+        .description("here's a gif if you prefer that over steps :)")
+        .image(ImageSource::url(TIMEZONE_GIF_EXAMPLE_URL).unwrap())
+        .build()
+}
+
 impl InteractionContext<'_> {
     pub async fn handle_timezone_command(self) -> Result<()> {
         self.handle
@@ -111,6 +121,7 @@ impl InteractionContext<'_> {
                     .embed(copy_timezone_example_embed())
                     .embed(paste_button_example_embed())
                     .embed(submit_timezone_example_embed())
+                    .embed(timezone_example_gif_embed())
                     .component(Component::ActionRow(ActionRow {
                         components: vec![copy_button(), paste_button()],
                     })),
