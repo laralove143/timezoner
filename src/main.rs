@@ -45,7 +45,7 @@ const TEST_GUILD_ID: Id<GuildMarker> = Id::new(903_367_565_349_384_202);
 const README_LINK: &str = "https://gh.laralove.gay/timezoner/blob/main/README.md#timezoner";
 const MISSING_PERMISSIONS_LINK: &str =
     "https://gh.laralove.gay/timezoner/blob/main/README.md#missing-permissions";
-const SUPPORT_SERVER_INVITE: &str = "https://gh.laralove.gay/discord";
+const SUPPORT_SERVER_INVITE: &str = "https://laralove.gay/discord";
 
 const REQUIRED_PERMISSIONS: Permissions = Permissions::MANAGE_WEBHOOKS
     .union(Permissions::VIEW_CHANNEL)
