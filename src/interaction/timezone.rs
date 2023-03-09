@@ -5,12 +5,11 @@ use sparkle_convenience::{
 use twilight_interactions::command::CreateCommand;
 use twilight_model::channel::message::{
     component::{ActionRow, Button, ButtonStyle, TextInput, TextInputStyle},
-    embed::EmbedImage,
     Component, Embed, ReactionType,
 };
-use twilight_util::builder::embed::{EmbedBuilder, ImageSource};
+use twilight_util::builder::embed::{EmbedFieldBuilder, ImageSource};
 
-use crate::{database::UsageKind, interaction::InteractionContext, CustomError, ACCENT_COLOR};
+use crate::{database::UsageKind, embed, interaction::InteractionContext, CustomError};
 
 const COPY_BUTTON_EXAMPLE_URL: &str =
     "https://github.com/laralove143/timezoner/blob/main/examples/copy_button.png?raw=true";
@@ -63,89 +62,43 @@ fn paste_button() -> Component {
 }
 
 fn copy_button_example_embed() -> Embed {
-    EmbedBuilder::new()
-        .title(format!(":one: press the `{COPY_BUTTON_LABEL}` button"))
-        .color(ACCENT_COLOR)
+    embed()
+        .title(":one:")
+        .description(format!("press the *{COPY_BUTTON_LABEL}* button"))
         .image(ImageSource::url(COPY_BUTTON_EXAMPLE_URL).unwrap())
         .build()
 }
 
 fn copy_timezone_example_embed() -> Embed {
-    Embed {
-        title: Some(":two: in the website that opens, press the `copy` button".to_owned()),
-        description: Some(
-            "if the detected timezone is wrong, select where you live on the map and then press \
-             the `copy` button"
-                .to_owned(),
-        ),
-        color: Some(ACCENT_COLOR),
-        image: Some(EmbedImage {
-            url: COPY_TIMEZONE_EXAMPLE_URL.to_owned(),
-            proxy_url: None,
-            height: None,
-            width: None,
-        }),
-        fields: vec![],
-        kind: String::new(),
-        author: None,
-        footer: None,
-        provider: None,
-        thumbnail: None,
-        timestamp: None,
-        url: None,
-        video: None,
-    }
+    embed()
+        .title(":two:")
+        .description("in the website that opens, press the *copy* button")
+        .field(EmbedFieldBuilder::new(
+            "if the detected timezone is wrong",
+            "select where you live on the map and then press the *copy* button",
+        ))
+        .image(ImageSource::url(COPY_TIMEZONE_EXAMPLE_URL).unwrap())
+        .build()
 }
 
 fn paste_button_example_embed() -> Embed {
-    Embed {
-        title: Some(format!(
-            ":three: come back to discord and press the `{PASTE_BUTTON_LABEL}` button"
-        )),
-        color: Some(ACCENT_COLOR),
-        image: Some(EmbedImage {
-            url: PASTE_BUTTON_EXAMPLE_URL.to_owned(),
-            proxy_url: None,
-            height: None,
-            width: None,
-        }),
-        fields: vec![],
-        kind: String::new(),
-        author: None,
-        description: None,
-        footer: None,
-        provider: None,
-        thumbnail: None,
-        timestamp: None,
-        url: None,
-        video: None,
-    }
+    embed()
+        .title(":three:")
+        .description(format!(
+            "come back to discord and press the *{PASTE_BUTTON_LABEL}* button"
+        ))
+        .image(ImageSource::url(PASTE_BUTTON_EXAMPLE_URL).unwrap())
+        .build()
 }
 
 fn submit_timezone_example_embed() -> Embed {
-    Embed {
-        title: Some(
-            ":four: paste the timezone you copied to the text field and press the `submit` button"
-                .to_owned(),
-        ),
-        color: Some(ACCENT_COLOR),
-        image: Some(EmbedImage {
-            url: SUBMIT_TIMEZONE_EXAMPLE_URL.to_owned(),
-            proxy_url: None,
-            height: None,
-            width: None,
-        }),
-        fields: vec![],
-        kind: String::new(),
-        author: None,
-        description: None,
-        footer: None,
-        provider: None,
-        thumbnail: None,
-        timestamp: None,
-        url: None,
-        video: None,
-    }
+    embed()
+        .title(":four:")
+        .description(
+            "paste the timezone you copied to the text field and press the *submit* button",
+        )
+        .image(ImageSource::url(SUBMIT_TIMEZONE_EXAMPLE_URL).unwrap())
+        .build()
 }
 
 impl InteractionContext<'_> {

@@ -26,6 +26,7 @@ use twilight_model::{
     },
 };
 use twilight_standby::Standby;
+use twilight_util::builder::embed::{EmbedBuilder, EmbedFooterBuilder};
 
 use crate::{
     interaction::{set_commands, CommandIds},
@@ -37,8 +38,6 @@ mod interaction;
 mod message;
 mod metrics;
 mod time;
-
-const ACCENT_COLOR: u32 = 0x00d4_f1f9;
 
 const LOGGING_CHANNEL_ID: Id<ChannelMarker> = Id::new(1_002_953_459_890_397_287);
 const TEST_GUILD_ID: Id<GuildMarker> = Id::new(903_367_565_349_384_202);
@@ -187,6 +186,14 @@ async fn main() -> Result<()> {
     }
 
     Ok(())
+}
+
+fn embed() -> EmbedBuilder {
+    EmbedBuilder::new()
+        .color(0x00d4_f1f9)
+        .footer(EmbedFooterBuilder::new(
+            "wondering anything? check the link in my bio!",
+        ))
 }
 
 fn err_reply(err: &anyhow::Error) -> Reply {
