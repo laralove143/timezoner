@@ -1,9 +1,12 @@
 use anyhow::Result;
 use sparkle_convenience::reply::Reply;
 use twilight_interactions::command::CreateCommand;
+use twilight_model::user::CurrentUser;
+use twilight_util::builder::embed::{EmbedFieldBuilder, EmbedFooterBuilder, ImageSource};
 
 use crate::{
-    database::UsageKind, interaction::InteractionContext, README_LINK, REQUIRED_PERMISSIONS,
+    database::UsageKind, embed, interaction::InteractionContext, message::avatar_url,
+    MISSING_PERMISSIONS_LINK, README_LINK, REQUIRED_PERMISSIONS, SUPPORT_SERVER_INVITE,
 };
 
 #[derive(CreateCommand)]
@@ -13,18 +16,38 @@ use crate::{
 )]
 pub struct Command {}
 
-fn help_reply() -> Reply {
-    Reply::new().content(format!(
-        "please check my page out for a list of features with gifs, info on contact, \
-         troubleshooting, sponsors and how to sponsor me :pleading_face:\n{README_LINK}"
-    ))
+fn help_reply(current_user: &CurrentUser) -> Reply {
+    Reply::new().embed(
+        embed()
+            .title("tap tap click tap here!")
+            .url(README_LINK)
+            .description("that page above has more info than i could ever say here!")
+            .thumbnail(
+                ImageSource::url(avatar_url(
+                    None,
+                    current_user.avatar,
+                    current_user.id,
+                    None,
+                    current_user.discriminator,
+                ))
+                .unwrap(),
+            )
+            .field(EmbedFieldBuilder::new(
+                "*the* server",
+                SUPPORT_SERVER_INVITE,
+            ))
+            .footer(EmbedFooterBuilder::new("thank you for using me :)"))
+            .build(),
+    )
 }
 
 fn missing_permissions_reply() -> Reply {
-    Reply::new().content(format!(
-        "permissions error detected :scream: don't worry though! just click below for a \
-         fix:\n{README_LINK}"
-    ))
+    Reply::new().embed(
+        embed()
+            .title(":scream: permissions error detected, press here for a fix!")
+            .url(MISSING_PERMISSIONS_LINK)
+            .build(),
+    )
 }
 
 impl InteractionContext<'_> {
@@ -39,7 +62,7 @@ impl InteractionContext<'_> {
             }
         }
 
-        self.handle.reply(help_reply()).await?;
+        self.handle.reply(help_reply(&self.ctx.bot.user)).await?;
 
         self.ctx.insert_usage(UsageKind::Help).await?;
         Ok(())

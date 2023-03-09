@@ -12,6 +12,11 @@ use twilight_http::{
 use twilight_model::{
     channel::{message::ReactionType, Message},
     gateway::payload::incoming::ReactionAdd,
+    id::{
+        marker::{GuildMarker, UserMarker},
+        Id,
+    },
+    util::ImageHash,
 };
 
 use crate::{database::UsageKind, err_reply, time::ParsedTime, Context, CustomError};
@@ -200,29 +205,48 @@ impl Context {
             execute_webhook = execute_webhook.thread_id(thread_id);
         }
 
-        if let Some(avatar_url) = message
-            .member
-            .as_ref()
-            .and_then(|member| member.avatar)
-            .zip(message.guild_id)
-            .map(|(avatar, guild_id)| {
-                format!(
-                    "https://cdn.discordapp.com/guilds/{guild_id}/users/{}/avatar/{}.png",
-                    message.author.id, avatar
-                )
-            })
-            .or_else(|| {
-                message.author.avatar.map(|avatar| {
+        Ok(execute_webhook
+            .avatar_url(&avatar_url(
+                message.member.and_then(|member| member.avatar),
+                message.author.avatar,
+                message.author.id,
+                message.guild_id,
+                message.author.discriminator,
+            ))
+            .into_future())
+    }
+}
+
+pub fn avatar_url(
+    member_avatar: Option<ImageHash>,
+    user_avatar: Option<ImageHash>,
+    user_id: Id<UserMarker>,
+    guild_id: Option<Id<GuildMarker>>,
+    user_discriminator: u16,
+) -> String {
+    member_avatar.zip(guild_id).map_or_else(
+        || {
+            user_avatar
+                .map(|avatar| {
                     format!(
-                        "https://cdn.discordapp.com/avatars/{}/{}.png",
-                        message.author.id, avatar
+                        "https://cdn.discordapp.com/avatars/{}/{}.{}",
+                        user_id,
+                        avatar,
+                        if avatar.is_animated() { "gif" } else { "png" }
                     )
                 })
-            })
-        {
-            Ok(execute_webhook.avatar_url(&avatar_url).into_future())
-        } else {
-            Ok(execute_webhook.into_future())
-        }
-    }
+                .unwrap_or(format!(
+                    "https://cdn.discordapp.com/embed/avatars/{}.png",
+                    user_discriminator % 5
+                ))
+        },
+        |(avatar, guild_id)| {
+            format!(
+                "https://cdn.discordapp.com/guilds/{guild_id}/users/{}/avatar/{}.{}",
+                user_id,
+                avatar,
+                if avatar.is_animated() { "gif" } else { "png" }
+            )
+        },
+    )
 }

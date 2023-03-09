@@ -43,6 +43,8 @@ const LOGGING_CHANNEL_ID: Id<ChannelMarker> = Id::new(1_002_953_459_890_397_287)
 const TEST_GUILD_ID: Id<GuildMarker> = Id::new(903_367_565_349_384_202);
 
 const README_LINK: &str = "https://github.com/laralove143/timezoner/blob/main/README.md#timezoner";
+const MISSING_PERMISSIONS_LINK: &str =
+    "https://github.com/laralove143/timezoner/blob/main/README.md#missing-permissions";
 const SUPPORT_SERVER_INVITE: &str = "https://discord.gg/KUMdnjcE97";
 
 const REQUIRED_PERMISSIONS: Permissions = Permissions::MANAGE_WEBHOOKS
@@ -191,7 +193,7 @@ fn embed() -> EmbedBuilder {
     EmbedBuilder::new()
         .color(0x00d4_f1f9)
         .footer(EmbedFooterBuilder::new(
-            "wondering anything? check the link in my bio!",
+            "wondering anything? check out the link in my bio!",
         ))
 }
 
