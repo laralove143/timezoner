@@ -40,7 +40,8 @@ impl Decode<Result<Tz>> for String {
 #[sqlx(type_name = "usage_kind")]
 pub enum UsageKind {
     TimeDetect,
-    TimeConvert,
+    TimeConvertByAuthor,
+    TimeConvertByNonAuthor,
     Help,
     TimezoneCalled,
     TimezoneSet,
@@ -97,7 +98,8 @@ impl Context {
             "
             SELECT count(*)
             FROM usage
-            WHERE kind IN ('TimeConvert', 'Date', 'Copy', 'CurrentTime')"
+            WHERE kind IN
+                ('TimeConvertByAuthor', 'TimeConvertByNonAuthor', 'Date', 'Copy', 'CurrentTime')"
         )
         .fetch_one(&self.db)
         .await?

@@ -18,6 +18,7 @@ the time in their own timezone!
 
 - only the person that sent the message needs to set their timezone, the ones reading the time don't even need to do
   anything
+- you can convert times even if you didn't send the message, it'll just dm you instead!
 - supports basically all the time formats
 
 ![example](examples/sent.gif)

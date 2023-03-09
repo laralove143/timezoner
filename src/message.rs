@@ -2,7 +2,11 @@ use std::{fmt::Write, future::IntoFuture, time::Duration};
 
 use anyhow::Result;
 use chrono::{offset::Local, Datelike, TimeZone};
-use sparkle_convenience::error::{ErrorExt, IntoError};
+use futures::StreamExt;
+use sparkle_convenience::{
+    error::{ErrorExt, IntoError},
+    message::HttpExt,
+};
 use tokio::time::timeout;
 use twilight_http::{
     request::channel::reaction::RequestReactionType,
@@ -18,8 +22,9 @@ use twilight_model::{
     },
     util::ImageHash,
 };
+use twilight_util::builder::embed::{EmbedAuthorBuilder, EmbedFooterBuilder, ImageSource};
 
-use crate::{database::UsageKind, err_reply, time::ParsedTime, Context, CustomError};
+use crate::{database::UsageKind, embed, err_reply, time::ParsedTime, Context, CustomError};
 
 const REACTION_EMOJI: &str = "⏰";
 
@@ -79,31 +84,94 @@ impl Context {
             .create_reaction(message.channel_id, message.id, &request_reaction_type)
             .await?;
 
-        if timeout(Duration::from_secs(60 * 5), async {
-            self.standby
-                .wait_for_reaction(message.id, move |reaction: &ReactionAdd| {
-                    reaction.user_id == message.author.id
-                        && ReactionType::Unicode {
-                            name: REACTION_EMOJI.to_owned(),
-                        } == reaction.emoji
+        let message_id = message.id;
+        let message_channel_id = message.channel_id;
+        let mut first_reaction = true;
+        let handle_reaction = async {
+            while let Some(reaction) = self
+                .standby
+                .wait_for_reaction_stream(message.id, move |reaction: &ReactionAdd| {
+                    ReactionType::Unicode {
+                        name: REACTION_EMOJI.to_owned(),
+                    } == reaction.emoji
                 })
+                .next()
                 .await
-        })
-        .await
-        .is_err()
+            {
+                if first_reaction {
+                    self.convert_message(&mut message, parsed_times.clone())
+                        .await?;
+                    first_reaction = false;
+                }
+
+                if reaction.user_id == message.author.id {
+                    let exec_webhook = self.execute_webhook_as_member(message).await?;
+
+                    self.bot
+                        .http
+                        .delete_message(message_channel_id, message_id)
+                        .await?;
+
+                    exec_webhook.await?;
+
+                    self.insert_usage(UsageKind::TimeConvertByAuthor).await?;
+                    return Ok(());
+                }
+
+                let message_member = message.member.as_ref().ok()?;
+                self.bot
+                    .http
+                    .dm_user(reaction.user_id)
+                    .await?
+                    .embeds(&[embed()
+                        .author(
+                            EmbedAuthorBuilder::new(
+                                message_member.nick.as_ref().unwrap_or(&message.author.name),
+                            )
+                            .icon_url(ImageSource::url(avatar_url(
+                                message_member.avatar,
+                                message.author.avatar,
+                                message.author.id,
+                                message.guild_id,
+                                message.author.discriminator,
+                            ))?),
+                        )
+                        .description(&message.content)
+                        .footer(EmbedFooterBuilder::new(
+                            "if the person that sent the message reacts, i can also replace the \
+                             original message!",
+                        ))
+                        .build()])?
+                    .await?;
+
+                self.insert_usage(UsageKind::TimeConvertByNonAuthor).await?;
+            }
+            Ok::<_, anyhow::Error>(())
+        };
+
+        if timeout(Duration::from_secs(60 * 5), handle_reaction)
+            .await
+            .is_err()
         {
             self.bot
                 .http
                 .delete_reaction(
-                    message.channel_id,
-                    message.id,
+                    message_channel_id,
+                    message_id,
                     &request_reaction_type,
                     self.bot.user.id,
                 )
                 .await?;
-            return Ok(());
-        }
+        };
 
+        Ok(())
+    }
+
+    async fn convert_message(
+        &self,
+        message: &mut Message,
+        parsed_times: Vec<ParsedTime>,
+    ) -> Result<()> {
         let now = Local::now();
         let Some(tz) = self.timezone(message.author.id).await? else {
             return Err(CustomError::MissingTimezone(self.command_ids.timezone).into());
@@ -126,19 +194,6 @@ impl Context {
         content.push_str(message.content.get(push_start..).ok()?);
         message.content = content;
 
-        let message_channel_id = message.channel_id;
-        let message_id = message.id;
-
-        let exec_webhook = self.execute_webhook_as_member(message).await?;
-
-        self.bot
-            .http
-            .delete_message(message_channel_id, message_id)
-            .await?;
-
-        exec_webhook.await?;
-
-        self.insert_usage(UsageKind::TimeConvert).await?;
         Ok(())
     }
 
