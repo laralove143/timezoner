@@ -42,10 +42,10 @@ mod time;
 const LOGGING_CHANNEL_ID: Id<ChannelMarker> = Id::new(1_002_953_459_890_397_287);
 const TEST_GUILD_ID: Id<GuildMarker> = Id::new(903_367_565_349_384_202);
 
-const README_LINK: &str = "https://github.com/laralove143/timezoner/blob/main/README.md#timezoner";
+const README_LINK: &str = "https://gh.laralove.gay/timezoner/blob/main/README.md#timezoner";
 const MISSING_PERMISSIONS_LINK: &str =
-    "https://github.com/laralove143/timezoner/blob/main/README.md#missing-permissions";
-const SUPPORT_SERVER_INVITE: &str = "https://discord.gg/KUMdnjcE97";
+    "https://gh.laralove.gay/timezoner/blob/main/README.md#missing-permissions";
+const SUPPORT_SERVER_INVITE: &str = "https://gh.laralove.gay/discord";
 
 const REQUIRED_PERMISSIONS: Permissions = Permissions::MANAGE_WEBHOOKS
     .union(Permissions::VIEW_CHANNEL)

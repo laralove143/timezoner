@@ -12,15 +12,15 @@ use twilight_util::builder::embed::{EmbedFieldBuilder, ImageSource};
 use crate::{database::UsageKind, embed, interaction::InteractionContext, CustomError};
 
 const COPY_BUTTON_EXAMPLE_URL: &str =
-    "https://github.com/laralove143/timezoner/blob/main/examples/copy_button.png?raw=true";
+    "https://gh.laralove.gay/timezoner/blob/main/examples/copy_button.png?raw=true";
 const COPY_TIMEZONE_EXAMPLE_URL: &str =
-    "https://github.com/laralove143/timezoner/blob/main/examples/copy_timezone.png?raw=true";
+    "https://gh.laralove.gay/timezoner/blob/main/examples/copy_timezone.png?raw=true";
 const PASTE_BUTTON_EXAMPLE_URL: &str =
-    "https://github.com/laralove143/timezoner/blob/main/examples/paste_button.png?raw=true";
+    "https://gh.laralove.gay/timezoner/blob/main/examples/paste_button.png?raw=true";
 const SUBMIT_TIMEZONE_EXAMPLE_URL: &str =
-    "https://github.com/laralove143/timezoner/blob/main/examples/submit_timezone.png?raw=true";
+    "https://gh.laralove.gay/timezoner/blob/main/examples/submit_timezone.png?raw=true";
 const TIMEZONE_GIF_EXAMPLE_URL: &str =
-    "https://github.com/laralove143/timezoner/blob/main/examples/timezone.gif?raw=true";
+    "https://gh.laralove.gay/timezoner/blob/main/examples/timezone.gif?raw=true";
 
 const TIMEZONE_PICKER_URL: &str = "https://kevinnovak.github.io/Time-Zone-Picker/";
 
