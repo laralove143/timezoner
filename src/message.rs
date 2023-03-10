@@ -284,9 +284,7 @@ pub fn avatar_url(
             user_avatar
                 .map(|avatar| {
                     format!(
-                        "https://cdn.discordapp.com/avatars/{}/{}.{}",
-                        user_id,
-                        avatar,
+                        "https://cdn.discordapp.com/avatars/{user_id}/{avatar}.{}",
                         if avatar.is_animated() { "gif" } else { "png" }
                     )
                 })
@@ -297,9 +295,7 @@ pub fn avatar_url(
         },
         |(avatar, guild_id)| {
             format!(
-                "https://cdn.discordapp.com/guilds/{guild_id}/users/{}/avatar/{}.{}",
-                user_id,
-                avatar,
+                "https://cdn.discordapp.com/guilds/{guild_id}/users/{user_id}/avatars/{avatar}.{}",
                 if avatar.is_animated() { "gif" } else { "png" }
             )
         },
