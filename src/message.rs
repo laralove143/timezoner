@@ -6,6 +6,7 @@ use futures::StreamExt;
 use sparkle_convenience::{
     error::{ErrorExt, IntoError},
     message::HttpExt,
+    reply::Reply,
 };
 use tokio::time::timeout;
 use twilight_http::{
@@ -24,7 +25,7 @@ use twilight_model::{
 };
 use twilight_util::builder::embed::{EmbedAuthorBuilder, EmbedFooterBuilder, ImageSource};
 
-use crate::{database::UsageKind, embed, err_reply, time::ParsedTime, Context, CustomError};
+use crate::{database::UsageKind, embed, err_embed, time::ParsedTime, Context, CustomError};
 
 const REACTION_EMOJI: &str = "⏰";
 
@@ -40,7 +41,17 @@ impl Context {
         if let Err(err) = message_handle_result {
             let maybe_err_response = self
                 .bot
-                .handle_error::<CustomError>(channel_id, err_reply(&err), err)
+                .handle_error::<CustomError>(
+                    channel_id,
+                    Reply::new().embed(
+                        err_embed(&err)
+                            .footer(EmbedFooterBuilder::new(
+                                "this message will self destruct in a minute",
+                            ))
+                            .build(),
+                    ),
+                    err,
+                )
                 .await;
 
             if let Some(err_response) = maybe_err_response {

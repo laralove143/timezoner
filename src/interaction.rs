@@ -2,6 +2,7 @@ use anyhow::Result;
 use sparkle_convenience::{
     error::IntoError,
     interaction::{extract::InteractionExt, InteractionHandle},
+    reply::Reply,
     Bot,
 };
 use twilight_interactions::command::CreateCommand;
@@ -10,7 +11,7 @@ use twilight_model::{
     id::{marker::CommandMarker, Id},
 };
 
-use crate::{err_reply, Context, CustomError, Error, TEST_GUILD_ID};
+use crate::{err_embed, Context, CustomError, Error, TEST_GUILD_ID};
 
 mod copy;
 mod current_time;
@@ -97,7 +98,10 @@ impl Context {
 
         if let Err(err) = ctx.handle().await {
             handle
-                .handle_error::<CustomError>(err_reply(&err), err)
+                .handle_error::<CustomError>(
+                    Reply::new().ephemeral().embed(err_embed(&err).build()),
+                    err,
+                )
                 .await;
         }
     }

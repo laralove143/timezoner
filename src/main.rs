@@ -10,7 +10,6 @@ use sparkle_convenience::{
     error::{ErrorExt, UserError},
     log::DisplayFormat,
     prettify::Prettify,
-    reply::Reply,
     Bot,
 };
 use sqlx::PgPool;
@@ -197,7 +196,7 @@ fn embed() -> EmbedBuilder {
         ))
 }
 
-fn err_reply(err: &anyhow::Error) -> Reply {
+fn err_embed(err: &anyhow::Error) -> EmbedBuilder {
     #[rustfmt::skip]
     const INTERNAL_ERROR_MESSAGE: &str = "something went terribly wrong there :facepalm:\n\
     i spammed lara (the dev) with the error, im sure they'll look at it asap";
@@ -213,10 +212,7 @@ fn err_reply(err: &anyhow::Error) -> Reply {
         INTERNAL_ERROR_MESSAGE.to_owned()
     };
 
-    Reply::new().ephemeral().embed(
-        embed()
-            .title(":x: catastrophic failure")
-            .description(message)
-            .build(),
-    )
+    embed()
+        .title(":x: catastrophic failure")
+        .description(message)
 }
