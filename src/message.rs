@@ -58,7 +58,7 @@ impl Context {
     async fn delete_err_response(&self, response: Response<Message>) -> Result<()> {
         let message = response.model().await?;
 
-        tokio::time::sleep(Duration::from_secs(60 * 5)).await;
+        tokio::time::sleep(Duration::from_secs(60)).await;
 
         self.bot
             .http
