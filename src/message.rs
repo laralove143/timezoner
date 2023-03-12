@@ -35,7 +35,7 @@ impl Context {
         }
         let channel_id = message.channel_id;
 
-        let message_handle_result = self.handle_time_message(message).await;
+        let message_handle_result = dbg!(self.handle_time_message(message).await);
 
         if let Err(err) = message_handle_result {
             let maybe_err_response = self
@@ -149,22 +149,21 @@ impl Context {
             Ok::<_, anyhow::Error>(())
         };
 
-        if timeout(Duration::from_secs(60 * 5), handle_reaction)
-            .await
-            .is_err()
-        {
-            self.bot
-                .http
-                .delete_reaction(
-                    message_channel_id,
-                    message_id,
-                    &request_reaction_type,
-                    self.bot.user.id,
-                )
-                .await?;
-        };
-
-        Ok(())
+        match timeout(Duration::from_secs(60 * 5), handle_reaction).await {
+            Ok(res) => res,
+            Err(_timeout) => {
+                self.bot
+                    .http
+                    .delete_reaction(
+                        message_channel_id,
+                        message_id,
+                        &request_reaction_type,
+                        self.bot.user.id,
+                    )
+                    .await?;
+                Ok(())
+            }
+        }
     }
 
     async fn convert_message(
