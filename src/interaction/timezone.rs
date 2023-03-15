@@ -177,9 +177,14 @@ impl InteractionContext<'_> {
         self.ctx.insert_timezone(user_id, tz).await?;
 
         self.handle
-            .reply(Reply::new().ephemeral().content(
-                "done! now you can use me to show magical times :partying_face:".to_owned(),
-            ))
+            .reply(
+                Reply::new().ephemeral().embed(
+                    embed()
+                        .title(":partying_face: welcome onboard")
+                        .description("now you can use me to show magical times")
+                        .build(),
+                ),
+            )
             .await?;
 
         self.ctx.insert_usage(UsageKind::TimezoneSet).await?;
