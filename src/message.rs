@@ -14,7 +14,7 @@ use twilight_http::{
 };
 use twilight_model::{
     channel::{message::ReactionType, Message},
-    gateway::GatewayReaction,
+    gateway::{payload::incoming::MessageUpdate, GatewayReaction},
     guild::Member,
     id::{
         marker::{GuildMarker, UserMarker},
@@ -35,6 +35,14 @@ impl Context {
         }
 
         let message_handle_result = self.handle_time_message(&message).await;
+
+        if let Err(Some(err)) = message_handle_result.map_err(ErrorExt::internal::<CustomError>) {
+            self.bot.log(err).await;
+        }
+    }
+
+    pub async fn handle_message_update(&self, message: MessageUpdate) {
+        let message_handle_result = self.handle_time_message_update(&message).await;
 
         if let Err(Some(err)) = message_handle_result.map_err(ErrorExt::internal::<CustomError>) {
             self.bot.log(err).await;
@@ -91,6 +99,43 @@ impl Context {
         if parsed_times.is_empty() {
             return Ok(());
         }
+        self.insert_usage(UsageKind::TimeDetect).await?;
+
+        self.bot
+            .http
+            .create_reaction(
+                message.channel_id,
+                message.id,
+                &RequestReactionType::Unicode {
+                    name: TIME_DETECT_EMOJI,
+                },
+            )
+            .await?;
+
+        Ok(())
+    }
+
+    async fn handle_time_message_update(&self, message: &MessageUpdate) -> Result<()> {
+        let Some(content) = &message.content else {
+            return Ok(())
+        };
+
+        let parsed_times = ParsedTime::all_from_text(content)?;
+        if parsed_times.is_empty() {
+            self.bot
+                .http
+                .delete_current_user_reaction(
+                    message.channel_id,
+                    message.id,
+                    &RequestReactionType::Unicode {
+                        name: TIME_DETECT_EMOJI,
+                    },
+                )
+                .await?;
+
+            return Ok(());
+        }
+
         self.insert_usage(UsageKind::TimeDetect).await?;
 
         self.bot

@@ -109,6 +109,7 @@ impl Context {
         match event {
             Event::InteractionCreate(interaction) => self.handle_interaction(interaction.0).await,
             Event::MessageCreate(message) => self.handle_message(message.0).await,
+            Event::MessageUpdate(message) => self.handle_message_update(*message).await,
             Event::ReactionAdd(reaction) => self.handle_reaction(reaction.0).await,
             _ => {}
         }
@@ -124,6 +125,7 @@ async fn main() -> Result<()> {
         Intents::GUILD_MESSAGES | Intents::MESSAGE_CONTENT | Intents::GUILD_MESSAGE_REACTIONS,
         EventTypeFlags::INTERACTION_CREATE
             | EventTypeFlags::MESSAGE_CREATE
+            | EventTypeFlags::MESSAGE_UPDATE
             | EventTypeFlags::REACTION_ADD,
     )
     .await?;
