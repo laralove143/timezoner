@@ -5,7 +5,6 @@ use chrono::{offset::Local, Datelike, TimeZone};
 use sparkle_convenience::{
     error::{ErrorExt, IntoError},
     message::HttpExt,
-    reply::Reply,
 };
 use twilight_http::{
     request::channel::reaction::RequestReactionType,
@@ -24,7 +23,9 @@ use twilight_model::{
 };
 use twilight_util::builder::embed::{EmbedAuthorBuilder, EmbedFooterBuilder, ImageSource};
 
-use crate::{database::UsageKind, embed, err_embed, time::ParsedTime, Context, CustomError, Error};
+use crate::{
+    database::UsageKind, embed, err_reply_timed, time::ParsedTime, Context, CustomError, Error,
+};
 
 const TIME_DETECT_EMOJI: &str = "⏰";
 
@@ -57,17 +58,7 @@ impl Context {
         if let Err(err) = reaction_handle_result {
             if let Some(err_response) = self
                 .bot
-                .handle_error::<CustomError>(
-                    channel_id,
-                    Reply::new().embed(
-                        err_embed(&err)
-                            .footer(EmbedFooterBuilder::new(
-                                "this message will self destruct in a minute",
-                            ))
-                            .build(),
-                    ),
-                    err,
-                )
+                .handle_error::<CustomError>(channel_id, err_reply_timed(&err), err)
                 .await
             {
                 if let Err(Some(delete_err)) = self

@@ -10,6 +10,7 @@ use sparkle_convenience::{
     error::{ErrorExt, UserError},
     log::DisplayFormat,
     prettify::Prettify,
+    reply::Reply,
     Bot,
 };
 use sqlx::PgPool;
@@ -17,6 +18,7 @@ use twilight_gateway::{
     error::ReceiveMessageErrorType, stream::ShardEventStream, EventTypeFlags, MessageSender, Shard,
 };
 use twilight_model::{
+    channel::message::{component::ActionRow, Component},
     gateway::{event::Event, Intents},
     guild::Permissions,
     id::{
@@ -27,7 +29,7 @@ use twilight_model::{
 use twilight_util::builder::embed::{EmbedBuilder, EmbedFooterBuilder};
 
 use crate::{
-    interaction::{set_commands, CommandIds},
+    interaction::{help::server_button, set_commands, CommandIds},
     metrics::{JsonStorageClient, Metrics},
 };
 
@@ -71,8 +73,7 @@ pub enum Error {
 pub enum CustomError {
     #[error(
         "i looked and looked but couldn't find that timezone anywhere :pensive:\n\
-        if you're sure the timezone is right, please join the support server here:\n\
-        {SUPPORT_SERVER_INVITE}"
+        if you're sure the timezone is right, please join the support server"
     )]
     BadTimezone,
     #[error(
@@ -91,7 +92,10 @@ pub enum CustomError {
         maybe you're using your super nitro powers or its right at the edge of the character limit"
     )]
     MessageTooLong,
-    #[error("that's not a valid date :rage:")]
+    #[error(
+        "that's not a valid date :rage:\n\
+        or maybe it is idk, join the support server if it is!"
+    )]
     BadDate,
 }
 
@@ -196,23 +200,55 @@ fn embed() -> EmbedBuilder {
         ))
 }
 
-fn err_embed(err: &anyhow::Error) -> EmbedBuilder {
+fn err_reply(err: &anyhow::Error) -> Reply {
+    _err_reply(err, false)
+}
+
+fn err_reply_timed(err: &anyhow::Error) -> Reply {
+    _err_reply(err, true)
+}
+
+fn _err_reply(err: &anyhow::Error, is_timed: bool) -> Reply {
     #[rustfmt::skip]
     const INTERNAL_ERROR_MESSAGE: &str = "something went terribly wrong there :facepalm:\n\
     i spammed lara (the dev) with the error, im sure they'll look at it asap";
 
-    let message = if let Some(UserError::MissingPermissions(permissions)) = err.user() {
+    let mut reply = Reply::new();
+
+    let description = if let Some(UserError::MissingPermissions(permissions)) = err.user() {
         format!(
             "please beg the mods to give me these permissions first:\n{}",
             permissions.unwrap_or(REQUIRED_PERMISSIONS).prettify()
         )
     } else if let Some(custom_err) = err.downcast_ref::<CustomError>() {
+        if let CustomError::BadTimezone | CustomError::BadDate = custom_err {
+            reply = reply.component(Component::ActionRow(ActionRow {
+                components: vec![server_button()],
+            }));
+        }
+
+        if let CustomError::BadTimezone
+        | CustomError::MissingTimezone(_)
+        | CustomError::MessageTooLong
+        | CustomError::BadDate = custom_err
+        {
+            reply = reply.ephemeral();
+        };
+
         custom_err.to_string()
     } else {
         INTERNAL_ERROR_MESSAGE.to_owned()
     };
 
-    embed()
+    let mut embed = embed()
         .title(":x: catastrophic failure")
-        .description(message)
+        .description(description);
+
+    if is_timed {
+        embed = embed.footer(EmbedFooterBuilder::new(
+            "this message will self destruct in a minute",
+        ));
+    }
+
+    reply.embed(embed.build())
 }
