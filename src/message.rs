@@ -155,14 +155,7 @@ impl Context {
     async fn handle_time_reaction(&self, reaction: GatewayReaction) -> Result<()> {
         let reaction_member = reaction.member.ok()?;
 
-        if reaction_member.user.bot
-            || !matches!(
-                reaction.emoji,
-                ReactionType::Unicode {
-                    name
-                } if name == TIME_DETECT_EMOJI
-            )
-        {
+        if reaction_member.user.bot || !is_time_detect(&reaction.emoji) {
             return Ok(());
         }
 
@@ -175,15 +168,11 @@ impl Context {
             .await?;
         message.guild_id = reaction.guild_id;
 
-        if !message.reactions.iter().any(|reaction| {
-            reaction.me
-                && matches!(
-                    &reaction.emoji,
-                    ReactionType::Unicode {
-                        name
-                    } if name == TIME_DETECT_EMOJI
-                )
-        }) {
+        if !message
+            .reactions
+            .iter()
+            .any(|reaction| reaction.me && is_time_detect(&reaction.emoji))
+        {
             return Ok(());
         }
 
@@ -389,5 +378,14 @@ pub fn avatar_url(
                 if avatar.is_animated() { "gif" } else { "png" }
             )
         },
+    )
+}
+
+fn is_time_detect(emoji: &ReactionType) -> bool {
+    matches!(
+        emoji,
+        ReactionType::Unicode {
+            name
+        } if name == TIME_DETECT_EMOJI
     )
 }
