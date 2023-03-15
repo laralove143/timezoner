@@ -58,7 +58,7 @@ pub enum Error {
     MetricsUpdateFail { get: Metrics, put: Metrics },
     #[error("unknown command: {0}")]
     UnknownCommand(String),
-    #[error("{0}")]
+    #[error("couldn't parse timezone: {0}")]
     TimezoneParseError(String),
     #[error("time doesn't end in am or pm")]
     Hour12InvalidSuffix,
