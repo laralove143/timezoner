@@ -60,8 +60,8 @@ pub enum Error {
     UnknownCommand(String),
     #[error("couldn't parse timezone: {0}")]
     TimezoneParseError(String),
-    #[error("time doesn't end in am or pm")]
-    Hour12InvalidSuffix,
+    #[error("time doesn't end in am or pm: hour: {hour}, suffix: {suffix}")]
+    Hour12InvalidSuffix { hour: u32, suffix: String },
     #[error("message without a time has time detect reaction by the bot")]
     FalseTimeDetectReaction,
 }

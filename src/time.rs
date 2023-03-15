@@ -150,6 +150,12 @@ fn to_24_hour(hour: u32, am_pm: &str) -> Result<u32> {
                 hour + 12
             }
         }
-        _ => return Err(Error::Hour12InvalidSuffix.into()),
+        _ => {
+            return Err(Error::Hour12InvalidSuffix {
+                hour,
+                suffix: am_pm.to_owned(),
+            }
+            .into())
+        }
     })
 }
