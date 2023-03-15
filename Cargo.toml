@@ -10,7 +10,6 @@ sparkle-convenience = "0.15"
 twilight-http = "0.15"
 twilight-gateway = "0.15"
 twilight-model = "0.15"
-twilight-standby = "0.15"
 twilight-util = { version = "0.15", features = ["builder"] }
 twilight-interactions = "0.15"
 chrono = { version = "0.4", default-features = false, features = ["clock"] }

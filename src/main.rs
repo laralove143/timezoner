@@ -24,7 +24,6 @@ use twilight_model::{
         Id,
     },
 };
-use twilight_standby::Standby;
 use twilight_util::builder::embed::{EmbedBuilder, EmbedFooterBuilder};
 
 use crate::{
@@ -61,6 +60,8 @@ pub enum Error {
     UnknownCommand(String),
     #[error("time doesn't end in am or pm")]
     Hour12InvalidSuffix,
+    #[error("message without a time has time detect reaction by the bot")]
+    FalseTimeDetectReaction,
     #[error("metrics weren't updated: put: {put:?}, got: {get:?}")]
     MetricsUpdateFail { get: Metrics, put: Metrics },
 }
@@ -100,17 +101,15 @@ pub struct Context {
     shards: Vec<MessageSender>,
     db: PgPool,
     json_storage: JsonStorageClient,
-    standby: Standby,
     command_ids: CommandIds,
 }
 
 impl Context {
     async fn handle_event(&self, event: Event) {
-        self.standby.process(&event);
-
         match event {
             Event::InteractionCreate(interaction) => self.handle_interaction(interaction.0).await,
             Event::MessageCreate(message) => self.handle_message(message.0).await,
+            Event::ReactionAdd(reaction) => self.handle_reaction(reaction.0).await,
             _ => {}
         }
     }
@@ -145,7 +144,6 @@ async fn main() -> Result<()> {
             api_key: env::var("JSONSTORAGE_API_KEY")?,
             url: env::var("METRICS_URL")?,
         },
-        standby: Standby::new(),
         command_ids,
     });
 
