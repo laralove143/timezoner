@@ -61,24 +61,21 @@ fn missing_permissions_button() -> Component {
     })
 }
 
-fn help_embed(current_user: &CurrentUser) -> Embed {
-    embed()
+fn help_embed(current_user: &CurrentUser) -> Result<Embed> {
+    Ok(embed()
         .title(":sos: support has arrived!")
         .description(
             "please use that page button below, it gives more info than i could ever give here!",
         )
-        .thumbnail(
-            ImageSource::url(avatar_url(
-                None,
-                current_user.avatar,
-                current_user.id,
-                None,
-                current_user.discriminator,
-            ))
-            .unwrap(),
-        )
+        .thumbnail(ImageSource::url(avatar_url(
+            None,
+            current_user.avatar,
+            current_user.id,
+            None,
+            current_user.discriminator,
+        ))?)
         .footer(EmbedFooterBuilder::new("thank you for using me :)"))
-        .build()
+        .build())
 }
 
 fn missing_permissions_embed() -> Embed {
@@ -110,7 +107,7 @@ impl InteractionContext<'_> {
         self.handle
             .reply(
                 Reply::new()
-                    .embed(help_embed(&self.ctx.bot.user))
+                    .embed(help_embed(&self.ctx.bot.user)?)
                     .component(Component::ActionRow(ActionRow {
                         components: vec![page_button(), server_button()],
                     })),

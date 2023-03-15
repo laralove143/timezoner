@@ -63,52 +63,52 @@ fn paste_button() -> Component {
     })
 }
 
-fn copy_button_example_embed() -> Embed {
-    embed()
+fn copy_button_example_embed() -> Result<Embed> {
+    Ok(embed()
         .title(":one:")
         .description(format!("press the *{COPY_BUTTON_LABEL}* button"))
-        .image(ImageSource::url(COPY_BUTTON_EXAMPLE_URL).unwrap())
-        .build()
+        .image(ImageSource::url(COPY_BUTTON_EXAMPLE_URL)?)
+        .build())
 }
 
-fn copy_timezone_example_embed() -> Embed {
-    embed()
+fn copy_timezone_example_embed() -> Result<Embed> {
+    Ok(embed()
         .title(":two:")
         .description("in the website that opens, press the *copy* button")
         .field(EmbedFieldBuilder::new(
             "if the detected timezone is wrong",
             "select where you live on the map and then press the *copy* button",
         ))
-        .image(ImageSource::url(COPY_TIMEZONE_EXAMPLE_URL).unwrap())
-        .build()
+        .image(ImageSource::url(COPY_TIMEZONE_EXAMPLE_URL)?)
+        .build())
 }
 
-fn paste_button_example_embed() -> Embed {
-    embed()
+fn paste_button_example_embed() -> Result<Embed> {
+    Ok(embed()
         .title(":three:")
         .description(format!(
             "come back to discord and press the *{PASTE_BUTTON_LABEL}* button"
         ))
-        .image(ImageSource::url(PASTE_BUTTON_EXAMPLE_URL).unwrap())
-        .build()
+        .image(ImageSource::url(PASTE_BUTTON_EXAMPLE_URL)?)
+        .build())
 }
 
-fn submit_timezone_example_embed() -> Embed {
-    embed()
+fn submit_timezone_example_embed() -> Result<Embed> {
+    Ok(embed()
         .title(":four:")
         .description(
             "paste the timezone you copied to the text field and press the *submit* button",
         )
-        .image(ImageSource::url(SUBMIT_TIMEZONE_EXAMPLE_URL).unwrap())
-        .build()
+        .image(ImageSource::url(SUBMIT_TIMEZONE_EXAMPLE_URL)?)
+        .build())
 }
 
-fn timezone_example_gif_embed() -> Embed {
-    embed()
+fn timezone_example_gif_embed() -> Result<Embed> {
+    Ok(embed()
         .title(":frame_photo:")
         .description("here's a gif if you prefer that over steps :)")
-        .image(ImageSource::url(TIMEZONE_GIF_EXAMPLE_URL).unwrap())
-        .build()
+        .image(ImageSource::url(TIMEZONE_GIF_EXAMPLE_URL)?)
+        .build())
 }
 
 impl InteractionContext<'_> {
@@ -117,11 +117,11 @@ impl InteractionContext<'_> {
             .reply(
                 Reply::new()
                     .ephemeral()
-                    .embed(copy_button_example_embed())
-                    .embed(copy_timezone_example_embed())
-                    .embed(paste_button_example_embed())
-                    .embed(submit_timezone_example_embed())
-                    .embed(timezone_example_gif_embed())
+                    .embed(copy_button_example_embed()?)
+                    .embed(copy_timezone_example_embed()?)
+                    .embed(paste_button_example_embed()?)
+                    .embed(submit_timezone_example_embed()?)
+                    .embed(timezone_example_gif_embed()?)
                     .component(Component::ActionRow(ActionRow {
                         components: vec![copy_button(), paste_button()],
                     })),
