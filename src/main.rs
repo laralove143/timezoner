@@ -54,16 +54,16 @@ const REQUIRED_PERMISSIONS: Permissions = Permissions::MANAGE_WEBHOOKS
 
 #[derive(Clone, Debug, Eq, PartialEq, thiserror::Error)]
 pub enum Error {
-    #[error("{0}")]
-    TimezoneParseError(String),
+    #[error("metrics weren't updated: put: {put:?}, got: {get:?}")]
+    MetricsUpdateFail { get: Metrics, put: Metrics },
     #[error("unknown command: {0}")]
     UnknownCommand(String),
+    #[error("{0}")]
+    TimezoneParseError(String),
     #[error("time doesn't end in am or pm")]
     Hour12InvalidSuffix,
     #[error("message without a time has time detect reaction by the bot")]
     FalseTimeDetectReaction,
-    #[error("metrics weren't updated: put: {put:?}, got: {get:?}")]
-    MetricsUpdateFail { get: Metrics, put: Metrics },
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq, thiserror::Error)]
