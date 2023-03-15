@@ -82,14 +82,14 @@ impl Context {
     }
 
     async fn delete_err_response(&self, response: Response<Message>) -> Result<()> {
-        let message = response.model().await?;
+        let (channel_id, message_id) = {
+            let message = response.model().await?;
+            (message.channel_id, message.id)
+        };
 
         tokio::time::sleep(Duration::from_secs(60)).await;
 
-        self.bot
-            .http
-            .delete_message(message.channel_id, message.id)
-            .await?;
+        self.bot.http.delete_message(channel_id, message_id).await?;
 
         Ok(())
     }
