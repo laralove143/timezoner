@@ -62,48 +62,29 @@ all you have to do is use the `/timezone` command to set your timezone, it takes
 
 ### bot doesn't react to a message
 
-- make sure the person that sent the message hasn't blocked the bot
-- run the `/help` command in the channel where this is happening
-- it'll probably warn you about missing permissions, if not, [join the server]
+1. make sure the person that sent the message hasn't blocked the bot
+2. run the `/help` command in the channel where this is happening
+3. it'll probably warn you about missing permissions, if not, [join the server]
 
 ### missing permissions
 
-- if you unticked any permissions when adding the bot, kick the bot and invite it again without unticking any
-  permissions, it actually needs them!
-- remove the bot from channel or category permissions
-    - **on desktop:**
-        1. right click on a channel or category
-        2. click _edit channel/category_
-        3. click _permissions_
-        4. click _advanced permissions_ if its closed
-        5. **either remove the channel permissions:**
-          1. select _timezoner_ or any roles the bot has
-          2. scroll all the way down and click _remove ..._
-        6. **or add channel permissions for the bot:**
-          1. press that tiny _+ button_
-          2. type _timezoner_ and select it
-          3. press the _green tick_ next to permissions listed below
-            1. _manage webhooks_
-            2. _read messages_
-            3. _send messages_
-            4. _manage messages_
-            5. _add reactions_
-    - **on mobile:**
-        1. hold down on a channel or category
-        2. tap _edit channel/category_
-        3. tap _channel/category permissions_
-        4. tap _advanced view_ if it's not where you are
-        5. **either remove the channel permissions:**
-          1. tap _edit_ then the _- button_ on any roles the bot has
-        6. **or add channel permissions for the bot:**
-          1. press the _add member_ button
-          2. search for _timezoner_ and select it
-          3. press the _green tick_ next to permissions listed below
-            1. _manage webhooks_
-            2. _read messages_
-            3. _send messages_
-            4. _manage messages_
-            5. _add reactions_
+1. if you unticked any permissions when adding the bot, kick the bot and invite it again without unticking any
+   permissions, it actually needs them!
+2. remove the bot from channel or category permissions
+    1. right click a channel or category _(hold down on it on mobile)_
+    2. select **edit channel/category** then press **permissions** _(**channel/category permissions** on mobile)_
+    3. click **advanced permissions** if it's closed _(**advanced view** on mobile)_
+    4. **either remove the channel permissions:**
+        1. select **timezoner** or any role the bot has, scroll all the way down and click **remove ???** _(tap **edit** then the **- button** on mobile)_
+    5. **or add channel permissions for the bot:**
+        1. press that tiny **+ button** _(**add member** on mobile)_
+        2. search **timezoner** and select it
+        3. press **the green tick** next to permissions listed below
+            - manage webhooks
+            - read messages
+            - send messages
+            - manage messages
+            - add reactions
 
 ### something else? how could this happen??
 
