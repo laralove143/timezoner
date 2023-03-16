@@ -76,14 +76,34 @@ all you have to do is use the `/timezone` command to set your timezone, it takes
         2. click _edit channel/category_
         3. click _permissions_
         4. click _advanced permissions_ if its closed
-        5. select _timezoner_ or any roles the bot has
-        6. scroll all the way down and click _remove ..._ or change all the _X_ to _/_
+        5. **either remove the channel permissions:**
+          a. select _timezoner_ or any roles the bot has
+          b. scroll all the way down and click _remove ..._
+        6. **or add channel permissions for the bot:**
+          a. press that tiny _+ button_
+          b. type _timezoner_ and select it
+          e. press the _green tick_ next to permissions listed below
+            i. _manage webhooks_
+            ii. _read messages_
+            iii. _send messages_
+            iv. _manage messages_
+            v. _add reactions_
     - **on mobile:**
         1. hold down on a channel or category
         2. tap _edit channel/category_
         3. tap _channel/category permissions_
-        4. tap _advanced view_ if its not where you are
-        5. tap _edit_ then _-_ on any roles the bot has or tap the role and change all the _X_ to _/_
+        4. tap _advanced view_ if it's not where you are
+        5. **either remove the channel permissions:**
+          a. tap _edit_ then the _- button_ on any roles the bot has
+        6. **or add channel permissions for the bot:**
+          a. press the _add member_ button
+          b. search for _timezoner_ and select it
+          e. press the _green tick_ next to permissions listed below
+            i. _manage webhooks_
+            ii. _read messages_
+            iii. _send messages_
+            iv. _manage messages_
+            v. _add reactions_
 
 ### something else? how could this happen??
 
