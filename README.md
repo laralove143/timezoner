@@ -77,33 +77,33 @@ all you have to do is use the `/timezone` command to set your timezone, it takes
         3. click _permissions_
         4. click _advanced permissions_ if its closed
         5. **either remove the channel permissions:**
-          a. select _timezoner_ or any roles the bot has
-          b. scroll all the way down and click _remove ..._
+          1. select _timezoner_ or any roles the bot has
+          2. scroll all the way down and click _remove ..._
         6. **or add channel permissions for the bot:**
-          a. press that tiny _+ button_
-          b. type _timezoner_ and select it
-          e. press the _green tick_ next to permissions listed below
-            i. _manage webhooks_
-            ii. _read messages_
-            iii. _send messages_
-            iv. _manage messages_
-            v. _add reactions_
+          1. press that tiny _+ button_
+          2. type _timezoner_ and select it
+          3. press the _green tick_ next to permissions listed below
+            1. _manage webhooks_
+            2. _read messages_
+            3. _send messages_
+            4. _manage messages_
+            5. _add reactions_
     - **on mobile:**
         1. hold down on a channel or category
         2. tap _edit channel/category_
         3. tap _channel/category permissions_
         4. tap _advanced view_ if it's not where you are
         5. **either remove the channel permissions:**
-          a. tap _edit_ then the _- button_ on any roles the bot has
+          1. tap _edit_ then the _- button_ on any roles the bot has
         6. **or add channel permissions for the bot:**
-          a. press the _add member_ button
-          b. search for _timezoner_ and select it
-          e. press the _green tick_ next to permissions listed below
-            i. _manage webhooks_
-            ii. _read messages_
-            iii. _send messages_
-            iv. _manage messages_
-            v. _add reactions_
+          1. press the _add member_ button
+          2. search for _timezoner_ and select it
+          3. press the _green tick_ next to permissions listed below
+            1. _manage webhooks_
+            2. _read messages_
+            3. _send messages_
+            4. _manage messages_
+            5. _add reactions_
 
 ### something else? how could this happen??
 
