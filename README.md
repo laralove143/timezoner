@@ -7,7 +7,7 @@
 [![](https://custom-icon-badges.demolab.com/badge/dynamic/json?url=https://api.jsonstorage.net/v1/json/52e7ddba-9c54-4f66-8e42-5aff2634f2fa/fd6b3135-0275-4f8a-8cfc-3e8910da1743&style=for-the-badge&color=555555&logo=graph&label=%20&prefix=used%20in%20&query=$.guild_count&suffix=%20servers)](#timezoner)
 [![](https://custom-icon-badges.demolab.com/badge/dynamic/json?url=https://api.jsonstorage.net/v1/json/52e7ddba-9c54-4f66-8e42-5aff2634f2fa/fd6b3135-0275-4f8a-8cfc-3e8910da1743&style=for-the-badge&color=555555&logo=clock&label=%20&prefix=converted%20&query=$.usage_count&suffix=%20times)](#timezoner)
 
-goodbye to timezone conversions! a discord bot that converts times so that everyone sees it in their own timezone
+goodbye to timezone conversions! a discord bot that converts times so that everyone sees them in their own timezone
 
 ## features
 
