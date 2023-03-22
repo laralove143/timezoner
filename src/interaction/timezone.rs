@@ -1,4 +1,5 @@
 use anyhow::Result;
+use chrono_tz::Tz;
 use sparkle_convenience::{
     error::IntoError, interaction::extract::InteractionDataExt, reply::Reply,
 };
@@ -7,9 +8,12 @@ use twilight_model::channel::message::{
     component::{ActionRow, Button, ButtonStyle, TextInput, TextInputStyle},
     Component, Embed, ReactionType,
 };
-use twilight_util::builder::embed::{EmbedFieldBuilder, ImageSource};
+use twilight_util::builder::embed::{EmbedFieldBuilder, EmbedFooterBuilder, ImageSource};
 
-use crate::{database::UsageKind, embed, interaction::InteractionContext, CustomError};
+use crate::{
+    database::UsageKind, embed, interaction::InteractionContext, time::tz_from_locale, CustomError,
+    Error,
+};
 
 const COPY_BUTTON_EXAMPLE_URL: &str =
     "https://github.com/laralove143/timezoner/blob/main/examples/copy_button.png?raw=true";
@@ -27,6 +31,8 @@ const TIMEZONE_PICKER_URL: &str = "https://kevinnovak.github.io/Time-Zone-Picker
 const COPY_BUTTON_LABEL: &str = "copy your timezone";
 const PASTE_BUTTON_LABEL: &str = "paste it";
 
+pub const DETECT_ACCEPT_CUSTOM_ID: &str = "timezone_detect_accept";
+pub const DETECT_REJECT_CUSTOM_ID: &str = "timezone_detect_reject";
 pub const PASTE_BUTTON_CUSTOM_ID: &str = "timezone_paste_button";
 pub const MODAL_SUBMIT_ID: &str = "timezone_modal_submit";
 
@@ -36,6 +42,32 @@ pub const MODAL_SUBMIT_ID: &str = "timezone_modal_submit";
     desc = "set your timezone so you can start sharing magical times"
 )]
 pub struct Command {}
+
+fn timezone_detect_accept_button() -> Component {
+    Component::Button(Button {
+        custom_id: Some(DETECT_ACCEPT_CUSTOM_ID.to_owned()),
+        emoji: Some(ReactionType::Unicode {
+            name: "🥳".to_owned(),
+        }),
+        label: Some("yes that looks right!!".to_owned()),
+        disabled: false,
+        style: ButtonStyle::Primary,
+        url: None,
+    })
+}
+
+fn timezone_detect_reject_button() -> Component {
+    Component::Button(Button {
+        custom_id: Some(DETECT_REJECT_CUSTOM_ID.to_owned()),
+        emoji: Some(ReactionType::Unicode {
+            name: "😠".to_owned(),
+        }),
+        label: Some("nope, lemme pick my own".to_owned()),
+        disabled: false,
+        style: ButtonStyle::Danger,
+        url: None,
+    })
+}
 
 fn copy_button() -> Component {
     Component::Button(Button {
@@ -111,24 +143,68 @@ fn timezone_example_gif_embed() -> Result<Embed> {
         .build())
 }
 
+fn timezone_set_embed() -> Embed {
+    embed()
+        .title(":partying_face: welcome onboard")
+        .description("now you can use me to show magical times")
+        .build()
+}
+
+fn timezone_detect_embed(tz: Tz) -> Embed {
+    embed()
+        .title(":face_with_monocle: i have a guess")
+        .field(EmbedFieldBuilder::new(
+            "i think your timezone is",
+            tz.name(),
+        ))
+        .footer(EmbedFooterBuilder::new(
+            "no magic, i just figured it out from your discord language",
+        ))
+        .build()
+}
+
 impl InteractionContext<'_> {
     pub async fn handle_timezone_command(self) -> Result<()> {
-        self.handle
-            .reply(
-                Reply::new()
-                    .ephemeral()
-                    .embed(copy_button_example_embed()?)
-                    .embed(copy_timezone_example_embed()?)
-                    .embed(paste_button_example_embed()?)
-                    .embed(submit_timezone_example_embed()?)
-                    .embed(timezone_example_gif_embed()?)
-                    .component(Component::ActionRow(ActionRow {
-                        components: vec![copy_button(), paste_button()],
-                    })),
-            )
-            .await?;
+        if let Some(tz) = tz_from_locale(&self.interaction.locale.ok()?) {
+            self.handle
+                .reply(
+                    Reply::new()
+                        .ephemeral()
+                        .embed(timezone_detect_embed(tz))
+                        .component(Component::ActionRow(ActionRow {
+                            components: vec![
+                                timezone_detect_accept_button(),
+                                timezone_detect_reject_button(),
+                            ],
+                        })),
+                )
+                .await?;
 
-        self.ctx.insert_usage(UsageKind::TimezoneCalled).await?;
+            self.ctx
+                .insert_usage(UsageKind::TimezoneCalledDetected)
+                .await?;
+        } else {
+            self.handle
+                .reply(
+                    Reply::new()
+                        .ephemeral()
+                        .update_last()
+                        .embed(copy_button_example_embed()?)
+                        .embed(copy_timezone_example_embed()?)
+                        .embed(paste_button_example_embed()?)
+                        .embed(submit_timezone_example_embed()?)
+                        .embed(timezone_example_gif_embed()?)
+                        .component(Component::ActionRow(ActionRow {
+                            components: vec![copy_button(), paste_button()],
+                        })),
+                )
+                .await?;
+
+            self.ctx
+                .insert_usage(UsageKind::TimezoneCalledUndetected)
+                .await?;
+        }
+
         Ok(())
     }
 
@@ -177,17 +253,52 @@ impl InteractionContext<'_> {
         self.ctx.insert_timezone(user_id, tz).await?;
 
         self.handle
+            .reply(Reply::new().ephemeral().embed(timezone_set_embed()))
+            .await?;
+
+        self.ctx
+            .insert_usage(UsageKind::TimezoneSetUndetected)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn handle_timezone_detect_accept(self) -> Result<()> {
+        let user_id = self.interaction.author_id().ok()?;
+        let tz = self
+            .interaction
+            .message
+            .ok()?
+            .embeds
+            .first()
+            .ok()?
+            .fields
+            .first()
+            .ok()?
+            .value
+            .parse()
+            .map_err(Error::TimezoneParseDetected)?;
+
+        self.ctx.insert_timezone(user_id, tz).await?;
+
+        self.handle
             .reply(
-                Reply::new().ephemeral().embed(
-                    embed()
-                        .title(":partying_face: welcome onboard")
-                        .description("now you can use me to show magical times")
-                        .build(),
-                ),
+                Reply::new()
+                    .ephemeral()
+                    .update_last()
+                    .embed(timezone_set_embed()),
             )
             .await?;
 
-        self.ctx.insert_usage(UsageKind::TimezoneSet).await?;
+        self.ctx
+            .insert_usage(UsageKind::TimezoneSetDetected)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn handle_timezone_detect_reject(mut self) -> Result<()> {
+        self.interaction.locale = Some("no-detect".to_owned());
+        self.handle_timezone_command().await?;
+
         Ok(())
     }
 }

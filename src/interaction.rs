@@ -55,6 +55,8 @@ impl<'ctx> InteractionContext<'ctx> {
             timezone::Command::NAME => self.handle_timezone_command().await,
             timezone::PASTE_BUTTON_CUSTOM_ID => self.handle_timezone_paste_button_click().await,
             timezone::MODAL_SUBMIT_ID => self.handle_timezone_modal_submit().await,
+            timezone::DETECT_ACCEPT_CUSTOM_ID => self.handle_timezone_detect_accept().await,
+            timezone::DETECT_REJECT_CUSTOM_ID => self.handle_timezone_detect_reject().await,
             date::Command::NAME => self.handle_date_command().await,
             copy::NAME => self.handle_copy_command().await,
             current_time::NAME => self.handle_current_time_command().await,

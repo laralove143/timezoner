@@ -32,7 +32,7 @@ trait Decode<T> {
 impl Decode<Result<Tz>> for String {
     #[allow(clippy::use_self)]
     fn decode(&self) -> Result<Tz> {
-        Ok(self.parse().map_err(Error::TimezoneParseError)?)
+        Ok(self.parse().map_err(Error::TimezoneParseDatabase)?)
     }
 }
 
@@ -43,8 +43,10 @@ pub enum UsageKind {
     TimeConvertByAuthor,
     TimeConvertByNonAuthor,
     Help,
-    TimezoneCalled,
-    TimezoneSet,
+    TimezoneCalledDetected,
+    TimezoneCalledUndetected,
+    TimezoneSetDetected,
+    TimezoneSetUndetected,
     Date,
     Copy,
     CurrentTime,

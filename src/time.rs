@@ -134,6 +134,34 @@ pub fn format(time: DateTime<Tz>, style: Option<Style>) -> String {
     )
 }
 
+pub fn tz_from_locale(locale: &str) -> Option<Tz> {
+    Some(match locale {
+        "da" | "de" => Tz::Europe__Berlin,
+        "fr" => Tz::Europe__Paris,
+        "hr" => Tz::Europe__Zagreb,
+        "it" => Tz::Europe__Rome,
+        "lt" => Tz::Europe__Vilnius,
+        "hu" | "ro" => Tz::Europe__Bucharest,
+        "nl" => Tz::Europe__Amsterdam,
+        "no" => Tz::Europe__Oslo,
+        "pl" => Tz::Poland,
+        "fi" => Tz::Europe__Helsinki,
+        "sv-SE" => Tz::Europe__Stockholm,
+        "vi" => Tz::Asia__Ho_Chi_Minh,
+        "tr" => Tz::Europe__Istanbul,
+        "cs" => Tz::Europe__Prague,
+        "el" => Tz::Europe__Athens,
+        "bg" => Tz::Europe__Sofia,
+        "uk" => Tz::Europe__Kiev,
+        "hi" => Tz::Asia__Calcutta,
+        "th" => Tz::Asia__Bangkok,
+        "ja" => Tz::Asia__Tokyo,
+        "zh-TW" => Tz::Asia__Taipei,
+        "ko" => Tz::Asia__Seoul,
+        _ => return None,
+    })
+}
+
 fn to_24_hour(hour: u32, am_pm: &str) -> Result<u32> {
     Ok(match am_pm.to_ascii_lowercase().as_str() {
         "am" => {

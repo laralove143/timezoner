@@ -60,8 +60,10 @@ pub enum Error {
     MetricsUpdateFail { get: Metrics, put: Metrics },
     #[error("unknown command: {0}")]
     UnknownCommand(String),
-    #[error("couldn't parse timezone: {0}")]
-    TimezoneParseError(String),
+    #[error("couldn't parse timezone from database: {0}")]
+    TimezoneParseDatabase(String),
+    #[error("couldn't parse detected timezone: {0}")]
+    TimezoneParseDetected(String),
     #[error("time doesn't end in am or pm: hour: {hour}, suffix: {suffix}")]
     Hour12InvalidSuffix { hour: u32, suffix: String },
     #[error("message without a time has time detect reaction by the bot")]
