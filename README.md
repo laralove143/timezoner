@@ -58,6 +58,10 @@ all you have to do is use the `/timezone` command to set your timezone, it takes
 
 ![example](examples/timezone.gif)
 
+the bot can even guess your timezone from your discord language
+
+![example](examples/timezone_detect.png)
+
 ## something not working? let's see
 
 ### bot doesn't react to a message
