@@ -74,21 +74,18 @@ the bot can even guess your timezone from your discord language
 
 1. if you unticked any permissions when adding the bot, kick the bot and invite it again without unticking any
    permissions, it actually needs them!
-2. remove the bot from channel or category permissions
-    1. right click a channel or category _(hold down on it on mobile)_
+2. fix channel or category permissions
+    1. right click on the channel or category where the bot doesn't work _(hold down on it on mobile)_
     2. select **edit channel/category** then press **permissions** _(**channel/category permissions** on mobile)_
     3. click **advanced permissions** if it's closed _(**advanced view** on mobile)_
-    4. **either remove the channel permissions:**
-        1. select **timezoner** or any role the bot has, scroll all the way down and click **remove ???** _(tap **edit** then the **- button** on mobile)_
-    5. **or add channel permissions for the bot:**
-        1. press that tiny **+ button** _(**add member** on mobile)_
-        2. search **timezoner** and select it
-        3. press **the green tick** next to permissions listed below
-            - manage webhooks
-            - read messages
-            - send messages
-            - manage messages
-            - add reactions
+    4. press that tiny **+ button** _(**add member** on mobile)_
+    5. search **timezoner** and select the one with the avatar
+    6. press **the green tick** next to permissions listed below
+        - manage webhooks
+        - read messages
+        - send messages
+        - manage messages
+        - add reactions
 
 ### something else? how could this happen??
 
