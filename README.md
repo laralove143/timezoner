@@ -1,23 +1,25 @@
 [join the server]: https://discord.com/invite/KUMdnjcE97
+[interchannel message mover]: https://github.com/laralove143/interchannel-message-mover
 
 # timezoner
 
-[![](https://custom-icon-badges.demolab.com/badge/add_to_your_server-invite-5865F2?style=for-the-badge&logo=discord&logoColor=ffffff)](https://discord.com/api/oauth2/authorize?client_id=909820903574106203&permissions=536947776&scope=bot%20applications.commands)
-[![](https://custom-icon-badges.demolab.com/discord/903367565349384202?style=for-the-badge&color=5865F2&logo=comment-discussion&label=join%20the%20server)](https://discord.com/invite/KUMdnjcE97)
-[![](https://custom-icon-badges.demolab.com/badge/dynamic/json?url=https://api.jsonstorage.net/v1/json/52e7ddba-9c54-4f66-8e42-5aff2634f2fa/fd6b3135-0275-4f8a-8cfc-3e8910da1743&style=for-the-badge&color=555555&logo=graph&label=%20&prefix=used%20in%20&query=$.guild_count&suffix=%20servers)](#timezoner)
-[![](https://custom-icon-badges.demolab.com/badge/dynamic/json?url=https://api.jsonstorage.net/v1/json/52e7ddba-9c54-4f66-8e42-5aff2634f2fa/fd6b3135-0275-4f8a-8cfc-3e8910da1743&style=for-the-badge&color=555555&logo=clock&label=%20&prefix=converted%20&query=$.usage_count&suffix=%20times)](#timezoner)
+[![add to your server](https://custom-icon-badges.demolab.com/badge/add_to_your_server-invite-5865F2?style=for-the-badge&logo=discord&logoColor=ffffff)](https://discord.com/api/oauth2/authorize?client_id=909820903574106203&permissions=536947776&scope=bot%20applications.commands)
+[![join the server](https://custom-icon-badges.demolab.com/discord/903367565349384202?style=for-the-badge&color=5865F2&logo=comment-discussion&label=join%20the%20server)](https://discord.com/invite/KUMdnjcE97)
+[![number of servers the bot is in](https://custom-icon-badges.demolab.com/badge/dynamic/json?url=https://api.jsonstorage.net/v1/json/52e7ddba-9c54-4f66-8e42-5aff2634f2fa/fd6b3135-0275-4f8a-8cfc-3e8910da1743&style=for-the-badge&color=555555&logo=graph&label=%20&prefix=used%20in%20&query=$.guild_count&suffix=%20servers)](#timezoner)
+[![number of times the bot converted a time](https://custom-icon-badges.demolab.com/badge/dynamic/json?url=https://api.jsonstorage.net/v1/json/52e7ddba-9c54-4f66-8e42-5aff2634f2fa/fd6b3135-0275-4f8a-8cfc-3e8910da1743&style=for-the-badge&color=555555&logo=clock&label=%20&prefix=converted%20&query=$.usage_count&suffix=%20times)](#timezoner)
 
-goodbye to timezone conversions! a discord bot that converts times so that everyone sees them in their own timezone
+goodbye to timezone conversions!
+a discord bot that converts times so that everyone sees them in their own timezone
 
 ## features
 
 ### convert a time in a message
 
-when there's a time in a message, the bot will add a reaction to it, just hit that reaction and everyone magically sees
-the time in their own timezone!
+when there's a time in a message, the bot will add a reaction to it,
+just hit that reaction and everyone magically sees the time in their own timezone!
 
-- only the person that sent the message needs to set their timezone, the ones reading the time don't even need to do
-  anything
+- only the person that sent the message needs to set their timezone,
+the ones reading the time don't even need to do anything
 - you can convert times even if you didn't send the message, it'll just dm you instead!
 - supports basically all the time formats
 
@@ -37,7 +39,8 @@ wanna include a date? the `/date` command is in your command
 
 ### share a date ANYwhere
 
-you can share a date in dms, other servers, even put it in your bio! just use the `/copy` command
+you can share a date in dms, other servers, even put it in your bio! just use
+the `/copy` command
 
 - consider asking the mods to add the bot to the other server though :)
 
@@ -45,16 +48,18 @@ you can share a date in dms, other servers, even put it in your bio! just use th
 
 ### learn what time it is for someone
 
-wanna know if your friend is asleep for example? now you can with just right clicking/tapping on a user then pressing
-_apps_ and then _get current time for user_
+wanna know if your friend is asleep for example? now you can with just right
+clicking/tapping on a user then pressing _apps_ and then _get current time for user_
 
 ![example](examples/get_current_time.gif)
 
 ## getting started
 
-all you have to do is use the `/timezone` command to set your timezone, it takes just a few seconds
+all you have to do is use the `/timezone` command to set your timezone,
+it takes just a few seconds
 
-- only the people that are sharing times need to do this, people seeing the times don't need to do anything!
+- only the people that are sharing times need to do this,
+people seeing the times don't need to do anything!
 
 ![example](examples/timezone.gif)
 
@@ -72,11 +77,13 @@ the bot can even guess your timezone from your discord language
 
 ### missing permissions
 
-1. if you unticked any permissions when adding the bot, kick the bot and invite it again without unticking any
-   permissions, it actually needs them!
+1. if you unticked any permissions when adding the bot, kick the bot and invite
+  it again without unticking any permissions, it actually needs them!
 2. fix channel or category permissions
-    1. right click on the channel or category where the bot doesn't work _(hold down on it on mobile)_
-    2. select **edit channel/category** then press **permissions** _(**channel/category permissions** on mobile)_
+    1. right click on the channel or category where the bot doesn't work
+    _(hold down on it on mobile)_
+    2. select **edit channel/category** then press **permissions**
+    _(**channel/category permissions** on mobile)_
     3. click **advanced permissions** if it's closed _(**advanced view** on mobile)_
     4. press that tiny **+ button** _(**add member** on mobile)_
     5. search **timezoner** and select the one with the avatar
@@ -104,7 +111,7 @@ please [join the server] and tell me
 
 ## check out my other bots
 
-- [interchannel message mover](https://github.com/laralove143/interchannel-message-mover): a discord bot to move
+- [interchannel message mover]: a discord bot to move
   messages between channels
 
 ## sponsors
@@ -114,14 +121,15 @@ please [join the server] and tell me
 
 ## terms of service
 
-- *"i" refers to lara kayaalp, the developer of timezoner*
-- *"you" refers to all users of the bot*
+- _"i" refers to lara kayaalp, the developer of timezoner_
+- _"you" refers to all users of the bot_
 
 ### privacy
 
 - your timezone is only used to convert times to timestamps
 - only your currently selected timezone is saved, no history is kept
-- unidentifiable, anonymous usage data is collected and used for advertisement and analytics
+- unidentifiable, anonymous usage data is collected and used
+for advertisement and analytics
 - no other data, including message content, is saved anywhere
 
 ### disclaimers
@@ -135,7 +143,8 @@ please [join the server] and tell me
 
 these clauses override all other licenses:
 
-- *"you" refers to the self-hoster of the bot*
-- you may not advertise the self-hosted bot, such as in app directory or on websites such as top.gg
+- _"you" refers to the self-hoster of the bot_
+- you may not advertise the self-hosted bot, such as in app directory
+or on websites such as top.gg
 - the self-hosted bot may not be in over 5 guilds
 - you must direct the feedback/support requests to me
