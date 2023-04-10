@@ -4,7 +4,7 @@ use sparkle_convenience::{
 };
 use twilight_interactions::command::{CommandModel, CommandOption, CreateCommand, CreateOption};
 
-use crate::{database::UsageKind, embed, interaction::InteractionContext, time};
+use crate::{database::UsageKind, interaction::InteractionContext, time};
 
 #[derive(Clone, Copy, CommandOption, CreateOption)]
 pub enum Style {
@@ -106,14 +106,7 @@ impl InteractionContext<'_> {
 
         let time = self.ctx.user_time(author_id, options).await?;
         self.handle
-            .reply(
-                Reply::new().embed(
-                    embed()
-                        .title(":calendar: mark this date")
-                        .description(time::format(time, options.style))
-                        .build(),
-                ),
-            )
+            .reply(Reply::new().content(time::format(time, options.style)))
             .await?;
 
         self.ctx.insert_usage(UsageKind::Date).await?;
