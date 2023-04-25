@@ -116,7 +116,8 @@ please [join the server] and tell me
 
 ## sponsors
 
-- [jason](https://github.com/zudsniper): thank you for funding the hosting!
+- [jason](https://github.com/zudsniper)
+- [grace](https://github.com/Grace-xo)
 - wanna see your name here? [support me with whatever amount you wish :)](https://github.com/sponsors/laralove143)
 
 ## terms of service
