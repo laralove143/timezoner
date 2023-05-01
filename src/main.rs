@@ -248,7 +248,7 @@ fn _err_reply(err: &anyhow::Error, is_timed: bool) -> Reply {
 
     if is_timed {
         embed = embed.footer(EmbedFooterBuilder::new(
-            "this message will self destruct in a minute",
+            "🧨 this message will self destruct in a minute",
         ));
     }
 
