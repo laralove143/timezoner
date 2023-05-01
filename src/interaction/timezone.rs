@@ -97,7 +97,7 @@ fn paste_button() -> Component {
 
 fn copy_button_example_embed() -> Result<Embed> {
     Ok(embed()
-        .title(":one:")
+        .title("1️⃣")
         .description(format!("press the *{COPY_BUTTON_LABEL}* button"))
         .image(ImageSource::url(COPY_BUTTON_EXAMPLE_URL)?)
         .build())
@@ -105,7 +105,7 @@ fn copy_button_example_embed() -> Result<Embed> {
 
 fn copy_timezone_example_embed() -> Result<Embed> {
     Ok(embed()
-        .title(":two:")
+        .title("2️⃣")
         .description("in the website that opens, press the *copy* button")
         .field(EmbedFieldBuilder::new(
             "if the detected timezone is wrong",
@@ -117,7 +117,7 @@ fn copy_timezone_example_embed() -> Result<Embed> {
 
 fn paste_button_example_embed() -> Result<Embed> {
     Ok(embed()
-        .title(":three:")
+        .title("3️⃣")
         .description(format!(
             "come back to discord and press the *{PASTE_BUTTON_LABEL}* button"
         ))
@@ -127,7 +127,7 @@ fn paste_button_example_embed() -> Result<Embed> {
 
 fn submit_timezone_example_embed() -> Result<Embed> {
     Ok(embed()
-        .title(":four:")
+        .title("4️⃣")
         .description(
             "paste the timezone you copied to the text field and press the *submit* button",
         )
@@ -137,7 +137,7 @@ fn submit_timezone_example_embed() -> Result<Embed> {
 
 fn timezone_example_gif_embed() -> Result<Embed> {
     Ok(embed()
-        .title(":frame_photo:")
+        .title("🖼️")
         .description("here's a gif if you prefer that over steps :)")
         .image(ImageSource::url(TIMEZONE_GIF_EXAMPLE_URL)?)
         .build())
@@ -145,14 +145,14 @@ fn timezone_example_gif_embed() -> Result<Embed> {
 
 fn timezone_set_embed() -> Embed {
     embed()
-        .title(":partying_face: welcome onboard")
+        .title("🥳 welcome onboard")
         .description("now you can use me to show magical times")
         .build()
 }
 
 fn timezone_detect_embed(tz: Tz) -> Embed {
     embed()
-        .title(":face_with_monocle: i have a guess")
+        .title("🧐 i have a guess")
         .field(EmbedFieldBuilder::new(
             "i think your timezone is",
             tz.name(),

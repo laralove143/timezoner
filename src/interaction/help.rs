@@ -63,7 +63,7 @@ fn missing_permissions_button() -> Component {
 
 fn help_embed(current_user: &CurrentUser) -> Result<Embed> {
     Ok(embed()
-        .title(":sos: support has arrived!")
+        .title("🆘 support has arrived!")
         .description(
             "please use that page button below, it gives more info than i could ever give here!",
         )
@@ -80,7 +80,7 @@ fn help_embed(current_user: &CurrentUser) -> Result<Embed> {
 
 fn missing_permissions_embed() -> Embed {
     embed()
-        .title(":scream: permissions error detected!")
+        .title("😱 permissions error detected!")
         .description("don't worry, click the button")
         .footer(EmbedFooterBuilder::new("and be happy"))
         .build()

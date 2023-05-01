@@ -243,7 +243,7 @@ fn _err_reply(err: &anyhow::Error, is_timed: bool) -> Reply {
     };
 
     let mut embed = embed()
-        .title(":x: catastrophic failure")
+        .title("❌ catastrophic failure")
         .description(description);
 
     if is_timed {
