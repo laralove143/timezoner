@@ -64,7 +64,7 @@ people seeing the times don't need to do anything!
 
 the bot can even guess your timezone from your discord language
 
-![example](https://github.com/laralove143/timezoner/blob/main/examples/timezone_detect.png)
+![example](https://github.com/laralove143/timezoner/blob/main/examples/timezone_detect.png?raw=true)
 
 ## something not working? let's see
 
