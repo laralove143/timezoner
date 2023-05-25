@@ -22,11 +22,11 @@ the ones reading the time don't even need to do anything
 - you can convert times even if you didn't send the message, it'll just dm you instead!
 - supports basically all the time formats
 
-![example](examples/sent.gif)
+![example](https://github.com/laralove143/timezoner/blob/main/examples/sent.gif?raw=true)
 
 and someone 8 hours behind sees:
 
-![example](examples/shown.png)
+![example](https://github.com/laralove143/timezoner/blob/main/examples/shown.png?raw=true)
 
 ### share a date
 
@@ -34,7 +34,7 @@ wanna include a date? the `/date` command is in your command
 
 - you can style it too, showing just the date for example
 
-![example](examples/date.gif)
+![example](https://github.com/laralove143/timezoner/blob/main/examples/date.gif?raw=true)
 
 ### share a date ANYwhere
 
@@ -43,14 +43,14 @@ the `/copy` command
 
 - consider asking the mods to add the bot to the other server though :)
 
-![example](examples/copy.gif)
+![example](https://github.com/laralove143/timezoner/blob/main/examples/copy.gif?raw=true)
 
 ### learn what time it is for someone
 
 wanna know if your friend is asleep for example? now you can with just right
 clicking/tapping on a user then pressing _apps_ and then _get current time for user_
 
-![example](examples/get_current_time.gif)
+![example](https://github.com/laralove143/timezoner/blob/main/examples/get_current_time.gif?raw=true)
 
 ## getting started
 
@@ -60,11 +60,11 @@ it takes just a few seconds
 - only the people that are sharing times need to do this,
 people seeing the times don't need to do anything!
 
-![example](examples/timezone.gif)
+![example](https://github.com/laralove143/timezoner/blob/main/examples/timezone.gif?raw=true)
 
 the bot can even guess your timezone from your discord language
 
-![example](examples/timezone_detect.png)
+![example](https://github.com/laralove143/timezoner/blob/main/examples/timezone_detect.png)
 
 ## something not working? let's see
 
