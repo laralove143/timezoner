@@ -1,10 +1,9 @@
 [join the server]: https://discord.com/invite/KUMdnjcE97
-[interchannel message mover]: https://github.com/laralove143/interchannel-message-mover
 
 # timezoner
 
 [![add to your server](https://custom-icon-badges.demolab.com/badge/add_to_your_server-invite-5865F2?style=for-the-badge&logo=discord&logoColor=ffffff)](https://discord.com/api/oauth2/authorize?client_id=909820903574106203&permissions=536947776&scope=bot%20applications.commands)
-[![join the server](https://custom-icon-badges.demolab.com/discord/903367565349384202?style=for-the-badge&color=5865F2&logo=comment-discussion&label=join%20the%20server)](https://discord.com/invite/KUMdnjcE97)
+[![join the server](https://custom-icon-badges.demolab.com/discord/903367565349384202?style=for-the-badge&color=5865F2&logo=comment-discussion&label=join%20the%20server)][join the server]
 [![number of servers the bot is in](https://custom-icon-badges.demolab.com/badge/dynamic/json?url=https://api.jsonstorage.net/v1/json/52e7ddba-9c54-4f66-8e42-5aff2634f2fa/fd6b3135-0275-4f8a-8cfc-3e8910da1743&style=for-the-badge&color=555555&logo=graph&label=%20&prefix=used%20in%20&query=$.guild_count&suffix=%20servers)](#timezoner)
 [![number of times the bot converted a time](https://custom-icon-badges.demolab.com/badge/dynamic/json?url=https://api.jsonstorage.net/v1/json/52e7ddba-9c54-4f66-8e42-5aff2634f2fa/fd6b3135-0275-4f8a-8cfc-3e8910da1743&style=for-the-badge&color=555555&logo=clock&label=%20&prefix=converted%20&query=$.usage_count&suffix=%20times)](#timezoner)
 
@@ -111,7 +110,7 @@ please [join the server] and tell me
 
 ## check out my other bots
 
-- [interchannel message mover]: a discord bot to move
+- [interchannel message mover](https://github.com/laralove143/interchannel-message-mover): a discord bot to move
   messages between channels
 
 ## sponsors
