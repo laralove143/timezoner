@@ -87,11 +87,12 @@ the bot can even guess your timezone from your discord language
     4. press that tiny **+ button** _(**add member** on mobile)_
     5. search **timezoner** and select the one with the avatar
     6. press **the green tick** next to permissions listed below
+        - view channel
         - manage webhooks
-        - read messages
         - send messages
-        - manage messages
         - add reactions
+        - manage messages
+        - read message history
 
 ### something else? how could this happen??
 
