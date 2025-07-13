@@ -1,21 +1,21 @@
-MIT License
+Copyright (c) 2025 Lara Kayaalp
 
-Copyright (c) 2021 Lara Kayaalp
+Any person or entity who uses, copies, modifies, or distributes this software or any part of it must include the original copyright notice and a copy of this license in all copies or substantial portions of the software.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+This software and any of its components may not be used for any commercial purpose. A commercial purpose is any use that is primarily intended for or directed toward commercial advantage or monetary compensation. This includes, but is not limited to, selling the software, using it in a product that is sold, or using it to generate revenue through advertising or subscriptions.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+You may not use the name of the software, the name of the original author, or any of its trademarks to endorse or promote any product, service, or entity without prior written permission from the original author. You are also prohibited from using the software itself as a means to advertise any third-party product, service, or Discord server.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+The software, or any derivative works based on this software, may not be used to provide services to more than five (5) Discord servers (guilds) simultaneously. Operating an instance of the bot that is connected to more than five servers is a violation of this license.
+
+All requests for support, bug reports, or other feedback should be directed to the officially listed support channels at https://lara.lv/timezoner.
+
+You are permitted to modify the source code of this software. However, you may not distribute the original or any modified version of this software to any third party. Any approved use of a modified version is bound by the terms of this license, retains all original copyright, license, and attribution notices, and may not be marketed or presented in a way that suggests it is the original software or that the original author endorses your changes.
+
+If any provision of this license is held to be unenforceable or invalid, such provision will be changed and interpreted to accomplish the objectives of such provision to the greatest extent possible under applicable law and the remaining provisions will continue in full force and effect.
+
+This license shall be governed by and construed in accordance with the laws of Türkiye, without regard to its conflict of law provisions.
+
+THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.

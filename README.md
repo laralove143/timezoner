@@ -18,7 +18,7 @@ when there's a time in a message, the bot will add a reaction to it,
 just hit that reaction and everyone magically sees the time in their own timezone!
 
 - only the person that sent the message needs to set their timezone,
-the ones reading the time don't even need to do anything
+  the ones reading the time don't even need to do anything
 - you can convert times even if you didn't send the message, it'll just dm you instead!
 - supports basically all the time formats
 
@@ -58,7 +58,7 @@ all you have to do is use the `/timezone` command to set your timezone,
 it takes just a few seconds
 
 - only the people that are sharing times need to do this,
-people seeing the times don't need to do anything!
+  people seeing the times don't need to do anything!
 
 ![example](https://github.com/laralove143/timezoner/blob/main/examples/timezone.gif?raw=true)
 
@@ -77,22 +77,22 @@ the bot can even guess your timezone from your discord language
 ### missing permissions
 
 1. if you unticked any permissions when adding the bot, kick the bot and invite
-  it again without unticking any permissions, it actually needs them!
+   it again without unticking any permissions, it actually needs them!
 2. fix channel or category permissions
-    1. right click on the channel or category where the bot doesn't work
-    _(hold down on it on mobile)_
-    2. select **edit channel/category** then press **permissions**
-    _(**channel/category permissions** on mobile)_
-    3. click **advanced permissions** if it's closed _(**advanced view** on mobile)_
-    4. press that tiny **+ button** _(**add member** on mobile)_
-    5. search **timezoner** and select the one with the avatar
-    6. press **the green tick** next to permissions listed below
-        - view channel
-        - manage webhooks
-        - send messages
-        - add reactions
-        - manage messages
-        - read message history
+   1. right click on the channel or category where the bot doesn't work
+      _(hold down on it on mobile)_
+   2. select **edit channel/category** then press **permissions**
+      _(**channel/category permissions** on mobile)_
+   3. click **advanced permissions** if it's closed _(**advanced view** on mobile)_
+   4. press that tiny **+ button** _(**add member** on mobile)_
+   5. search **timezoner** and select the one with the avatar
+   6. press **the green tick** next to permissions listed below
+      - view channel
+      - manage webhooks
+      - send messages
+      - add reactions
+      - manage messages
+      - read message history
 
 ### something else? how could this happen??
 
@@ -130,7 +130,7 @@ please [join the server] and tell me
 - your timezone is only used to convert times to timestamps
 - only your currently selected timezone is saved, no history is kept
 - unidentifiable, anonymous usage data is collected and used
-for advertisement and analytics
+  for advertisement and analytics
 - no other data, including message content, is saved anywhere
 
 ### disclaimers
@@ -139,13 +139,3 @@ for advertisement and analytics
 - i am not responsible for this copied data
 - i am the sole owner and developer of this bot
 - the hosted application is built directly from this repo
-
-### self-hosting
-
-these clauses override all other licenses:
-
-- _"you" refers to the self-hoster of the bot_
-- you may not advertise the self-hosted bot, such as in app directory
-or on websites such as top.gg
-- the self-hosted bot may not be in over 5 guilds
-- you must direct the feedback/support requests to me
