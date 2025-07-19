@@ -1,3 +1,9 @@
-.DS_Store
-.nova/
-target/
+/_build/
+/cover/
+/deps/
+/doc/
+erl_crash.dump
+*.ez
+timezoner-*.tar
+/tmp/
+/config/config.exs
