@@ -1,15 +1,13 @@
-defmodule Timezoner.Supervisor do
-  use Supervisor
+defmodule Timezoner.Application do
+  use Application
 
-  def start_link(args) do
-    Supervisor.start_link(__MODULE__, args, name: __MODULE__)
-  end
+  def start(_type, _args) do
+    children = [
+      Timezoner.Consumer
+    ]
 
-  @impl true
-  def init(_init_arg) do
-    children = [Timezoner.Consumer]
-
-    Supervisor.init(children, strategy: :one_for_one)
+    opts = [strategy: :one_for_one, name: Timezoner.Supervisor]
+    Supervisor.start_link(children, opts)
   end
 end
 
