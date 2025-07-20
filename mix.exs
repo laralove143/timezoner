@@ -14,7 +14,7 @@ defmodule Timezoner.MixProject do
   def application do
     [
       extra_applications: [:logger],
-      mod: {Timezoner.Application, []}
+      mod: {Timezoner.Main, []}
     ]
   end
 
