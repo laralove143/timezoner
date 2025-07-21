@@ -16,7 +16,7 @@ defmodule Timezoner.Component do
     %{type: 10, content: text}
   end
 
-  def container() do
+  def container do
     %{
       type: 17,
       accent_color: 0x57E8F2,

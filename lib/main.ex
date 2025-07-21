@@ -1,10 +1,10 @@
 defmodule Timezoner.Main do
   use Application
 
-  def start(_type, _args) do
-    Supervisor.start_link([Timezoner.Consumer],
+  def start(_, _) do
+    Supervisor.start_link([Timezoner.Consumer, Timezoner.StatusUpdater],
       strategy: :one_for_one,
-      name: Timezoner.Supervisor
+      name: __MODULE__
     )
   end
 end

@@ -5,8 +5,19 @@ defmodule Timezoner.Interactions.Help do
   alias Timezoner.{Component, Error}
   alias Nostrum.Struct.Component.{ActionRow, Button}
 
+  @impl true
   def name, do: "help"
 
+  @impl true
+  def command do
+    %{
+      name: name(),
+      description: "Get information about the bot",
+      type: Nostrum.Constants.ApplicationCommandType.chat_input()
+    }
+  end
+
+  @impl true
   def handle(interaction) do
     title_section =
       Component.section("https://cdn.lara.lv/emoji/sos.gif")
@@ -96,13 +107,5 @@ defmodule Timezoner.Interactions.Help do
       }
     })
     |> Error.handle()
-  end
-
-  def command do
-    %{
-      name: name(),
-      description: "Get information about the bot",
-      type: Nostrum.Constants.ApplicationCommandType.chat_input()
-    }
   end
 end

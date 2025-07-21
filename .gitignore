@@ -6,4 +6,4 @@ erl_crash.dump
 *.ez
 timezoner-*.tar
 /tmp/
-/config/config.exs
+/config/runtime.exs
