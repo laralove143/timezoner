@@ -25,13 +25,15 @@ defmodule Timezoner.Component do
   end
 
   def put_text(component, text) do
+    # credo:disable-for-next-line Credo.Check.Refactor.AppendSingleItem
     %{component | components: component.components ++ [text(text)]}
   end
 
   def put_media(component, media_url) do
     %{
       component
-      | components: component.components ++ [%{type: 12, items: [%{media: %{url: media_url}}]}]
+      | # credo:disable-for-next-line Credo.Check.Refactor.AppendSingleItem
+        components: component.components ++ [%{type: 12, items: [%{media: %{url: media_url}}]}]
     }
   end
 end

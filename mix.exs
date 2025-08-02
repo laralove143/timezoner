@@ -6,6 +6,7 @@ defmodule Timezoner.MixProject do
       app: :timezoner,
       version: "0.1.0",
       elixir: "~> 1.18",
+      # credo:disable-for-next-line Credo.Check.Warning.MixEnv
       start_permanent: Mix.env() == :prod,
       deps: deps()
     ]
@@ -20,7 +21,8 @@ defmodule Timezoner.MixProject do
 
   defp deps do
     [
-      {:nostrum, "~> 0.10"}
+      {:nostrum, "~> 0.10"},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
     ]
   end
 end

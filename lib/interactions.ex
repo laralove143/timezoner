@@ -11,10 +11,14 @@ defmodule Timezoner.Interactions do
     commands = Enum.map(commands(), fn cmd -> cmd.command() end)
 
     if guild_id do
-      ApplicationCommand.bulk_overwrite_guild_commands(guild_id, commands) |> Error.handle()
+      guild_id
+      |> ApplicationCommand.bulk_overwrite_guild_commands(commands)
+      |> Error.handle()
     end
 
-    ApplicationCommand.bulk_overwrite_global_commands(commands) |> Error.handle()
+    commands
+    |> ApplicationCommand.bulk_overwrite_global_commands()
+    |> Error.handle()
   end
 
   def handle(interaction) do
