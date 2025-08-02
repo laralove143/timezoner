@@ -22,7 +22,8 @@ defmodule Timezoner.MixProject do
   defp deps do
     [
       {:nostrum, "~> 0.10"},
-      {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:exsync, "~> 0.4", only: :dev}
     ]
   end
 end
