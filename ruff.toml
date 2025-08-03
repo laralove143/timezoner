@@ -1,0 +1,97 @@
+target-version = "py312"
+
+[format]
+docstring-code-format = true
+skip-magic-trailing-comma = true
+
+[lint]
+ignore = [
+  "COM812",
+  "COM819",
+  "D10",
+  "D206",
+  "D300",
+  "E111",
+  "E114",
+  "E117",
+  "FBT001",
+  "FBT002",
+  "ISC001",
+  "ISC002",
+  "PLR2004",
+  "Q000",
+  "Q001",
+  "Q002",
+  "Q003",
+  "S101",
+  "TRY002",
+  "TRY003",
+  "W191",
+]
+select = [
+  "A",
+  "AIR",
+  "ARG",
+  "ASYNC",
+  "B",
+  "BLE",
+  "C4",
+  "C90",
+  "COM",
+  "CPY",
+  "D",
+  "DJ",
+  "DOC",
+  "DTZ",
+  "E",
+  "EM",
+  "ERA",
+  "EXE",
+  "F",
+  "FA",
+  "FAST",
+  "FBT",
+  "FIX",
+  "FLY",
+  "FURB",
+  "G",
+  "I",
+  "ICN",
+  "INP",
+  "INT",
+  "ISC",
+  "LOG",
+  "N",
+  "NPY",
+  "PD",
+  "PERF",
+  "PGH",
+  "PIE",
+  "PL",
+  "PT",
+  "PTH",
+  "PYI",
+  "Q",
+  "RET",
+  "RSE",
+  "RUF",
+  "S",
+  "SIM",
+  "SLF",
+  "SLOT",
+  "T10",
+  "TCH",
+  "TD",
+  "TID",
+  "TRY",
+  "UP",
+  "W",
+  "YTT",
+]
+
+[lint.pycodestyle]
+ignore-overlong-task-comments = true
+max-doc-length = 88
+
+[lint.pydocstyle]
+convention = "pep257"

@@ -14,8 +14,7 @@
       strict: true,
       checks: %{
         disabled: [
-          {Credo.Check.Readability.ModuleDoc, []},
-          {Credo.Check.Readability.Specs, []}
+          {Credo.Check.Readability.ModuleDoc, []}
         ],
         extra: [
           {Credo.Check.Refactor.UtcNowTruncate, []},
@@ -33,7 +32,6 @@
           {Credo.Check.Readability.SeparateAliasRequire, []},
           {Credo.Check.Readability.SingleFunctionToBlockPipe, []},
           {Credo.Check.Readability.SinglePipe, []},
-          {Credo.Check.Readability.Specs, []},
           {Credo.Check.Readability.StrictModuleLayout, []},
           {Credo.Check.Readability.WithCustomTaggedTuple, []},
           {Credo.Check.Refactor.ABCSize, []},

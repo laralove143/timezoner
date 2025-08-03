@@ -8,7 +8,7 @@ config :nostrum,
   ffmpeg: nil,
   log_full_events: Mix.env() != :prod,
   log_dispatch_events: Mix.env() != :prod,
-  gateway_intents: [:guilds]
+  gateway_intents: [:guilds, :guild_messages, :direct_messages, :message_content]
 
 config :logger, :console,
   level: if(Mix.env() == :prod, do: :info, else: :debug),

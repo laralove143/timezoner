@@ -12,4 +12,8 @@ defmodule Timezoner.Consumer do
   def handle_event({:INTERACTION_CREATE, interaction, _}) do
     Interactions.handle(interaction)
   end
+
+  def handle_event({:MESSAGE_CREATE, message, _}) do
+    Timezoner.MessageCreate.handle(message)
+  end
 end

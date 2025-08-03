@@ -9,7 +9,6 @@ defmodule Timezoner.StatusUpdater do
   end
 
   @impl GenServer
-  @spec init(any()) :: {:ok, nil}
   def init(_) do
     {:ok, nil}
   end

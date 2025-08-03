@@ -1,0 +1,11 @@
+{
+  "deprecateTypingAliases": true,
+  "reportCallInDefaultInitializer": "warning",
+  "reportImplicitOverride": "warning",
+  "reportImportCycles": "warning",
+  "reportMissingSuperCall": "warning",
+  "reportPropertyTypeMismatch": "warning",
+  "reportShadowedImports": "warning",
+  "reportUninitializedInstanceVariable": "warning",
+  "reportUnnecessaryTypeIgnoreComment": "warning"
+}

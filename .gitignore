@@ -1,9 +1,11 @@
+*.ez
 /_build/
+/.elixir_ls/
+/config/runtime.exs
 /cover/
 /deps/
 /doc/
-erl_crash.dump
-*.ez
-timezoner-*.tar
 /tmp/
-/config/runtime.exs
+erl_crash.dump
+timezoner-*.tar
+priv/.venv

@@ -13,5 +13,5 @@ defmodule Timezoner.Error do
     end
   end
 
-  def handle(_, _), do: :ok
+  def handle(value, _), do: value
 end
