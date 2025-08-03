@@ -5,7 +5,11 @@
       "label": "run",
       "type": "shell",
       "command": "iex -S mix",
-      "problemMatcher": []
+      "problemMatcher": [],
+      "presentation": {
+        "clear": true,
+        "focus": true
+      }
     }
   ]
 }
