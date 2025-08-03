@@ -23,7 +23,8 @@ defmodule Timezoner.MixProject do
     [
       {:nostrum, "~> 0.10"},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
-      {:exsync, "~> 0.4", only: :dev}
+      {:exsync, "~> 0.4", only: :dev},
+      {:nimble_pool, "~> 1.1"}
     ]
   end
 end

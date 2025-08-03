@@ -1,53 +1,71 @@
 defmodule Timezoner.DatetimeParser do
-  use GenServer
+  @behaviour NimblePool
 
-  alias Timezoner.Error
-  require Logger
-
-  def start_link(_) do
-    GenServer.start_link(__MODULE__, %{}, name: __MODULE__)
+  def start_link do
+    NimblePool.start_link(worker: {__MODULE__, []}, name: __MODULE__)
   end
 
-  defp start_port do
-    priv_dir = Application.app_dir(:timezoner, "priv")
-
-    Port.open({:spawn, "#{priv_dir}/.venv/bin/python #{priv_dir}/datetime_parse.py"}, [
-      {:packet, 4},
-      :binary,
-      :exit_status,
-      :nouse_stdio
-    ])
-  end
-
-  @impl GenServer
-  def init(_) do
-    {:ok, %{port: start_port()}}
+  def child_spec(_) do
+    %{
+      id: __MODULE__,
+      start: {__MODULE__, :start_link, []}
+    }
   end
 
   def parse(content, tz) do
-    __MODULE__
-    |> GenServer.call({:parse, content, tz})
-    |> Error.handle("parsing datetime failed")
+    payload = Jason.encode!(%{content: content, tz: tz})
+
+    NimblePool.checkout!(__MODULE__, :checkout, fn _, port ->
+      send_command(port, payload)
+    end)
   end
 
-  @impl GenServer
-  def handle_call({:parse, content, tz}, _, state) do
-    payload = Jason.encode!(%{content: content, tz: tz})
-    Port.command(state.port, payload)
+  defp send_command(port, payload) do
+    send(port, {self(), {:command, payload}})
 
     receive do
-      {_, {:data, data}} ->
-        {:reply, Jason.decode(data), state}
+      {^port, {:data, data}} ->
+        data = Jason.decode(data)
 
-      {:error, err} ->
-        {:reply, {:error, err}, state}
+        Process.unlink(port)
+        {data, :ok}
+
+      {^port, {:exit_status, status}} ->
+        {{:error, "datetime parse process exited with status #{status}"}, :close}
+    after
+      5000 ->
+        {{:error, "datetime parse timeout"}, :close}
     end
   end
 
-  @impl GenServer
-  def handle_info({port, {:exit_status, status}}, state) when port == state.port do
-    Logger.warning("datetime parse process exited with status #{status}, restarting")
+  @impl NimblePool
+  def init_worker(pool_state) do
+    priv_dir = Application.app_dir(:timezoner, "priv")
 
-    {:noreply, %{state | port: start_port()}}
+    port =
+      Port.open({:spawn, "#{priv_dir}/.venv/bin/python #{priv_dir}/datetime_parse.py"}, [
+        {:packet, 4},
+        :binary,
+        :exit_status,
+        :nouse_stdio
+      ])
+
+    {:ok, port, pool_state}
+  end
+
+  @impl NimblePool
+  def handle_checkout(:checkout, {pid, _}, port, pool_state) do
+    Port.connect(port, pid)
+    {:ok, port, port, pool_state}
+  end
+
+  @impl NimblePool
+  def handle_checkin(:ok, _, port, pool_state) do
+    {:ok, port, pool_state}
+  end
+
+  @impl NimblePool
+  def handle_checkin(:close, _, _, pool_state) do
+    {:remove, :closed, pool_state}
   end
 end

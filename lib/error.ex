@@ -11,6 +11,8 @@ defmodule Timezoner.Error do
     else
       Logger.error(err_msg)
     end
+
+    {:error, err}
   end
 
   def handle(value, _), do: value

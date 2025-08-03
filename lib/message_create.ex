@@ -1,7 +1,10 @@
 defmodule Timezoner.MessageCreate do
   alias Timezoner.DatetimeParser
+  alias Timezoner.Error
 
   def handle(message) do
-    DatetimeParser.parse(message.content, "UTC") |> dbg()
+    message.content
+    |> DatetimeParser.parse("UTC")
+    |> Error.handle()
   end
 end
