@@ -1,4 +1,6 @@
 {
+  "venvPath": "./priv",
+  "venv": ".venv",
   "deprecateTypingAliases": true,
   "reportCallInDefaultInitializer": "warning",
   "reportImplicitOverride": "warning",
