@@ -59,7 +59,7 @@ defmodule Timezoner.Interactions.Help do
     |> Component.put_text(
       "-# Only the person that sent the message needs to set their timezone, the ones reading the time don't even need to do anything."
     )
-    |> Component.put_media("https://cdn.lara.lv/timezoner/help/convert.gif")
+    |> Component.put_media("https://cdn.lara.lv/timezoner/help/placeholder-example.png")
   end
 
   defp date_container do
@@ -69,7 +69,7 @@ defmodule Timezoner.Interactions.Help do
       "You can also send a time or date directly by using the command `/date`."
     )
     |> Component.put_text("-# You can style it too, showing just the date for example.")
-    |> Component.put_media("https://cdn.lara.lv/timezoner/help/date.gif")
+    |> Component.put_media("https://cdn.lara.lv/timezoner/help/placeholder-example.png")
   end
 
   defp copy_container do
@@ -81,7 +81,7 @@ defmodule Timezoner.Interactions.Help do
     |> Component.put_text(
       "-# You can even use this in your bio, maybe to show what your noon is to others."
     )
-    |> Component.put_media("https://cdn.lara.lv/timezoner/help/copy.mov")
+    |> Component.put_media("https://cdn.lara.lv/timezoner/help/placeholder-example.png")
   end
 
   defp user_time_container do
@@ -93,7 +93,7 @@ defmodule Timezoner.Interactions.Help do
     |> Component.put_text(
       "-# Just remember that the other user needs to set their timezone first."
     )
-    |> Component.put_media("https://cdn.lara.lv/timezoner/help/user-time.gif")
+    |> Component.put_media("https://cdn.lara.lv/timezoner/help/placeholder-example.png")
   end
 
   defp footer_section do
