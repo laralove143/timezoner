@@ -13,3 +13,6 @@ config :nostrum,
 config :logger, :console,
   level: if(Mix.env() == :prod, do: :info, else: :debug),
   metadata: [:shard, :guild, :channel]
+
+config :tz_world,
+  backend: TzWorld.Backend.DetsWithIndexCache

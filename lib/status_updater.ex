@@ -5,7 +5,7 @@ defmodule Timezoner.StatusUpdater do
   alias Nostrum.Cache.GuildCache
 
   def start_link(_) do
-    GenServer.start_link(__MODULE__, %{}, name: __MODULE__)
+    GenServer.start_link(__MODULE__, nil, name: __MODULE__)
   end
 
   @impl GenServer

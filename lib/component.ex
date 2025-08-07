@@ -1,8 +1,8 @@
 defmodule Timezoner.Component do
-  def section(media_url) do
+  def section(media_url, components) do
     %{
       type: 9,
-      components: [],
+      components: components,
       accessory: %{
         type: 11,
         media: %{
@@ -16,24 +16,15 @@ defmodule Timezoner.Component do
     %{type: 10, content: text}
   end
 
-  def container do
+  def media_gallery(media_urls) do
+    %{type: 12, items: Enum.map(media_urls, &%{media: %{url: &1}})}
+  end
+
+  def container(components) do
     %{
       type: 17,
       accent_color: 0x57E8F2,
-      components: []
-    }
-  end
-
-  def put_text(component, text) do
-    # credo:disable-for-next-line Credo.Check.Refactor.AppendSingleItem
-    %{component | components: component.components ++ [text(text)]}
-  end
-
-  def put_media(component, media_url) do
-    %{
-      component
-      | # credo:disable-for-next-line Credo.Check.Refactor.AppendSingleItem
-        components: component.components ++ [%{type: 12, items: [%{media: %{url: media_url}}]}]
+      components: components
     }
   end
 end

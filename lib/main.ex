@@ -4,9 +4,12 @@ defmodule Timezoner.Main do
   def start(_, _) do
     Supervisor.start_link(
       [
+        Geocoder.Supervisor,
         Timezoner.Consumer,
+        Timezoner.DatetimeParser,
         Timezoner.StatusUpdater,
-        Timezoner.DatetimeParser
+        Timezoner.TzWorldUpdater,
+        TzWorld.Backend.DetsWithIndexCache
       ],
       strategy: :one_for_one,
       name: __MODULE__

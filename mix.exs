@@ -21,10 +21,13 @@ defmodule Timezoner.MixProject do
 
   defp deps do
     [
-      {:nostrum, "~> 0.10"},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:exsync, "~> 0.4", only: :dev},
-      {:nimble_pool, "~> 1.1"}
+      {:geocoder, "~> 2.2"},
+      {:httpoison, "~> 2.2"},
+      {:nimble_pool, "~> 1.1"},
+      {:nostrum, "~> 0.10"},
+      {:tz_world, "~> 1.3"}
     ]
   end
 end

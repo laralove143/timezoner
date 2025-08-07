@@ -3,7 +3,7 @@ defmodule Timezoner.Interactions do
   alias Timezoner.Error
 
   def commands do
-    [Timezoner.Interactions.Help]
+    [Timezoner.Interactions.Help, Timezoner.Interactions.Timezone]
   end
 
   def register do
