@@ -26,7 +26,7 @@ const SUBMIT_TIMEZONE_EXAMPLE_URL: &str =
 const TIMEZONE_GIF_EXAMPLE_URL: &str =
     "https://github.com/laralove143/timezoner/blob/main/examples/timezone.gif?raw=true";
 
-const TIMEZONE_PICKER_URL: &str = "https://kevinnovak.github.io/Time-Zone-Picker/";
+const TIMEZONE_PICKER_URL: &str = "https://zones.arilyn.cc/";
 
 const COPY_BUTTON_LABEL: &str = "copy your timezone";
 const PASTE_BUTTON_LABEL: &str = "paste it";
